@@ -6,11 +6,11 @@ import { Menu, X } from "lucide-react";
 import { LanguagePicker } from "@/components/languagePicker";
 import { ThemePicker } from "@/components/themePicker";
 import { useTranslations } from "@/utils/translations";
+import { getNavbarBreakpoint } from "@/utils/getBreakpoint";
 
 interface NavbarProps {
   lang: string;
   table: string;
-  mobileThreshold: number; // Valore che recuperi dal database
 }
 
 function MenuList({ menuItems }: { menuItems: string[] }) {
@@ -27,23 +27,35 @@ function MenuList({ menuItems }: { menuItems: string[] }) {
   );
 }
 
-export default function Navbar({ lang, table, mobileThreshold }: NavbarProps) {
+export default function Navbar({ lang, table }: NavbarProps) {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { translations, loadAllTranslations } = useTranslations();
 
+  const [breakpoint, setBreakpoint] = useState<number | null>(null);
+
   useEffect(() => {
-    setMounted(true);
-    setIsMobile(mobileThreshold >= window.innerWidth);
+    const fetchBreakpoint = async () => {
+      const currentBreakpoint = await getNavbarBreakpoint(lang);
+      setBreakpoint(currentBreakpoint);
+    };
+
+    fetchBreakpoint();
+
+    if (breakpoint !== null) {
+      setIsMobile(breakpoint >= window.innerWidth);
+    }
 
     if (Object.keys(translations).length === 0) {
       loadAllTranslations().then(() => setLoading(false));
     } else {
       setLoading(false);
     }
-  }, [translations, loadAllTranslations, mobileThreshold]);
+
+    setMounted(true);
+  }, [translations, loadAllTranslations, breakpoint, lang]);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   if (!mounted) return null;

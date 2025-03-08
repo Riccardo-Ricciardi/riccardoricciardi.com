@@ -25,7 +25,7 @@ export async function getTranslations(): Promise<{
 
   const allTranslations: { [lang: string]: { [component: string]: string[] } } =
     {};
-  const components = ["competenze", "navbar"]; // Aggiungi altri componenti se necessario
+  const components = ["competenze", "navbar"];
 
   for (const language of languages) {
     const translationsForLanguage: { [component: string]: string[] } = {};
