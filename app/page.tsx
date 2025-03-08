@@ -8,7 +8,7 @@ export default function Page() {
 
   return (
     <>
-      <Navbar lang={language} table="navbar" />
+      <Navbar lang={language} table="navbar" mobileThreshold={510}/>
     </>
   );
 }

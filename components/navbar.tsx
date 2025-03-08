@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import { LanguagePicker } from "@/components/languagePicker";
 import { ThemePicker } from "@/components/themePicker";
 import { useTranslations } from "@/utils/translations";
+
 interface NavbarProps {
   lang: string;
   table: string;
@@ -35,7 +36,7 @@ export default function Navbar({ lang, table, mobileThreshold }: NavbarProps) {
 
   useEffect(() => {
     setMounted(true);
-    setIsMobile(window.innerWidth <= mobileThreshold);
+    setIsMobile(mobileThreshold >= window.innerWidth);
 
     if (Object.keys(translations).length === 0) {
       loadAllTranslations().then(() => setLoading(false));
