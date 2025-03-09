@@ -75,7 +75,7 @@ export default function Navbar({ lang, table }: NavbarProps) {
               <>
                 <MenuList menuItems={translations[lang]?.[table] || []} />
                 <li className="flex items-center space-x-3">
-                  <ThemePicker isMobile={isMobile} />
+                  <ThemePicker />
                   <LanguagePicker isMobile={isMobile} />
                 </li>
               </>
@@ -103,7 +103,7 @@ export default function Navbar({ lang, table }: NavbarProps) {
             <>
               <MenuList menuItems={translations[lang]?.[table] || []} />
               <li className="flex items-center space-x-3">
-                <ThemePicker isMobile={isMobile} />
+                <ThemePicker />
                 <LanguagePicker isMobile={isMobile} />
               </li>
             </>
