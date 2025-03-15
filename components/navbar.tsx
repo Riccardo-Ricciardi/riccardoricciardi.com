@@ -1,115 +1,116 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import { LanguagePicker } from "@/components/languagePicker";
 import { ThemePicker } from "@/components/themePicker";
-import { useTranslations } from "@/utils/translations";
-import { getNavbarBreakpoint } from "@/utils/getBreakpoint";
+import { useTranslationStore } from "@/utils/useTranslations";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface NavbarProps {
-  lang: string;
+  language: string;
   table: string;
+  isMobile: boolean;
 }
 
-function MenuList({ menuItems }: { menuItems: string[] }) {
+export default function Navbar({ language, table, isMobile }: NavbarProps) {
+  const [isMounted, setIsMounted] = useState(false);
+  const { translations, loadTranslations } = useTranslationStore();
+
+  useEffect(() => {
+    if (Object.keys(translations).length === 0) {
+      loadTranslations().then(() => setIsMounted(true));
+    } else {
+      setIsMounted(true);
+    }
+  }, [translations, loadTranslations]);
+
+  if (!isMounted) return null;
+
   return (
-    <>
-      {menuItems.map((text) => (
-        <li key={text}>
-          <Link href="#" className="whitespace-nowrap">
+    <Card className="border-grid top-0 z-50 w-full border-0 rounded-none bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div
+        className="mx-auto h-14 flex justify-between items-center"
+        style={{ width: "clamp(0px, 80%, 1200px)" }}
+      >
+        <h1 className="text-xl font-bold text-primary">
+          Logo
+        </h1>
+
+        {isMobile ? (
+          <div className="flex items-center space-x-2">
+            <ThemePicker />
+            <LanguagePicker />
+            <NavbarMobile language={language} table={table} />
+          </div>
+        ) : (
+          <div className="flex items-center space-x-2">
+            <NavbarDesktop language={language} table={table} />
+            <ThemePicker />
+            <LanguagePicker />
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
+
+function NavbarDesktop({
+  language,
+  table,
+}: {
+  language: string;
+  table: string;
+}) {
+  const { translations } = useTranslationStore();
+  const menuItems = translations?.[language]?.[table] ?? [];
+
+  return (
+    <ul className="flex items-center space-x-2 pl-16 text-card-foreground">
+      {menuItems.map((text, index) => (
+        <li key={index}>
+          <Link href={`/${text.toLowerCase()}`} className="whitespace-nowrap">
             {text}
           </Link>
         </li>
       ))}
-    </>
+    </ul>
   );
 }
 
-export default function Navbar({ lang, table }: NavbarProps) {
-  const [mounted, setMounted] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const { translations, loadAllTranslations } = useTranslations();
-
-  const [breakpoint, setBreakpoint] = useState<number | null>(null);
-
-  useEffect(() => {
-    const fetchBreakpoint = async () => {
-      const currentBreakpoint = await getNavbarBreakpoint(lang);
-      setBreakpoint(currentBreakpoint);
-    };
-
-    fetchBreakpoint();
-
-    if (breakpoint !== null) {
-      setIsMobile(breakpoint >= window.innerWidth);
-    }
-
-    if (Object.keys(translations).length === 0) {
-      loadAllTranslations().then(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
-
-    setMounted(true);
-  }, [translations, loadAllTranslations, breakpoint, lang]);
-
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-  if (!mounted) return null;
+function NavbarMobile({
+  language,
+  table,
+}: {
+  language: string;
+  table: string;
+}) {
+  const { translations } = useTranslationStore();
+  const menuItems = translations?.[language]?.[table] ?? [];
 
   return (
-    <nav className="bg-secondary">
-      <div
-        className="mx-auto flex justify-between items-center py-4"
-        style={{ width: "clamp(0px, 80%, 1200px)" }}
-      >
-        <h1 className="text-xl font-bold text-primary">Logo</h1>
-        {!isMobile ? (
-          <ul className="flex items-center space-x-6 pl-16 text-primary">
-            {loading ? (
-              <li>Caricamento...</li>
-            ) : (
-              <>
-                <MenuList menuItems={translations[lang]?.[table] || []} />
-                <li className="flex items-center space-x-3">
-                  <ThemePicker />
-                  <LanguagePicker isMobile={isMobile} />
-                </li>
-              </>
-            )}
-          </ul>
-        ) : (
-          <div className="flex items-center">
-            {isMobileMenuOpen ? (
-              <X className="text-primary" onClick={toggleMobileMenu} />
-            ) : (
-              <Menu className="text-primary" onClick={toggleMobileMenu} />
-            )}
-          </div>
-        )}
-      </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="icon">
+          <Menu />
+        </Button>
+      </DropdownMenuTrigger>
 
-      {isMobileMenuOpen && (
-        <ul
-          className="mx-auto py-4 text-primary space-y-2"
-          style={{ width: "clamp(0px, 80%, 1200px)" }}
-        >
-          {loading ? (
-            <li>Caricamento...</li>
-          ) : (
-            <>
-              <MenuList menuItems={translations[lang]?.[table] || []} />
-              <li className="flex items-center space-x-3">
-                <ThemePicker />
-                <LanguagePicker isMobile={isMobile} />
-              </li>
-            </>
-          )}
-        </ul>
-      )}
-    </nav>
+      <DropdownMenuContent align="end">
+        {menuItems.map((text, index) => (
+          <DropdownMenuItem key={index}>
+            <Link href={`/${text.toLowerCase()}`}>{text}</Link>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

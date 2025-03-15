@@ -22,11 +22,7 @@ export const useLanguageStore = create<LanguageStore>((set) => ({
   setLanguage: (newLanguage: string) => set({ language: newLanguage }),
 }));
 
-interface LanguagePickerProps {
-  isMobile: boolean;
-}
-
-export function LanguagePicker({ isMobile }: LanguagePickerProps) {
+export function LanguagePicker() {
   const { language, setLanguage } = useLanguageStore();
 
   return (
@@ -36,14 +32,14 @@ export function LanguagePicker({ isMobile }: LanguagePickerProps) {
           <Languages />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align={isMobile ? "start" : "end"}>
+      <DropdownMenuContent align="end">
         <DropdownMenuItem
           onClick={() => setLanguage("en")}
           className={`flex items-center gap-2 ${
             language === "en" ? "font-bold" : ""
           }`}
         >
-          <GB title="Great Britain"/>
+          <GB title="Great Britain" />
           English
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -52,7 +48,7 @@ export function LanguagePicker({ isMobile }: LanguagePickerProps) {
             language === "it" ? "font-bold" : ""
           }`}
         >
-          <IT title="Italy"/>
+          <IT title="Italy" />
           Italiano
         </DropdownMenuItem>
       </DropdownMenuContent>

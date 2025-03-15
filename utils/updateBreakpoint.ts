@@ -1,58 +1,54 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
-export function breakpoint(
-  h1Ref: HTMLHeadingElement | null,
-  ulRef: HTMLUListElement | null,
-  navRef: HTMLDivElement | null
+export function useIsMobile(
+  containerRef: React.RefObject<HTMLDivElement>,
+  headerRef: React.RefObject<HTMLHeadingElement>,
+  contentRef: React.RefObject<HTMLDivElement>
 ) {
-  if (!h1Ref || !ulRef || !navRef) return;
+  const [isMobile, setIsMobile] = useState(false);
 
-  const h1Width = h1Ref.getBoundingClientRect().width;
-  const ulWidth = ulRef.getBoundingClientRect().width;
-  const totalNavbarWidth = h1Width + ulWidth;
-
-  const navWidth = navRef.getBoundingClientRect().width;
-  const screenWidth = window.innerWidth;
-
-  if (totalNavbarWidth >= navWidth) {
-    console.log(`Navbar non va più bene per lo schermo a ${screenWidth}px`);
-  }
-}
-
-export function useBreakpoint(
-  h1Ref: React.RefObject<HTMLHeadingElement | null>,
-  ulRef: React.RefObject<HTMLUListElement | null>,
-  navRef: React.RefObject<HTMLDivElement | null>
-) {
   useEffect(() => {
-    const handleResize = () => {
-      if (h1Ref.current && ulRef.current && navRef.current) {
-        breakpoint(h1Ref.current, ulRef.current, navRef.current);
+    const checkIsMobile = () => {
+      if (!containerRef.current || !headerRef.current || !contentRef.current) {
+        return;
+      }
+
+      const containerWidth = containerRef.current.getBoundingClientRect().width;
+      const headerWidth = headerRef.current.getBoundingClientRect().width;
+      const contentWidth = contentRef.current.getBoundingClientRect().width;
+      const totalChildrenWidth = headerWidth + contentWidth;
+
+      const newIsMobile = totalChildrenWidth > containerWidth;
+      const screenWidth = window.innerWidth;
+
+      if (newIsMobile !== isMobile) {
+        console.log(
+          `Switching to ${
+            newIsMobile ? "MOBILE" : "DESKTOP"
+          } mode at screen width: ${screenWidth}px`
+        );
+        setIsMobile(newIsMobile);
       }
     };
 
-    window.addEventListener("resize", handleResize);
-    handleResize();
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
 
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [h1Ref, ulRef, navRef]);
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, [containerRef, headerRef, contentRef, isMobile]);
+
+  return isMobile;
 }
 
-// // js:
-// import { useBreakpoint } from "@/utils/getBreakpoint";
-// import { useRef, useState, useEffect } from "react";
+// import { useRef } from "react";
+// import { useIsMobile } from "@/utils/updateBreakpoint";
 
-// const h1Ref = useRef<HTMLHeadingElement | null>(null);
-// const ulRef = useRef<HTMLUListElement | null>(null);
-// const navRef = useRef<HTMLDivElement | null>(null);
+// const containerRef = useRef<HTMLDivElement>(null!);
+// const headerRef = useRef<HTMLHeadingElement>(null!);
+// const contentRef = useRef<HTMLDivElement>(null!);
 
-// useBreakpoint(h1Ref, ulRef, navRef, setScreenWidth);
+// const isMobile = useIsMobile(containerRef, headerRef, contentRef);
 
-// // html:
-// <div ref={navRef}
-
-// <h1 ref={h1Ref}
-
-// <ul ref={ulRef}
+// ref = { containerRef }
+// ref = { headerRef }
+// ref = { contentRef }
