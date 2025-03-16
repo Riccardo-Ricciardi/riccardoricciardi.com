@@ -35,7 +35,10 @@ export default function Navbar({ language, table, isMobile }: NavbarProps) {
   if (!isMounted) return null;
 
   return (
-    <header className="border-grid sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header
+      className="border-grid sticky top-0 z-50 w-full border-b
+     bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/85"
+    >
       <div
         className="mx-auto h-14 flex justify-between items-center"
         style={{ width: "clamp(0px, 80%, 1200px)" }}
@@ -104,7 +107,9 @@ function NavbarMobile({
       <DropdownMenuContent align="end">
         {menuItems.map((text, index) => (
           <DropdownMenuItem key={index}>
-            <Link className="w-full" href={`/${text.toLowerCase()}`}>{text}</Link>
+            <Link className="w-full" href={`/${text.toLowerCase()}`}>
+              {text}
+            </Link>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
