@@ -17,10 +17,21 @@ interface LanguageStore {
   setLanguage: (newLanguage: string) => void;
 }
 
-export const useLanguageStore = create<LanguageStore>((set) => ({
-  language: "en", // Lingua di default
-  setLanguage: (newLanguage: string) => set({ language: newLanguage }),
-}));
+// Lista delle lingue supportate nel database
+const supportedLanguages = ["en", "it"];
+
+export const useLanguageStore = create<LanguageStore>((set) => {
+  const browserLanguage = navigator.language.slice(0, 2);
+
+  const defaultLanguage = supportedLanguages.includes(browserLanguage)
+    ? browserLanguage
+    : "en";
+
+  return {
+    language: defaultLanguage,
+    setLanguage: (newLanguage: string) => set({ language: newLanguage }),
+  };
+});
 
 export function LanguagePicker() {
   const { language, setLanguage } = useLanguageStore();
@@ -51,6 +62,7 @@ export function LanguagePicker() {
           <IT title="Italy" />
           Italiano
         </DropdownMenuItem>
+        {/* se agigungi un altra opzione aggiorna supportedLanguages sopra oppure fallo funzionare dinamicamente (ti scassi la testa) */}
       </DropdownMenuContent>
     </DropdownMenu>
   );
