@@ -7,7 +7,6 @@ import { LanguagePicker } from "@/components/languagePicker";
 import { ThemePicker } from "@/components/themePicker";
 import { useTranslationStore } from "@/utils/useTranslations";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,14 +35,12 @@ export default function Navbar({ language, table, isMobile }: NavbarProps) {
   if (!isMounted) return null;
 
   return (
-    <Card className="border-grid top-0 z-50 w-full border-0 rounded-none bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="border-grid sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div
         className="mx-auto h-14 flex justify-between items-center"
         style={{ width: "clamp(0px, 80%, 1200px)" }}
       >
-        <h1 className="text-xl font-bold text-primary">
-          Logo
-        </h1>
+        <h1 className="text-xl font-bold text-primary">Logo</h1>
 
         {isMobile ? (
           <div className="flex items-center space-x-2">
@@ -59,7 +56,7 @@ export default function Navbar({ language, table, isMobile }: NavbarProps) {
           </div>
         )}
       </div>
-    </Card>
+    </header>
   );
 }
 
@@ -99,7 +96,7 @@ function NavbarMobile({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="ghost" size="icon">
           <Menu />
         </Button>
       </DropdownMenuTrigger>
@@ -107,7 +104,7 @@ function NavbarMobile({
       <DropdownMenuContent align="end">
         {menuItems.map((text, index) => (
           <DropdownMenuItem key={index}>
-            <Link href={`/${text.toLowerCase()}`}>{text}</Link>
+            <Link className="w-full" href={`/${text.toLowerCase()}`}>{text}</Link>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

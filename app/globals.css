@@ -119,3 +119,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.border-grid {
+    border-style: dashed;
+    border-color: hsl(var(--border)/.5);
+}
+
+.border-grid:is(.dark *) {
+    border-color: hsl(var(--border))
+}

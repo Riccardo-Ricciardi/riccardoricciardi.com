@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTheme, ThemeProvider as NextThemesProvider } from "next-themes";
+import { useTranslationStore } from "@/utils/useTranslations";
+import { useLanguageStore } from "@/components/languagePicker";
 
 export function ThemeProvider({
   children,
@@ -20,26 +22,49 @@ export function ThemeProvider({
 
 export function ThemePicker() {
   const { setTheme } = useTheme();
+  const { language } = useLanguageStore();
+  const [isMounted, setIsMounted] = useState(false);
+  const { translations, loadTranslations } = useTranslationStore();
+
+  useEffect(() => {
+    if (Object.keys(translations).length === 0) {
+      loadTranslations().then(() => setIsMounted(true));
+    } else {
+      setIsMounted(true);
+    }
+  }, [translations, loadTranslations]);
+
+  if (!isMounted) return null;
+
+  const themeOptions = ["light", "dark", "system"];
+  const themeItems =
+    translations?.[language]?.["theme"] ??
+    themeOptions.map(capitalizeFirstLetter);
+
+  function capitalizeFirstLetter(str: string) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  console.log(themeItems)
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="ghost" size="icon">
           <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
-        </DropdownMenuItem>
+        {themeItems.map((item, index) => (
+          <DropdownMenuItem
+            key={index}
+            onClick={() => setTheme(themeOptions[index].toLowerCase())}
+          >
+            {capitalizeFirstLetter(item)}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
