@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Image from "next/image";
 
 interface NavbarProps {
   language: string;
@@ -43,7 +44,13 @@ export default function Navbar({ language, table, isMobile }: NavbarProps) {
         className="mx-auto h-14 flex justify-between items-center"
         style={{ width: "clamp(0px, 80%, 1200px)" }}
       >
-        <h1 className="text-xl font-bold text-primary">Logo</h1>
+        <Image
+          src="/logo.png"
+          alt="Logo"
+          width={40}
+          height={40}
+          className="!h-10 !w-auto"
+        />
 
         {isMobile ? (
           <div className="flex items-center space-x-2">
