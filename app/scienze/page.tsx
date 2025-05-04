@@ -18,22 +18,32 @@ export default function BiotecnologieOGM() {
           />
           <CardContent className="p-6">
             <h2 className="text-2xl font-semibold text-green-600">
-              Vantaggi delle Biotecnologie e degli OGM
+              Le potenzialità delle biotecnologie
             </h2>
+            <p className="mt-4 text-gray-700">
+              Le biotecnologie sono una delle innovazioni più interessanti del
+              nostro tempo. Usarle bene può aiutarci a risolvere problemi
+              enormi, come la fame nel mondo, le malattie delle piante e i
+              cambiamenti climatici. Gli OGM, per esempio, permettono di
+              migliorare le coltivazioni rendendole più resistenti e nutrienti.
+              Questo significa produrre di più con meno risorse, riducendo anche
+              l'impatto ambientale.
+            </p>
+            <p className="mt-4 text-gray-700">
+              In un periodo in cui il clima è sempre più instabile e la
+              popolazione mondiale continua a crescere, trovare soluzioni
+              sostenibili non è più un'opzione, è una necessità. Non possiamo
+              affidarci solo ai metodi tradizionali, servono strumenti nuovi. E
+              le biotecnologie, se usate bene, lo sono.
+            </p>
             <ul className="list-disc list-inside mt-4 space-y-2 text-gray-700">
+              <li>Colture più forti, che resistono a siccità e malattie.</li>
               <li>
-                Aumento della produttività agricola e lotta alla fame nel mondo.
+                Meno pesticidi = meno inquinamento e rischi per la salute.
               </li>
+              <li>Alimenti più ricchi di vitamine e sostanze utili.</li>
               <li>
-                Riduzione dell’uso di pesticidi grazie a colture geneticamente
-                migliorate.
-              </li>
-              <li>
-                Potenziale miglioramento del valore nutrizionale degli alimenti.
-              </li>
-              <li>
-                Minimizzazione dell’impatto ambientale con pratiche agricole
-                sostenibili.
+                Più resa = meno bisogno di disboscare per creare nuovi campi.
               </li>
             </ul>
           </CardContent>
@@ -49,22 +59,34 @@ export default function BiotecnologieOGM() {
           />
           <CardContent className="p-6">
             <h2 className="text-2xl font-semibold text-red-600">
-              Svantaggi e Criticità
+              Rischi e dubbi da considerare
             </h2>
+            <p className="mt-4 text-gray-700">
+              Detto questo, è importante essere critici. Gli OGM non sono magia,
+              e dietro c'è un sistema complesso, fatto anche di interessi
+              economici. Un rischio reale è che poche grandi aziende controllino
+              i semi, togliendo indipendenza agli agricoltori. Inoltre, creare
+              piante geneticamente uniformi può danneggiare la biodiversità, che
+              invece è una risorsa vitale.
+            </p>
+            <p className="mt-4 text-gray-700">
+              Alcune persone sono anche preoccupate per la salute, anche se ad
+              oggi non ci sono prove concrete che gli OGM facciano male. Però la
+              mancanza di informazioni chiare e l'etichettatura poco trasparente
+              aumentano la diffidenza. La scienza va avanti, ma serve anche
+              comunicare bene e coinvolgere le persone.
+            </p>
             <ul className="list-disc list-inside mt-4 space-y-2 text-gray-700">
               <li>
-                Impatto potenziale sulla biodiversità e sugli ecosistemi
-                naturali.
+                Rischio di ridurre la varietà genetica delle coltivazioni.
               </li>
               <li>
-                Preoccupazioni riguardo alla sicurezza alimentare e alla salute
-                umana.
+                Controllo eccessivo da parte delle multinazionali agricole.
               </li>
+              <li>Scarsa trasparenza nelle informazioni per i consumatori.</li>
               <li>
-                Rischi di dipendenza economica dagli agricoltori verso grandi
-                multinazionali.
+                Timori legittimi che meritano risposte, non banalizzazioni.
               </li>
-              <li>Questioni etiche legate all’ingegneria genetica.</li>
             </ul>
           </CardContent>
         </Card>
@@ -79,14 +101,22 @@ export default function BiotecnologieOGM() {
           />
           <CardContent className="p-6">
             <h2 className="text-2xl font-semibold text-blue-600">
-              Riflessione Personale
+              La mia riflessione
             </h2>
             <p className="mt-4 text-gray-700">
-              Le biotecnologie e gli OGM offrono straordinarie opportunità per
-              il progresso scientifico e la sicurezza alimentare, ma è
-              fondamentale adottare un approccio responsabile e trasparente. Un
-              regolamento rigoroso e una costante valutazione dei rischi possono
-              garantire un equilibrio tra innovazione e sicurezza ambientale.
+              Personalmente non penso che gli OGM siano da evitare a
+              prescindere, ma neanche da accettare senza farsi domande. Come
+              ogni tecnologia, dipende da come la usiamo e da chi la controlla.
+              Non possiamo restare indifferenti: serve informarsi, discutere e
+              scegliere con la testa.
+            </p>
+            <p className="mt-4 text-gray-700">
+              Questo progetto nasce dalla voglia di capirne di più. Non mi
+              bastava dire “gli OGM fanno bene” o “fanno male”. Volevo sapere
+              perché, leggere studi, confrontare idee. E ho capito che la verità
+              è più complessa. Le biotecnologie possono davvero migliorare il
+              nostro futuro, ma solo se le guidiamo con etica, responsabilità e
+              una visione sostenibile.
             </p>
           </CardContent>
         </Card>
