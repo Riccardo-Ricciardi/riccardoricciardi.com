@@ -27,12 +27,12 @@ export default function BiotecnologieOGM() {
               cambiamenti climatici. Gli OGM, per esempio, permettono di
               migliorare le coltivazioni rendendole più resistenti e nutrienti.
               Questo significa produrre di più con meno risorse, riducendo anche
-              l'impatto ambientale.
+              l`impatto ambientale.
             </p>
             <p className="mt-4 text-gray-700">
               In un periodo in cui il clima è sempre più instabile e la
               popolazione mondiale continua a crescere, trovare soluzioni
-              sostenibili non è più un'opzione, è una necessità. Non possiamo
+              sostenibili non è più un`opzione, è una necessità. Non possiamo
               affidarci solo ai metodi tradizionali, servono strumenti nuovi. E
               le biotecnologie, se usate bene, lo sono.
             </p>
@@ -63,7 +63,7 @@ export default function BiotecnologieOGM() {
             </h2>
             <p className="mt-4 text-gray-700">
               Detto questo, è importante essere critici. Gli OGM non sono magia,
-              e dietro c'è un sistema complesso, fatto anche di interessi
+              e dietro c`è un sistema complesso, fatto anche di interessi
               economici. Un rischio reale è che poche grandi aziende controllino
               i semi, togliendo indipendenza agli agricoltori. Inoltre, creare
               piante geneticamente uniformi può danneggiare la biodiversità, che
@@ -72,7 +72,7 @@ export default function BiotecnologieOGM() {
             <p className="mt-4 text-gray-700">
               Alcune persone sono anche preoccupate per la salute, anche se ad
               oggi non ci sono prove concrete che gli OGM facciano male. Però la
-              mancanza di informazioni chiare e l'etichettatura poco trasparente
+              mancanza di informazioni chiare e l`etichettatura poco trasparente
               aumentano la diffidenza. La scienza va avanti, ma serve anche
               comunicare bene e coinvolgere le persone.
             </p>

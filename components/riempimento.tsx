@@ -11,21 +11,6 @@ const ScrollableCardComponent = () => {
         <Card className="border-grid shadow-none">
           <CardHeader>
             <CardTitle className="text-3xl font-bold text-secondary-foreground">
-              Italiano: Raccolta senza confini
-            </CardTitle>
-          </CardHeader>
-          <CardFooter>
-            <Link href="/italiano">
-              <button className="bg-blue-600 text-white py-2 px-4 rounded">
-                Scopri di più
-              </button>
-            </Link>
-          </CardFooter>
-        </Card>
-
-        <Card className="border-grid shadow-none">
-          <CardHeader>
-            <CardTitle className="text-3xl font-bold text-secondary-foreground">
               Scienze: Biotecnologie e OGM
             </CardTitle>
           </CardHeader>
