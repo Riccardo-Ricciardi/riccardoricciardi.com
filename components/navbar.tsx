@@ -44,16 +44,12 @@ export default function Navbar({ language, table, isMobile }: NavbarProps) {
         className="mx-auto h-14 flex justify-between items-center"
         style={{ width: "clamp(0px, 80%, 1200px)" }}
       >
-        <div className="relative h-10 w-auto aspect-[1/1]">
-          <Image
-            src="/logo.png"
-            alt="Logo"
-            fill
-            priority
-            className="object-contain"
-            sizes="40px"
-          />
-        </div>
+        <Image
+          src="/logo.png"
+          alt="Logo"
+          height={40}
+          width={34.28}
+        />
 
         {isMobile ? (
           <div className="flex items-center space-x-2">
