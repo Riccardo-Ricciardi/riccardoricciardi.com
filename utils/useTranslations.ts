@@ -1,5 +1,6 @@
 import { createClient } from "@/utils/supabase/client";
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface Translation {
   slug: string;
@@ -71,14 +72,22 @@ interface TranslationStore {
   loadTranslations: () => Promise<void>;
 }
 
-export const useTranslationStore = create<TranslationStore>((set) => ({
-  translations: {},
-  loadTranslations: async () => {
-    try {
-      const translations = await fetchTranslations();
-      set({ translations });
-    } catch (error) {
-      console.error("Errore nel caricamento delle traduzioni:", error);
+export const useTranslationStore = create<TranslationStore>()(
+  persist(
+    (set) => ({
+      translations: {},
+      loadTranslations: async () => {
+        try {
+          const translations = await fetchTranslations();
+          set({ translations });
+        } catch (error) {
+          console.error("Errore nel caricamento delle traduzioni:", error);
+        }
+      },
+    }),
+    {
+      name: "translation-store", // nome chiave nel localStorage
+      partialize: (state) => ({ translations: state.translations }), // esclude la funzione async dal persist
     }
-  },
-}));
+  )
+);

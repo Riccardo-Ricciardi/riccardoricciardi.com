@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { createClient } from "@/utils/supabase/client";
 import { useLanguageStore } from "@/components/languagePicker";
 
@@ -8,10 +9,17 @@ interface DeviceStore {
   setIsMobile: (value: boolean) => void;
 }
 
-const useDeviceStore = create<DeviceStore>((set) => ({
-  isMobile: false,
-  setIsMobile: (value) => set({ isMobile: value }),
-}));
+const useDeviceStore = create<DeviceStore>()(
+  persist(
+    (set) => ({
+      isMobile: false,
+      setIsMobile: (value) => set({ isMobile: value }),
+    }),
+    {
+      name: "device-store", // nome della chiave in localStorage
+    }
+  )
+);
 
 export const useIsMobile = () => {
   const { language } = useLanguageStore();
