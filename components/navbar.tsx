@@ -44,12 +44,9 @@ export default function Navbar({ language, table, isMobile }: NavbarProps) {
         className="mx-auto h-14 flex justify-between items-center"
         style={{ width: "clamp(0px, 80%, 1200px)" }}
       >
-        <Image
-          src="/logo.png"
-          alt="Logo"
-          height={40}
-          width={34.28}
-        />
+        <Link href="/">
+          <Image src="/logo.png" alt="Logo" height={40} width={34.28} />
+        </Link>
 
         {isMobile ? (
           <div className="flex items-center space-x-2">
@@ -83,7 +80,10 @@ function NavbarDesktop({
     <ul className="flex items-center space-x-2 pl-16 text-card-foreground">
       {translation.map((text, index) => (
         <li key={index}>
-          <Link href={`/${text.toLowerCase()}`} className="whitespace-nowrap">
+          <Link
+            href={index === 0 ? "/" : `/${text.toLowerCase()}`}
+            className="whitespace-nowrap"
+          >
             {text}
           </Link>
         </li>
@@ -113,7 +113,10 @@ function NavbarMobile({
       <DropdownMenuContent align="end">
         {translation.map((text, index) => (
           <DropdownMenuItem key={index}>
-            <Link className="w-full" href={`/${text.toLowerCase()}`}>
+            <Link
+              href={index === 0 ? "/" : `/${text.toLowerCase()}`}
+              className="w-full"
+            >
               {text}
             </Link>
           </DropdownMenuItem>
