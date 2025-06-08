@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,18 +21,26 @@ interface LanguageStore {
 // Lista delle lingue supportate nel database
 const supportedLanguages = ["en", "it"];
 
-export const useLanguageStore = create<LanguageStore>((set) => {
-  const browserLanguage = navigator.language.slice(0, 2);
+export const useLanguageStore = create<LanguageStore>()(
+  persist(
+    (set) => {
+      const browserLanguage =
+        typeof window !== "undefined" ? navigator.language.slice(0, 2) : "en";
 
-  const defaultLanguage = supportedLanguages.includes(browserLanguage)
-    ? browserLanguage
-    : "en";
+      const defaultLanguage = supportedLanguages.includes(browserLanguage)
+        ? browserLanguage
+        : "en";
 
-  return {
-    language: defaultLanguage,
-    setLanguage: (newLanguage: string) => set({ language: newLanguage }),
-  };
-});
+      return {
+        language: defaultLanguage,
+        setLanguage: (newLanguage: string) => set({ language: newLanguage }),
+      };
+    },
+    {
+      name: "language-store",
+    }
+  )
+);
 
 export function LanguagePicker() {
   const { language, setLanguage } = useLanguageStore();
@@ -62,7 +71,6 @@ export function LanguagePicker() {
           <IT title="Italy" />
           Italiano
         </DropdownMenuItem>
-        {/* se agigungi un altra opzione aggiorna supportedLanguages sopra oppure fallo funzionare dinamicamente (ti scassi la testa) */}
       </DropdownMenuContent>
     </DropdownMenu>
   );

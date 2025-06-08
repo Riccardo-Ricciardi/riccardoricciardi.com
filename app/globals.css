@@ -117,7 +117,7 @@
 .border-grid {
   border-style: dashed;
   border-color: hsl(var(--border));
-}
+} 
 
 .border-grid:is(.dark *) {
   border-color: hsl(var(--border));

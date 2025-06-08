@@ -25,6 +25,8 @@ export default function Navbar({ language, table, isMobile }: NavbarProps) {
   const [isMounted, setIsMounted] = useState(false);
   const { translations, loadTranslations } = useTranslationStore();
 
+  console.log(translations);
+
   useEffect(() => {
     if (Object.keys(translations).length === 0) {
       loadTranslations().then(() => setIsMounted(true));
@@ -78,11 +80,11 @@ function NavbarDesktop({
   table: string;
 }) {
   const { translations } = useTranslationStore();
-  const menuItems = translations?.[language]?.[table] ?? [];
+  const translation = translations?.[language]?.[table] ?? [];
 
   return (
     <ul className="flex items-center space-x-2 pl-16 text-card-foreground">
-      {menuItems.map((text, index) => (
+      {translation.map((text, index) => (
         <li key={index}>
           <Link href={`/${text.toLowerCase()}`} className="whitespace-nowrap">
             {text}
@@ -101,7 +103,7 @@ function NavbarMobile({
   table: string;
 }) {
   const { translations } = useTranslationStore();
-  const menuItems = translations?.[language]?.[table] ?? [];
+  const translation = translations?.[language]?.[table] ?? [];
 
   return (
     <DropdownMenu>
@@ -112,7 +114,7 @@ function NavbarMobile({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end">
-        {menuItems.map((text, index) => (
+        {translation.map((text, index) => (
           <DropdownMenuItem key={index}>
             <Link className="w-full" href={`/${text.toLowerCase()}`}>
               {text}

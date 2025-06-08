@@ -27,7 +27,7 @@ export async function fetchTranslations(): Promise<Translations> {
   }
 
   const translations: Translations = {};
-  const components = ["competenze", "navbar", "theme"];
+  const components = ["competenze", "navbar", "theme", "not-found"];
 
   for (const { code, id: languageId } of languages) {
     const languageTranslations: { [component: string]: string[] } = {};
@@ -46,9 +46,15 @@ export async function fetchTranslations(): Promise<Translations> {
         continue;
       }
 
-      const sortedTranslations = (data as Translation[]).sort(
-        (a, b) => (a.position ?? 0) - (b.position ?? 0)
-      );
+      const sortedTranslations = (data as Translation[]).sort((a, b) => {
+        const aHasPosition = "position" in a;
+        const bHasPosition = "position" in b;
+
+        if (aHasPosition && bHasPosition) {
+          return (a.position ?? 0) - (b.position ?? 0);
+        }
+        return 0;
+      });
 
       languageTranslations[component] = sortedTranslations.map((t) => t.value);
     }
