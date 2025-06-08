@@ -25,8 +25,6 @@ export default function Navbar({ language, table, isMobile }: NavbarProps) {
   const [isMounted, setIsMounted] = useState(false);
   const { translations, loadTranslations } = useTranslationStore();
 
-  console.log(translations);
-
   useEffect(() => {
     if (Object.keys(translations).length === 0) {
       loadTranslations().then(() => setIsMounted(true));
@@ -46,13 +44,16 @@ export default function Navbar({ language, table, isMobile }: NavbarProps) {
         className="mx-auto h-14 flex justify-between items-center"
         style={{ width: "clamp(0px, 80%, 1200px)" }}
       >
-        <Image
-          src="/logo.png"
-          alt="Logo"
-          width={40}
-          height={40}
-          className="!h-10 !w-auto"
-        />
+        <div className="relative h-10 w-auto aspect-[1/1]">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            fill
+            priority
+            className="object-contain"
+            sizes="40px"
+          />
+        </div>
 
         {isMobile ? (
           <div className="flex items-center space-x-2">
