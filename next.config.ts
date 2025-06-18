@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "media.canva.com",
       },
+      {
+        protocol: "https",
+        hostname: "yfzqurdmbllthonjdzpb.supabase.co",
+      },
     ],
   },
 };

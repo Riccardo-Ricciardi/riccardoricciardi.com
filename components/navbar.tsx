@@ -45,7 +45,12 @@ export default function Navbar({ language, table, isMobile }: NavbarProps) {
         style={{ width: "clamp(0px, 80%, 1200px)" }}
       >
         <Link href="/">
-          <Image src="/logo.png" alt="Logo" height={40} width={34.28} />
+          <Image
+            src="https://yfzqurdmbllthonjdzpb.supabase.co/storage/v1/object/public/image//Logo.png"
+            alt="Logo"
+            height={36}
+            width={36}
+          />
         </Link>
 
         {isMobile ? (
