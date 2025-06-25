@@ -28,7 +28,7 @@ export async function fetchTranslations(): Promise<Translations> {
   }
 
   const translations: Translations = {};
-  const components = ["competenze", "navbar", "theme", "not-found"];
+  const components = ["navbar", "theme", "not-found"];
 
   for (const { code, id: languageId } of languages) {
     const languageTranslations: { [component: string]: string[] } = {};

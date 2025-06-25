@@ -50,6 +50,7 @@ export default function Navbar({ language, table, isMobile }: NavbarProps) {
             alt="Logo"
             height={36}
             width={36}
+            priority
           />
         </Link>
 

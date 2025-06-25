@@ -3,12 +3,14 @@ import "@/app/globals.css";
 import { ThemeProvider } from "@/components/themePicker";
 import { Metadata } from "next";
 
+const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL;
+
 export const metadata: Metadata = {
   title: "Riccardo Ricciardi",
   description: "The official website of Riccardo Ricciardi",
-  icons:
-    "https://yfzqurdmbllthonjdzpb.supabase.co/storage/v1/object/public/image//Logo.png",
+  icons: `${BASE_URL}/Logo.png`,
 };
+
 
 export default function RootLayout({
   children,

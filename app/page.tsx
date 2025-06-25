@@ -1,8 +1,10 @@
 "use client";
 
 import Navbar from "@/components/navbar";
+import Skills from "@/components/skills";
 import { useLanguageStore } from "@/components/languagePicker";
 import { useIsMobile } from "@/utils/useIsMobile";
+
 
 export default function Page() {
   const { language } = useLanguageStore();
@@ -11,6 +13,7 @@ export default function Page() {
   return (
     <>
       <Navbar language={language} table="navbar" isMobile={isMobile} />
+      <Skills />
     </>
   );
 }
