@@ -11,15 +11,12 @@ type Skill = {
   id: number;
   name: string;
   position: number;
+  percentage: number;
 };
 
 export default function Skills() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   useEffect(() => {
     async function fetchSkills() {
@@ -36,6 +33,8 @@ export default function Skills() {
 
     if (isMounted) {
       fetchSkills();
+    } else {
+      setIsMounted(true);
     }
   }, [isMounted]);
 
@@ -43,33 +42,62 @@ export default function Skills() {
 
   return (
     <div style={{ width: "clamp(0px, 80%, 1200px)", margin: "0 auto" }}>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
-          gap: "16px",
-          width: "100%",
-        }}
-      >
-        {skills.map(({ id, name }) => (
-          <div
-            key={id}
-            style={{
-              position: "relative",
-              width: "100%",
-              paddingTop: "100%",
-            }}
-          >
-            <Image
-              src={`${BASE_URL}/${name}.png`}
-              alt={name}
-              fill
-              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 16vw, 100px"
-              style={{ objectFit: "contain" }}
-              priority
-            />
-          </div>
-        ))}
+      <h1 className="text-4xl font-bold my-6 text-card-foreground">
+        My Skills
+      </h1>
+      <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(80px,1fr))]">
+        {skills.map(({ id, name, percentage }) => {
+          const exactSegments = (percentage / 100) * 4;
+          const filledSegments = Math.floor(exactSegments);
+          const partialFill = exactSegments - filledSegments;
+
+          return (
+            <div
+              key={id}
+              className="group relative rounded-lg border border-grid bg-card p-3 text-center"
+            >
+              <div className="relative w-full pt-[75%]">
+                <Image
+                  src={`${BASE_URL}/${name}.png`}
+                  alt={name}
+                  fill
+                  sizes="(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px"
+                  className="object-contain"
+                  priority
+                />
+              </div>
+
+              <p className="mt-2 mb-1 text-xs font-medium text-muted-foreground">
+                {name}
+              </p>
+
+              <div className="flex gap-x-[2px] justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                {Array.from({ length: 4 }).map((_, i) => {
+                  let overlayWidth = 0;
+                  if (i < filledSegments) {
+                    overlayWidth = 100;
+                  } else if (i === filledSegments) {
+                    overlayWidth = partialFill * 100;
+                  }
+
+                  return (
+                    <div
+                      key={i}
+                      className="flex-1 h-1 rounded bg-blue-300 relative overflow-hidden"
+                    >
+                      {overlayWidth > 0 && (
+                        <div
+                          className="absolute top-0 left-0 h-full bg-blue-800 rounded transition-all duration-300"
+                          style={{ width: `${overlayWidth}%` }}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
