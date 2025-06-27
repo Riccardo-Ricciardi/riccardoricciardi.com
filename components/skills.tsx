@@ -54,7 +54,7 @@ export default function Skills() {
           return (
             <div
               key={id}
-              className="group relative rounded-lg border border-grid bg-card p-3 text-center"
+              className="bg-white group relative rounded-lg border border-grid bg-card p-3 text-center"
             >
               <div className="relative w-full pt-[75%]">
                 <Image
