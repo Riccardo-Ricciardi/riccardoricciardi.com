@@ -54,7 +54,7 @@ export default function Skills() {
           return (
             <div
               key={id}
-              className="group relative rounded-lg border border-grid bg-card p-3 text-center"
+              className="group relative rounded-lg border border-grid p-3 text-center bg-background"
             >
               <div className="relative w-full pt-[75%]">
                 <Image
@@ -67,11 +67,12 @@ export default function Skills() {
                 />
               </div>
 
-              <p className="mt-2 mb-1 text-xs font-medium text-muted-foreground">
+              <p className="mt-2 mb-1 text-xs font-medium text-primary">
                 {name}
               </p>
 
-              <div className="flex gap-x-[2px] justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              {/* Rettangolini */}
+              <div className="flex gap-x-[2px] justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded overflow-hidden">
                 {Array.from({ length: 4 }).map((_, i) => {
                   let overlayWidth = 0;
                   if (i < filledSegments) {
@@ -80,18 +81,26 @@ export default function Skills() {
                     overlayWidth = partialFill * 100;
                   }
 
+                  const partialGradient =
+                    overlayWidth > 0 && overlayWidth < 100
+                      ? `linear-gradient(to right, #1e40af ${overlayWidth}%, transparent ${overlayWidth}%)`
+                      : "none";
+
                   return (
                     <div
                       key={i}
-                      className="flex-1 h-1 rounded bg-blue-300 relative overflow-hidden"
-                    >
-                      {overlayWidth > 0 && (
-                        <div
-                          className="absolute top-0 left-0 h-full bg-blue-800 rounded transition-all duration-300"
-                          style={{ width: `${overlayWidth}%` }}
-                        />
-                      )}
-                    </div>
+                      className="flex-1 h-1 relative rounded bg-blue-300"
+                      style={{
+                        backgroundColor: "#93c5fd",
+                        backgroundImage:
+                          overlayWidth === 100 ? "none" : partialGradient,
+                        transition: "background-image 0.3s ease",
+                        ...(overlayWidth === 100 && {
+                          backgroundColor: "#1e40af",
+                          backgroundImage: "none",
+                        }),
+                      }}
+                    />
                   );
                 })}
               </div>
