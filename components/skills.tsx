@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 
 const supabase = createClient();
 const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL;
@@ -12,11 +13,13 @@ type Skill = {
   name: string;
   position: number;
   percentage: number;
+  dark: boolean;
 };
 
 export default function Skills() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+  const { theme } = useTheme();
 
   useEffect(() => {
     async function fetchSkills() {
@@ -28,6 +31,7 @@ export default function Skills() {
         console.error("Errore nel recupero skills:", error);
       } else {
         setSkills(data || []);
+        console.log(data)
       }
     }
 
@@ -46,7 +50,7 @@ export default function Skills() {
         My Skills
       </h1>
       <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(80px,1fr))]">
-        {skills.map(({ id, name, percentage }) => {
+        {skills.map(({ id, name, percentage, dark }) => {
           const exactSegments = (percentage / 100) * 4;
           const filledSegments = Math.floor(exactSegments);
           const partialFill = exactSegments - filledSegments;
@@ -58,7 +62,9 @@ export default function Skills() {
             >
               <div className="relative w-full pt-[75%]">
                 <Image
-                  src={`${BASE_URL}/${name}.png`}
+                  src={`${BASE_URL}/${name}${
+                    dark && theme === "dark" ? "-dark" : ""
+                  }.png`}
                   alt={name}
                   fill
                   sizes="(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px"
