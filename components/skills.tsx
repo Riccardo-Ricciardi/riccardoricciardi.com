@@ -16,7 +16,7 @@ type Skill = {
   dark: boolean;
 };
 
-export default function Skills() {
+export default function Skills({ language }: { language: string }) {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const { theme } = useTheme();
@@ -46,7 +46,7 @@ export default function Skills() {
   return (
     <div style={{ width: "clamp(0px, 80%, 1200px)", margin: "0 auto" }}>
       <h1 className="text-4xl font-bold my-6 text-card-foreground">
-        My Skills
+        {language == "it" ? "Le mie Competenze" : "My Skills"}
       </h1>
       <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(80px,1fr))]">
         {skills.map(({ id, name, percentage, dark }) => {

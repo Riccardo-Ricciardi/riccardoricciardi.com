@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
-import { useLoadingManager } from "@/components/LoadingManager";
+import { useLoadingManager } from "@/components/loadingManager";
 
 interface NavbarProps {
   language: string;

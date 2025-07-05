@@ -9,8 +9,8 @@ export default function Page() {
 
   return (
     <>
-      <Navbar language={language} table="navbar"/>
-      <Skills />
+      <Navbar language={language} table="navbar" />
+      <Skills language={language} />
     </>
   );
 }
