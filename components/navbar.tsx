@@ -22,13 +22,12 @@ interface NavbarProps {
 
 export default function Navbar({ language, table }: NavbarProps) {
   const { translations, loadTranslations } = useTranslationStore();
-  const { showLoader, hideLoader } = useLoadingManager();
+  const { hideLoader } = useLoadingManager();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (Object.keys(translations).length === 0) {
-      showLoader();
       loadTranslations().then(() => {
         if (containerRef.current && !isMobile) {
           const rect = containerRef.current.getBoundingClientRect();
@@ -69,7 +68,7 @@ export default function Navbar({ language, table }: NavbarProps) {
         };
       });
     }
-  }, [translations, loadTranslations, showLoader, hideLoader, isMobile]);
+  }, [translations, loadTranslations, hideLoader, isMobile]);
 
   return (
     <header className="border-grid sticky top-0 z-50 w-full border-b bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/85">

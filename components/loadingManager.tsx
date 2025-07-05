@@ -10,7 +10,7 @@ import { Bouncy } from "ldrs/react";
 import "ldrs/react/Bouncy.css";
 
 const LoadingContext = createContext({
-  activeCount: 0,
+  activeCount: 1, // parte da 1, loader sempre visibile all'inizio
   showLoader: () => {},
   hideLoader: () => {},
 });
@@ -20,12 +20,15 @@ export const useLoadingManager = () => useContext(LoadingContext);
 export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [activeCount, setActiveCount] = useState(0);
+  // activeCount parte da 1, quindi loader è visibile subito
+  const [activeCount, setActiveCount] = useState(1);
 
+  // showLoader non serve più o può essere una no-op
   const showLoader = useCallback(() => {
-    setActiveCount((count) => count + 1);
+    // opzionale: se vuoi disabilitare showLoader, lascia vuoto
   }, []);
 
+  // hideLoader fa diminuire il count e quindi nasconde il loader
   const hideLoader = useCallback(() => {
     setActiveCount((count) => Math.max(count - 1, 0));
   }, []);
@@ -44,7 +47,6 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-// Componente per mostrare il loader
 export const GlobalLoader = () => {
   const { activeCount } = useLoadingManager();
 
