@@ -52,7 +52,7 @@ export const GlobalLoader = () => {
 
   return (
     <div className="fixed inset-0 w-screen h-screen flex justify-center items-center z-[9999] bg-secondary">
-      <Bouncy size="100" speed="2" color="#1e40af" />
+      <Bouncy size="100" speed="2" color="#2563eb" />
     </div>
   );
 };
