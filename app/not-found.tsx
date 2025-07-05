@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useLanguageStore } from "@/components/languagePicker";
+import { useLanguageStore } from "@/components/languageManager";
 import { useTranslationStore } from "@/utils/useTranslations";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -20,7 +20,7 @@ export default function NotFound() {
     }
   }, [translations, loadTranslations]);
 
-  const translation = translations?.[language]?.["not-found"] ?? []
+  const translation = translations?.[language]?.["not-found"] ?? [];
 
   if (!isMounted) return null;
 

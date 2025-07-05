@@ -31,7 +31,6 @@ export default function Skills() {
         console.error("Errore nel recupero skills:", error);
       } else {
         setSkills(data || []);
-        console.log(data)
       }
     }
 

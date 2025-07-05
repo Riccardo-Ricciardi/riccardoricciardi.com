@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { createClient } from "@/utils/supabase/client";
-import { useLanguageStore } from "@/components/languagePicker";
+import { useLanguageStore } from "@/components/languageManager";
 
 interface DeviceStore {
   isMobile: boolean;

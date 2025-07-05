@@ -1,6 +1,7 @@
 import "@/app/globals.css";
 
-import { ThemeProvider } from "@/components/themePicker";
+import { ThemeProvider } from "@/components/themeManager";
+import { LoadingProvider, GlobalLoader } from "@/components/LoadingManager";
 import { Metadata } from "next";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL;
@@ -11,17 +12,16 @@ export const metadata: Metadata = {
   icons: `${BASE_URL}/Logo.png`,
 };
 
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <html lang="en" suppressHydrationWarning>
-        <head />
-        <body>
+    <html lang="en" suppressHydrationWarning>
+      <head />
+      <body>
+        <LoadingProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -30,8 +30,9 @@ export default function RootLayout({
           >
             {children}
           </ThemeProvider>
-        </body>
-      </html>
-    </>
+          <GlobalLoader />
+        </LoadingProvider>
+      </body>
+    </html>
   );
 }

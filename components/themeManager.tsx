@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTheme, ThemeProvider as NextThemesProvider } from "next-themes";
 import { useTranslationStore } from "@/utils/useTranslations";
-import { useLanguageStore } from "@/components/languagePicker";
+import { useLanguageStore } from "@/components/languageManager";
 
 export function ThemeProvider({
   children,

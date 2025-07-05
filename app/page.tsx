@@ -2,17 +2,14 @@
 
 import Navbar from "@/components/navbar";
 import Skills from "@/components/skills";
-import { useLanguageStore } from "@/components/languagePicker";
-import { useIsMobile } from "@/utils/useIsMobile";
-
+import { useLanguageStore } from "@/components/languageManager";
 
 export default function Page() {
   const { language } = useLanguageStore();
-  const isMobile = useIsMobile();
 
   return (
     <>
-      <Navbar language={language} table="navbar" isMobile={isMobile} />
+      <Navbar language={language} table="navbar"/>
       <Skills />
     </>
   );
