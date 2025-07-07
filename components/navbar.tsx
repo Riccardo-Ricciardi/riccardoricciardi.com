@@ -26,6 +26,7 @@ export default function Navbar({ language, table }: NavbarProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
+
   useEffect(() => {
     if (Object.keys(translations).length === 0) {
       loadTranslations().then(() => {
@@ -120,7 +121,7 @@ function NavbarDesktop({
   const { translations } = useTranslationStore();
   const translation = translations?.[language]?.[table] ?? [];
   return (
-    <ul className="flex items-center space-x-2 pl-16 text-card-foreground">
+    <ul className="flex items-center space-x-2 pl-28 text-card-foreground">
       {translation.map((text, index) => (
         <li key={index}>
           <Link
