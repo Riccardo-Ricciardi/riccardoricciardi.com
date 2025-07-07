@@ -26,7 +26,6 @@ export default function Navbar({ language, table }: NavbarProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
-
   useEffect(() => {
     if (Object.keys(translations).length === 0) {
       loadTranslations().then(() => {
@@ -46,30 +45,50 @@ export default function Navbar({ language, table }: NavbarProps) {
           if (!overflowDetected) setIsMobile(false);
         }
         hideLoader();
-
-        const handleResize = () => {
-          if (isMobile) return;
-          if (containerRef.current) {
-            const rect = containerRef.current.getBoundingClientRect();
-            const children = Array.from(
-              containerRef.current.children
-            ) as HTMLElement[];
-            for (const child of children) {
-              if (child.getBoundingClientRect().right > rect.right) {
-                setIsMobile(true);
-                break;
-              }
-            }
-          }
-        };
-
-        window.addEventListener("resize", handleResize);
-        return () => {
-          window.removeEventListener("resize", handleResize);
-        };
       });
     }
   }, [translations, loadTranslations, hideLoader, isMobile]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (isMobile) return;
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const children = Array.from(
+          containerRef.current.children
+        ) as HTMLElement[];
+        for (const child of children) {
+          if (child.getBoundingClientRect().right > rect.right) {
+            setIsMobile(true);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (containerRef.current && !isMobile) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const children = Array.from(
+        containerRef.current.children
+      ) as HTMLElement[];
+      let overflowDetected = false;
+      for (const child of children) {
+        if (child.getBoundingClientRect().right > rect.right) {
+          setIsMobile(true);
+          overflowDetected = true;
+          break;
+        }
+      }
+      if (!overflowDetected) setIsMobile(false);
+    }
+  }, [language, isMobile]);
 
   return (
     <header className="border-grid sticky top-0 z-50 w-full border-b bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/85">
