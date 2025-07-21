@@ -31,34 +31,15 @@ export default function Skills({ language }: { language: string }) {
 
       if (error) {
         console.error("Errore nel recupero skills:", error);
-        hideLoader();
       } else {
         setSkills(data || []);
-
-        if (typeof window !== "undefined") {
-          const imageUrls = (data || []).map(({ name, dark }) =>
-            `${BASE_URL}/${name}${dark && theme === "dark" ? "-dark" : ""}.png`
-          );
-
-          await Promise.all(
-            imageUrls.map(
-              (url) =>
-                new Promise<void>((resolve) => {
-                  const img = new window.Image();
-                  img.src = url;
-                  img.onload = () => resolve();
-                  img.onerror = () => resolve();
-                })
-            )
-          );
-        }
-
-        hideLoader();
       }
+
+      hideLoader();
     }
 
     fetchSkills();
-  }, [hideLoader, theme]);
+  }, [hideLoader]);
 
   return (
     <div style={{ width: "clamp(0px, 80%, 1200px)", margin: "0 auto" }}>
@@ -93,6 +74,7 @@ export default function Skills({ language }: { language: string }) {
                 {name}
               </p>
 
+              {/* Rettangolini */}
               <div className="flex gap-x-[2px] justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded overflow-hidden">
                 {Array.from({ length: 4 }).map((_, i) => {
                   let overlayWidth = 0;
