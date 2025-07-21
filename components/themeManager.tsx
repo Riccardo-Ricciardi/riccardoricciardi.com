@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
 import { useTheme, ThemeProvider as NextThemesProvider } from "next-themes";
 import { useTranslationStore } from "@/utils/useTranslations";
 import { useLanguageStore } from "@/components/languageManager";
+import { useLoadingManager } from "@/components/loadingManager";
 
 export function ThemeProvider({
   children,
@@ -23,18 +24,16 @@ export function ThemeProvider({
 export function ThemePicker() {
   const { setTheme } = useTheme();
   const { language } = useLanguageStore();
-  const [isMounted, setIsMounted] = useState(false);
   const { translations, loadTranslations } = useTranslationStore();
+  const { hideLoader } = useLoadingManager(); // <-- usa hook qui
 
   useEffect(() => {
     if (Object.keys(translations).length === 0) {
-      loadTranslations().then(() => setIsMounted(true));
+      loadTranslations().then(() => hideLoader());
     } else {
-      setIsMounted(true);
+      hideLoader();
     }
-  }, [translations, loadTranslations]);
-
-  if (!isMounted) return null;
+  }, [translations, loadTranslations, hideLoader]);
 
   const themeOptions = ["light", "dark", "system"];
   const themeItems =
