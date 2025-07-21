@@ -23,42 +23,42 @@ export default function Skills({ language }: { language: string }) {
   const { hideLoader } = useLoadingManager();
 
   useEffect(() => {
-  async function fetchSkills() {
-    const { data, error } = await supabase
-      .from("skills")
-      .select("*")
-      .order("position", { ascending: true });
+    async function fetchSkills() {
+      const { data, error } = await supabase
+        .from("skills")
+        .select("*")
+        .order("position", { ascending: true });
 
-    if (error) {
-      console.error("Errore nel recupero skills:", error);
-      hideLoader();
-    } else {
-      setSkills(data || []);
+      if (error) {
+        console.error("Errore nel recupero skills:", error);
+        hideLoader();
+      } else {
+        setSkills(data || []);
 
-      if (typeof window !== "undefined") {
-        const imageUrls = (data || []).map(({ name, dark }) =>
-          `${BASE_URL}/${name}${dark && theme === "dark" ? "-dark" : ""}.png`
-        );
+        if (typeof window !== "undefined") {
+          const imageUrls = (data || []).map(({ name, dark }) =>
+            `${BASE_URL}/${name}${dark && theme === "dark" ? "-dark" : ""}.png`
+          );
 
-        await Promise.all(
-          imageUrls.map(
-            (url) =>
-              new Promise<void>((resolve) => {
-                const img = new window.Image();
-                img.src = url;
-                img.onload = () => resolve();
-                img.onerror = () => resolve();
-              })
-          )
-        );
+          await Promise.all(
+            imageUrls.map(
+              (url) =>
+                new Promise<void>((resolve) => {
+                  const img = new window.Image();
+                  img.src = url;
+                  img.onload = () => resolve();
+                  img.onerror = () => resolve();
+                })
+            )
+          );
+        }
+
+        hideLoader();
       }
-
-      hideLoader();
     }
-  }
 
-  fetchSkills();
-}, [hideLoader, theme]);
+    fetchSkills();
+  }, [hideLoader, theme]);
 
   return (
     <div style={{ width: "clamp(0px, 80%, 1200px)", margin: "0 auto" }}>
