@@ -7,7 +7,7 @@ import { useTheme } from "next-themes";
 import { useLoadingManager } from "@/components/loadingManager";
 
 const supabase = createClient();
-const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL ?? "";
 
 type Skill = {
   id: number;
@@ -23,6 +23,7 @@ export default function Skills({ language }: { language: string }) {
   const { theme } = useTheme();
   const { hideLoader } = useLoadingManager();
 
+  // Fetch delle skill
   useEffect(() => {
     async function fetchSkills() {
       const { data, error } = await supabase
@@ -30,36 +31,40 @@ export default function Skills({ language }: { language: string }) {
         .select("*")
         .order("position", { ascending: true });
 
-      if (error) {
-        console.error("Errore nel recupero skills:", error);
-      } else {
-        setSkills(data || []);
-      }
+      if (error) console.error("Errore nel recupero skills:", error);
+      else setSkills(data ?? []);
     }
 
     fetchSkills();
   }, []);
 
+  // Quando tutte le immagini sono caricate → nascondi loader
   useEffect(() => {
-    if (skills.length > 0 && imagesLoaded === skills.length) {
+    if (skills.length > 0 && imagesLoaded >= skills.length) {
       hideLoader();
     }
   }, [imagesLoaded, skills.length, hideLoader]);
 
-  const handleImageLoad = () => {
+  // Contatore immagini caricate
+  const handleImageLoadComplete = () => {
     setImagesLoaded((prev) => prev + 1);
   };
 
   return (
     <div style={{ width: "clamp(0px, 80%, 1200px)", margin: "0 auto" }}>
       <h1 className="text-4xl font-bold my-6 text-card-foreground">
-        {language == "it" ? "Le mie Competenze" : "My Skills"}
+        {language === "it" ? "Le mie Competenze" : "My Skills"}
       </h1>
+
       <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(80px,1fr))]">
         {skills.map(({ id, name, percentage, dark }) => {
           const exactSegments = (percentage / 100) * 4;
           const filledSegments = Math.floor(exactSegments);
           const partialFill = exactSegments - filledSegments;
+
+          const imageUrl = `${BASE_URL}/${name}${
+            dark && theme === "dark" ? "-dark" : ""
+          }.png`;
 
           return (
             <div
@@ -68,15 +73,13 @@ export default function Skills({ language }: { language: string }) {
             >
               <div className="relative w-full pt-[75%]">
                 <Image
-                  src={`${BASE_URL}/${name}${
-                    dark && theme === "dark" ? "-dark" : ""
-                  }.png`}
+                  src={imageUrl}
                   alt={name}
                   fill
                   sizes="(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px"
                   className="object-contain"
                   priority
-                  onLoad={handleImageLoad}
+                  onLoadingComplete={handleImageLoadComplete}
                 />
               </div>
 
@@ -87,11 +90,8 @@ export default function Skills({ language }: { language: string }) {
               <div className="flex gap-x-[2px] justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded overflow-hidden">
                 {Array.from({ length: 4 }).map((_, i) => {
                   let overlayWidth = 0;
-                  if (i < filledSegments) {
-                    overlayWidth = 100;
-                  } else if (i === filledSegments) {
-                    overlayWidth = partialFill * 100;
-                  }
+                  if (i < filledSegments) overlayWidth = 100;
+                  else if (i === filledSegments) overlayWidth = partialFill * 100;
 
                   const partialGradient =
                     overlayWidth > 0 && overlayWidth < 100
