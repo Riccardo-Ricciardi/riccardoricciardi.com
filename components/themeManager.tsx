@@ -25,7 +25,7 @@ export function ThemePicker() {
   const { setTheme } = useTheme();
   const { language } = useLanguageStore();
   const { translations, loadTranslations } = useTranslationStore();
-  const { hideLoader } = useLoadingManager(); // <-- usa hook qui
+  const { hideLoader } = useLoadingManager();
 
   useEffect(() => {
     if (Object.keys(translations).length === 0) {
