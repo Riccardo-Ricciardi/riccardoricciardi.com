@@ -4,25 +4,24 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLanguageStore } from "@/components/languageManager";
 import { useTranslationStore } from "@/utils/useTranslations";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
+import { useLoadingManager } from "@/components/loadingManager";
 
 export default function NotFound() {
   const { language } = useLanguageStore();
   const { translations, loadTranslations } = useTranslationStore();
-  const [isMounted, setIsMounted] = useState(false);
+  const { hideLoader } = useLoadingManager();
 
   useEffect(() => {
     if (Object.keys(translations).length === 0) {
-      loadTranslations().then(() => setIsMounted(true));
+      loadTranslations().then(() => hideLoader());
     } else {
-      setIsMounted(true);
+      hideLoader();
     }
-  }, [translations, loadTranslations]);
+  }, [translations, loadTranslations, hideLoader]);
 
   const translation = translations?.[language]?.["not-found"] ?? [];
-
-  if (!isMounted) return null;
 
   return (
     <div
