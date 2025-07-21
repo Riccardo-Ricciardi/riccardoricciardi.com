@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import { useLoadingManager } from "@/components/loadingManager";
 
 const supabase = createClient();
 const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL ?? "";
@@ -19,6 +20,7 @@ type Skill = {
 export default function Skills({ language }: { language: string }) {
   const [skills, setSkills] = useState<Skill[]>([]);
   const { theme } = useTheme();
+  const { hideLoader } = useLoadingManager();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -35,10 +37,12 @@ export default function Skills({ language }: { language: string }) {
       } else {
         setSkills(data ?? []);
       }
+
+      hideLoader();
     }
 
     fetchSkills();
-  }, []);
+  }, [hideLoader]);
 
   if (!isMounted) return null;
 
