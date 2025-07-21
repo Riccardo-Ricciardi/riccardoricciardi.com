@@ -19,11 +19,10 @@ type Skill = {
 
 export default function Skills({ language }: { language: string }) {
   const [skills, setSkills] = useState<Skill[]>([]);
-  const [imagesLoaded, setImagesLoaded] = useState(0);
   const { theme } = useTheme();
-  const { hideLoader } = useLoadingManager();
+  const { showLoader, hideLoader } = useLoadingManager();
 
-  // Fetch delle skill
+  // 1. Fetch skills da Supabase
   useEffect(() => {
     async function fetchSkills() {
       const { data, error } = await supabase
@@ -31,24 +30,22 @@ export default function Skills({ language }: { language: string }) {
         .select("*")
         .order("position", { ascending: true });
 
-      if (error) console.error("Errore nel recupero skills:", error);
-      else setSkills(data ?? []);
+      if (error) {
+        console.error("Errore nel recupero skills:", error);
+      } else {
+        setSkills(data ?? []);
+      }
     }
 
     fetchSkills();
   }, []);
 
-  // Quando tutte le immagini sono caricate → nascondi loader
+  // 2. Aggiungi un loader per ogni immagine da caricare
   useEffect(() => {
-    if (skills.length > 0 && imagesLoaded >= skills.length) {
-      hideLoader();
+    if (skills.length > 0) {
+      skills.forEach(() => showLoader());
     }
-  }, [imagesLoaded, skills.length, hideLoader]);
-
-  // Contatore immagini caricate
-  const handleImageLoadComplete = () => {
-    setImagesLoaded((prev) => prev + 1);
-  };
+  }, [skills, showLoader]);
 
   return (
     <div style={{ width: "clamp(0px, 80%, 1200px)", margin: "0 auto" }}>
@@ -79,7 +76,7 @@ export default function Skills({ language }: { language: string }) {
                   sizes="(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px"
                   className="object-contain"
                   priority
-                  onLoadingComplete={handleImageLoadComplete}
+                  onLoadingComplete={hideLoader}
                 />
               </div>
 
@@ -87,6 +84,7 @@ export default function Skills({ language }: { language: string }) {
                 {name}
               </p>
 
+              {/* Rettangolini di livello */}
               <div className="flex gap-x-[2px] justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded overflow-hidden">
                 {Array.from({ length: 4 }).map((_, i) => {
                   let overlayWidth = 0;
