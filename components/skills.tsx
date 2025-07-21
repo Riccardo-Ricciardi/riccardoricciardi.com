@@ -21,11 +21,8 @@ export default function Skills({ language }: { language: string }) {
   const [skills, setSkills] = useState<Skill[]>([]);
   const { theme } = useTheme();
   const { hideLoader } = useLoadingManager();
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
-
     async function fetchSkills() {
       const { data, error } = await supabase
         .from("skills")
@@ -43,8 +40,6 @@ export default function Skills({ language }: { language: string }) {
 
     fetchSkills();
   }, [hideLoader]);
-
-  if (!isMounted) return null;
 
   return (
     <div style={{ width: "clamp(0px, 80%, 1200px)", margin: "0 auto" }}>
