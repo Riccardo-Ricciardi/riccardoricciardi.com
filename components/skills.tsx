@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import { useTheme } from "next-themes";
-import { useLoadingManager } from "@/components/loadingManager";
 
 const supabase = createClient();
 const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL ?? "";
@@ -20,10 +19,11 @@ type Skill = {
 export default function Skills({ language }: { language: string }) {
   const [skills, setSkills] = useState<Skill[]>([]);
   const { theme } = useTheme();
-  const { showLoader, hideLoader } = useLoadingManager();
+  const [isMounted, setIsMounted] = useState(false);
 
-  // 1. Fetch skills da Supabase
   useEffect(() => {
+    setIsMounted(true);
+
     async function fetchSkills() {
       const { data, error } = await supabase
         .from("skills")
@@ -40,12 +40,7 @@ export default function Skills({ language }: { language: string }) {
     fetchSkills();
   }, []);
 
-  // 2. Aggiungi un loader per ogni immagine da caricare
-  useEffect(() => {
-    if (skills.length > 0) {
-      skills.forEach(() => showLoader());
-    }
-  }, [skills, showLoader]);
+  if (!isMounted) return null;
 
   return (
     <div style={{ width: "clamp(0px, 80%, 1200px)", margin: "0 auto" }}>
@@ -76,7 +71,6 @@ export default function Skills({ language }: { language: string }) {
                   sizes="(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px"
                   className="object-contain"
                   priority
-                  onLoadingComplete={hideLoader}
                 />
               </div>
 
@@ -84,7 +78,6 @@ export default function Skills({ language }: { language: string }) {
                 {name}
               </p>
 
-              {/* Rettangolini di livello */}
               <div className="flex gap-x-[2px] justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded overflow-hidden">
                 {Array.from({ length: 4 }).map((_, i) => {
                   let overlayWidth = 0;
