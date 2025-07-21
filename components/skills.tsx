@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import { useLoadingManager } from "@/components/loadingManager";
 
 const supabase = createClient();
 const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL;
@@ -18,8 +19,8 @@ type Skill = {
 
 export default function Skills({ language }: { language: string }) {
   const [skills, setSkills] = useState<Skill[]>([]);
-  const [isMounted, setIsMounted] = useState(false);
   const { theme } = useTheme();
+  const { hideLoader } = useLoadingManager();
 
   useEffect(() => {
     async function fetchSkills() {
@@ -27,21 +28,18 @@ export default function Skills({ language }: { language: string }) {
         .from("skills")
         .select("*")
         .order("position", { ascending: true });
+
       if (error) {
         console.error("Errore nel recupero skills:", error);
       } else {
         setSkills(data || []);
       }
+
+      hideLoader();
     }
 
-    if (isMounted) {
-      fetchSkills();
-    } else {
-      setIsMounted(true);
-    }
-  }, [isMounted]);
-
-  if (!isMounted) return null;
+    fetchSkills();
+  }, [hideLoader]);
 
   return (
     <div style={{ width: "clamp(0px, 80%, 1200px)", margin: "0 auto" }}>
