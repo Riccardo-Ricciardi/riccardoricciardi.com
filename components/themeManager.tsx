@@ -25,15 +25,18 @@ export function ThemePicker() {
   const { setTheme } = useTheme();
   const { language } = useLanguageStore();
   const { translations, loadTranslations } = useTranslationStore();
-  const { hideLoader } = useLoadingManager();
+  const { registerLoader, hideLoader } = useLoadingManager();
 
   useEffect(() => {
     if (Object.keys(translations).length === 0) {
-      loadTranslations().then(() => hideLoader());
+      registerLoader();
+      loadTranslations().then(() => {
+        hideLoader();
+      });
     } else {
       hideLoader();
     }
-  }, [translations, loadTranslations, hideLoader]);
+  }, [translations, loadTranslations, hideLoader, registerLoader]);
 
   const themeOptions = ["light", "dark", "system"];
   const themeItems =

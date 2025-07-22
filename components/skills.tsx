@@ -20,7 +20,7 @@ type Skill = {
 export default function Skills({ language }: { language: string }) {
   const [skills, setSkills] = useState<Skill[]>([]);
   const { theme } = useTheme();
-  const { hideLoader } = useLoadingManager();
+  const { registerLoader, hideLoader } = useLoadingManager();
 
   useEffect(() => {
     async function fetchSkills() {
@@ -33,13 +33,16 @@ export default function Skills({ language }: { language: string }) {
         console.error("Errore nel recupero skills:", error);
       } else {
         setSkills(data ?? []);
+        if (data && data.length > 0) {
+          for (let i = 0; i < data.length; i++) {
+            registerLoader();
+          }
+        }
       }
-
-      hideLoader();
     }
 
     fetchSkills();
-  }, [hideLoader]);
+  }, [registerLoader]);
 
   return (
     <div style={{ width: "clamp(0px, 80%, 1200px)", margin: "0 auto" }}>
@@ -70,6 +73,9 @@ export default function Skills({ language }: { language: string }) {
                   sizes="(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px"
                   className="object-contain"
                   priority
+                  onLoad={() => {
+                    hideLoader();
+                  }}
                 />
               </div>
 
@@ -81,7 +87,8 @@ export default function Skills({ language }: { language: string }) {
                 {Array.from({ length: 4 }).map((_, i) => {
                   let overlayWidth = 0;
                   if (i < filledSegments) overlayWidth = 100;
-                  else if (i === filledSegments) overlayWidth = partialFill * 100;
+                  else if (i === filledSegments)
+                    overlayWidth = partialFill * 100;
 
                   const partialGradient =
                     overlayWidth > 0 && overlayWidth < 100

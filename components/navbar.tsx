@@ -22,11 +22,14 @@ interface NavbarProps {
 
 export default function Navbar({ language, table }: NavbarProps) {
   const { translations, loadTranslations } = useTranslationStore();
-  const { hideLoader } = useLoadingManager();
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const { registerLoader, hideLoader } = useLoadingManager();
   const [isMobile, setIsMobile] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    registerLoader();
+    registerLoader();
+
     if (Object.keys(translations).length === 0) {
       loadTranslations().then(() => {
         if (containerRef.current && !isMobile) {
@@ -46,8 +49,10 @@ export default function Navbar({ language, table }: NavbarProps) {
         }
         hideLoader();
       });
+    } else {
+      hideLoader();
     }
-  }, [translations, loadTranslations, hideLoader, isMobile]);
+  }, [translations, loadTranslations, hideLoader, isMobile, registerLoader]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -106,6 +111,9 @@ export default function Navbar({ language, table }: NavbarProps) {
               height={36}
               priority
               className="w-[36px] h-[36px] object-contain"
+              onLoad={() => {
+                hideLoader();
+              }}
             />
           </Link>
         </div>

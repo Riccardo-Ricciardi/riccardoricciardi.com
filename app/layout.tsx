@@ -1,7 +1,12 @@
 import "@/app/globals.css";
 
 import { ThemeProvider } from "@/components/themeManager";
-import { LoadingProvider, GlobalLoader } from "@/components/loadingManager";
+import {
+  LoadingProvider,
+  GlobalLoader,
+  InitLoader,
+} from "@/components/loadingManager";
+import { InitLanguage } from "@/components/languageManager";
 import { Metadata } from "next";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL;
@@ -21,7 +26,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body>
+        <InitLanguage />
         <LoadingProvider>
+          <InitLoader />
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

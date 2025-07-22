@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useEffect } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Button } from "@/components/ui/button";
@@ -12,35 +13,44 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Languages } from "lucide-react";
 import { GB, IT } from "country-flag-icons/react/3x2";
+import { useLoadingManager } from "@/components/loadingManager";
+
+const supportedLanguages = ["en", "it"];
 
 interface LanguageStore {
   language: string;
   setLanguage: (newLanguage: string) => void;
 }
 
-// Lista delle lingue supportate nel database
-const supportedLanguages = ["en", "it"];
-
 export const useLanguageStore = create<LanguageStore>()(
   persist(
-    (set) => {
-      const browserLanguage =
-        typeof window !== "undefined" ? navigator.language.slice(0, 2) : "en";
-
-      const defaultLanguage = supportedLanguages.includes(browserLanguage)
-        ? browserLanguage
-        : "en";
-
-      return {
-        language: defaultLanguage,
-        setLanguage: (newLanguage: string) => set({ language: newLanguage }),
-      };
-    },
+    (set) => ({
+      language: "en",
+      setLanguage: (newLanguage: string) => set({ language: newLanguage }),
+    }),
     {
       name: "language-store",
     }
   )
 );
+
+export function InitLanguage() {
+  const setLanguage = useLanguageStore((state) => state.setLanguage);
+  const { registerLoader, hideLoader } = useLoadingManager();
+
+  useEffect(() => {
+    registerLoader();
+
+    const browserLang = navigator.language.slice(0, 2);
+    if (supportedLanguages.includes(browserLang)) {
+      setLanguage(browserLang);
+    }
+
+    hideLoader();
+  }, [setLanguage, registerLoader, hideLoader]);
+
+  return null;
+}
 
 export function LanguagePicker() {
   const { language, setLanguage } = useLanguageStore();

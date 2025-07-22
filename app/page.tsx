@@ -5,7 +5,7 @@ import Skills from "@/components/skills";
 import { useLanguageStore } from "@/components/languageManager";
 
 export default function Page() {
-  const { language } = useLanguageStore();
+  const language = useLanguageStore((state) => state.language);
 
   return (
     <>
