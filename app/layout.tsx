@@ -8,6 +8,7 @@ import {
 } from "@/components/loadingManager";
 import { InitLanguage } from "@/components/languageManager";
 import { Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL;
 
@@ -36,6 +37,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
+            <SpeedInsights />
           </ThemeProvider>
           <GlobalLoader />
         </LoadingProvider>

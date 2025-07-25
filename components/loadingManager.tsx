@@ -39,6 +39,7 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({
     }),
     [activeCount, registerLoader, hideLoader]
   );
+  
 
   return (
     <LoadingContext.Provider value={value}>{children}</LoadingContext.Provider>
