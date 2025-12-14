@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useEffect } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -28,9 +27,7 @@ export const useLanguageStore = create<LanguageStore>()(
       language: "en",
       setLanguage: (newLanguage: string) => set({ language: newLanguage }),
     }),
-    {
-      name: "language-store",
-    }
+    { name: "language-store" }
   )
 );
 
@@ -40,12 +37,10 @@ export function InitLanguage() {
 
   useEffect(() => {
     registerLoader();
-
     const browserLang = navigator.language.slice(0, 2);
     if (supportedLanguages.includes(browserLang)) {
       setLanguage(browserLang);
     }
-
     hideLoader();
   }, [setLanguage, registerLoader, hideLoader]);
 

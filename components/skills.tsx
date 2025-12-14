@@ -83,7 +83,7 @@ export default function Skills({ language }: { language: string }) {
                 {name}
               </p>
 
-              <div className="flex gap-x-[2px] justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded overflow-hidden">
+              <div className="flex gap-x-2px justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded overflow-hidden">
                 {Array.from({ length: 4 }).map((_, i) => {
                   let overlayWidth = 0;
                   if (i < filledSegments) overlayWidth = 100;

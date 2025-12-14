@@ -5,7 +5,7 @@ import React, {
   useState,
   useCallback,
   useMemo,
-  useEffect
+  useEffect,
 } from "react";
 import { Bouncy } from "ldrs/react";
 import "ldrs/react/Bouncy.css";
@@ -39,21 +39,18 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({
     }),
     [activeCount, registerLoader, hideLoader]
   );
-  
 
   return (
     <LoadingContext.Provider value={value}>{children}</LoadingContext.Provider>
   );
 };
 
-
 export const GlobalLoader = () => {
   const { activeCount } = useLoadingManager();
-
   if (activeCount === 0) return null;
 
   return (
-    <div className="fixed inset-0 w-screen h-screen flex justify-center items-center z-[9999] bg-secondary">
+    <div className="fixed inset-0 w-screen h-screen flex justify-center items-center z-9999 bg-secondary">
       <Bouncy size="100" speed="2" color="#2563eb" />
     </div>
   );
@@ -64,8 +61,7 @@ export const InitLoader = () => {
 
   useEffect(() => {
     hideLoader();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [hideLoader]);
 
   return null;
 };

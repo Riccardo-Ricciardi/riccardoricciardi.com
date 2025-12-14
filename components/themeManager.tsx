@@ -30,9 +30,7 @@ export function ThemePicker() {
   useEffect(() => {
     if (Object.keys(translations).length === 0) {
       registerLoader();
-      loadTranslations().then(() => {
-        hideLoader();
-      });
+      loadTranslations().then(() => hideLoader());
     } else {
       hideLoader();
     }

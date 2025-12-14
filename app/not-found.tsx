@@ -1,12 +1,14 @@
 "use client";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useLanguageStore } from "@/components/languageManager";
-import { useTranslationStore } from "@/utils/useTranslations";
 import { useEffect } from "react";
 import Link from "next/link";
+
+import { useTranslationStore } from "@/utils/useTranslations";
+import { useLanguageStore } from "@/components/languageManager";
 import { useLoadingManager } from "@/components/loadingManager";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function NotFound() {
   const { language } = useLanguageStore();
@@ -42,7 +44,7 @@ export default function NotFound() {
         </CardHeader>
         <CardContent className="p-0 flex flex-col gap-6 w-full">
           <p className="text-base text-muted-foreground">{translation[0]}</p>
-          <Link href="/" passHref>
+          <Link href="/">
             <Button className="w-full bg-red-600 text-white text-lg py-4 px-8 rounded-md hover:bg-red-700 transition-colors">
               {translation[1]}
             </Button>

@@ -96,13 +96,13 @@ export default function Navbar({ language, table }: NavbarProps) {
   }, [language, isMobile]);
 
   return (
-    <header className="border-grid sticky top-0 z-50 w-full border-b bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/85">
+    <header className="border-grid sticky top-0 z-50 w-full border-b bg-background/90 backdrop-blur supports-backdrop-filter:bg-background/85">
       <div
         className="mx-auto h-14 flex justify-between items-center"
         style={{ width: "clamp(0px, 80%, 1200px)" }}
         ref={containerRef}
       >
-        <div className="block w-[36px] h-[36px] shrink-0">
+        <div className="block w-36px h-36px shrink-0">
           <Link href="/">
             <Image
               src="https://yfzqurdmbllthonjdzpb.supabase.co/storage/v1/object/public/image//Logo.png"
@@ -110,7 +110,7 @@ export default function Navbar({ language, table }: NavbarProps) {
               width={36}
               height={36}
               priority
-              className="w-[36px] h-[36px] object-contain"
+              className="w-36px] h-[36px object-contain"
               onLoad={() => {
                 hideLoader();
               }}
