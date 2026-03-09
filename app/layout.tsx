@@ -14,7 +14,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL;
 export const metadata: Metadata = {
   title: "Riccardo Ricciardi",
   description: "The official website of Riccardo Ricciardi",
-  icons: `${BASE_URL}/Logo.png`,
+  icons: BASE_URL ? `${BASE_URL}/Logo.png` : "/logo.png",
 };
 
 export default function RootLayout({
@@ -24,11 +24,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head />
       <body suppressHydrationWarning>
-        <InitLanguage />
         <LoadingProvider>
           <InitLoader />
+          <InitLanguage />
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

@@ -1,19 +1,27 @@
 "use client";
+
 import React, {
   createContext,
-  useContext,
-  useState,
   useCallback,
+  useContext,
   useMemo,
-  useEffect,
+  useState,
 } from "react";
 import { Bouncy } from "ldrs/react";
 import "ldrs/react/Bouncy.css";
 
-const LoadingContext = createContext({
+type LoadingContextValue = {
+  activeCount: number;
+  registerLoader: () => void;
+  hideLoader: () => void;
+  withLoader: <T>(task: Promise<T>) => Promise<T>;
+};
+
+const LoadingContext = createContext<LoadingContextValue>({
   activeCount: 0,
-  registerLoader: () => {},
-  hideLoader: () => {},
+  registerLoader: () => undefined,
+  hideLoader: () => undefined,
+  withLoader: async <T,>(task: Promise<T>) => task,
 });
 
 export const useLoadingManager = () => useContext(LoadingContext);
@@ -31,13 +39,26 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({
     setActiveCount((count) => Math.max(count - 1, 0));
   }, []);
 
+  const withLoader = useCallback(
+    async <T,>(task: Promise<T>) => {
+      registerLoader();
+      try {
+        return await task;
+      } finally {
+        hideLoader();
+      }
+    },
+    [hideLoader, registerLoader]
+  );
+
   const value = useMemo(
     () => ({
       activeCount,
       registerLoader,
       hideLoader,
+      withLoader,
     }),
-    [activeCount, registerLoader, hideLoader]
+    [activeCount, hideLoader, registerLoader, withLoader]
   );
 
   return (
@@ -58,8 +79,7 @@ export const GlobalLoader = () => {
 
 export const InitLoader = () => {
   const { hideLoader } = useLoadingManager();
-
-  useEffect(() => {
+  React.useEffect(() => {
     hideLoader();
   }, [hideLoader]);
 
