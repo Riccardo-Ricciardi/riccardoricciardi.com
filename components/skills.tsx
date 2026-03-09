@@ -64,9 +64,7 @@ export default function Skills({ language }: { language: string }) {
           return;
         }
 
-        const nextSkills = data ?? [];
-        setSkills(nextSkills);
-        nextSkills.forEach(() => registerLoader());
+        setSkills(data ?? []);
       } finally {
         hideLoader();
       }
@@ -100,8 +98,6 @@ export default function Skills({ language }: { language: string }) {
                   sizes={SKILL_IMAGE_SIZES}
                   className="object-contain"
                   loading="lazy"
-                  onLoad={hideLoader}
-                  onError={hideLoader}
                 />
               </div>
 
