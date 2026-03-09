@@ -1,97 +1,101 @@
 import { createClient, isSupabaseConfigured } from "@/utils/supabase/client";
+import { APP_CONFIG, type TranslationTable } from "@/utils/config/app";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface Translation {
-  slug: string;
+interface TranslationRow {
   value: string;
   position?: number;
-  language_id: number;
 }
 
-interface Translations {
+export interface Translations {
   [languageCode: string]: { [component: string]: string[] };
 }
 
-// Funzione per recuperare tutte le traduzioni dal database
+let cachedPromise: Promise<Translations> | null = null;
+
 export async function fetchTranslations(): Promise<Translations> {
   if (!isSupabaseConfigured()) {
     return {};
   }
 
-  const supabase = createClient();
-
-  // Recupera le lingue disponibili
-  const { data: languages, error: languagesError } = await supabase
-    .from("languages")
-    .select("code, id");
-
-  if (languagesError) {
-    console.error("Errore nel recupero delle lingue:", languagesError.message);
-    return {};
+  if (cachedPromise) {
+    return cachedPromise;
   }
 
-  const translations: Translations = {};
-  const components = ["navbar", "theme", "not-found"];
+  cachedPromise = (async () => {
+    const supabase = createClient();
 
-  for (const { code, id: languageId } of languages) {
-    const languageTranslations: { [component: string]: string[] } = {};
+    const { data: languages, error: languagesError } = await supabase
+      .from("languages")
+      .select("code, id");
 
-    for (const component of components) {
-      const { data, error } = await supabase
-        .from(component)
-        .select("slug, value, position")
-        .eq("language_id", languageId);
-
-      if (error) {
-        console.error(
-          `Errore nel recupero delle traduzioni per ${code} nel componente ${component}:`,
-          error.message
-        );
-        continue;
-      }
-
-      const sortedTranslations = (data as Translation[]).sort((a, b) => {
-        const aHasPosition = "position" in a;
-        const bHasPosition = "position" in b;
-
-        if (aHasPosition && bHasPosition) {
-          return (a.position ?? 0) - (b.position ?? 0);
-        }
-        return 0;
-      });
-
-      languageTranslations[component] = sortedTranslations.map((t) => t.value);
+    if (languagesError || !languages) {
+      console.error("Errore nel recupero delle lingue:", languagesError?.message);
+      return {};
     }
 
-    translations[code] = languageTranslations;
-  }
+    const translationsByLanguage = await Promise.all(
+      languages.map(async ({ code, id: languageId }) => {
+        const componentEntries = await Promise.all(
+          APP_CONFIG.translationTables.map(async (component: TranslationTable) => {
+            const { data, error } = await supabase
+              .from(component)
+              .select("value, position")
+              .eq("language_id", languageId)
+              .order("position", { ascending: true });
 
-  return translations;
+            if (error) {
+              console.error(
+                `Errore nel recupero delle traduzioni per ${code} nel componente ${component}:`,
+                error.message
+              );
+              return [component, []] as const;
+            }
+
+            const values = ((data ?? []) as TranslationRow[]).map((t) => t.value);
+            return [component, values] as const;
+          })
+        );
+
+        return [code, Object.fromEntries(componentEntries)] as const;
+      })
+    );
+
+    return Object.fromEntries(translationsByLanguage);
+  })();
+
+  return cachedPromise;
 }
 
-// Store Zustand per gestire le traduzioni globalmente
 interface TranslationStore {
   translations: Translations;
+  isLoaded: boolean;
   loadTranslations: () => Promise<void>;
 }
 
 export const useTranslationStore = create<TranslationStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       translations: {},
+      isLoaded: false,
       loadTranslations: async () => {
+        if (get().isLoaded) return;
+
         try {
           const translations = await fetchTranslations();
-          set({ translations });
+          set({ translations, isLoaded: true });
         } catch (error) {
           console.error("Errore nel caricamento delle traduzioni:", error);
         }
       },
     }),
     {
-      name: "translation-store", // nome chiave nel localStorage
-      partialize: (state) => ({ translations: state.translations }), // esclude la funzione async dal persist
+      name: "translation-store",
+      partialize: (state) => ({
+        translations: state.translations,
+        isLoaded: state.isLoaded,
+      }),
     }
   )
 );

@@ -1,87 +1,20 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { createClient, isSupabaseConfigured } from "@/utils/supabase/client";
-import { useLanguageStore } from "@/components/languageManager";
+import { APP_CONFIG } from "@/utils/config/app";
 
-interface DeviceStore {
-  isMobile: boolean;
-  setIsMobile: (value: boolean) => void;
-}
-
-const useDeviceStore = create<DeviceStore>()(
-  persist(
-    (set) => ({
-      isMobile: false,
-      setIsMobile: (value) => set({ isMobile: value }),
-    }),
-    {
-      name: "device-store", // nome della chiave in localStorage
-    }
-  )
-);
-
-export const useIsMobile = () => {
-  const { language } = useLanguageStore();
-  const { isMobile, setIsMobile } = useDeviceStore();
-  const [breakpoint, setBreakpoint] = useState<number | null>(null);
+export const useIsMobile = (breakpoint = APP_CONFIG.mobileBreakpointPx) => {
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchBreakpoint = async () => {
-      if (!isSupabaseConfigured()) {
-        return;
-      }
+    const mediaQuery = window.matchMedia(`(max-width: ${breakpoint}px)`);
+    const updateState = () => setIsMobile(mediaQuery.matches);
 
-      const supabase = createClient();
+    updateState();
+    mediaQuery.addEventListener("change", updateState);
 
-      const { data: langData, error: langError } = await supabase
-        .from("languages")
-        .select("id")
-        .eq("code", language)
-        .single();
-
-      if (langError || !langData) {
-        console.error(
-          "Errore nel recupero dell'ID della lingua:",
-          langError?.message
-        );
-        return;
-      }
-
-      const languageId = langData.id;
-
-      const { data, error } = await supabase
-        .from("breakpoints")
-        .select("breakpoint")
-        .eq("language_id", languageId)
-        .single();
-
-      if (error) {
-        console.error("Errore nel recupero del breakpoint:", error.message);
-        return;
-      }
-
-      if (data) {
-        setBreakpoint(data.breakpoint);
-        // console.log("Breakpoint recuperato:", data.breakpoint);
-      }
-    };
-
-    fetchBreakpoint();
-  }, [language]);
-
-  useEffect(() => {
-    if (breakpoint !== null) {
-      const checkMobile = () => {
-        setIsMobile(window.innerWidth <= breakpoint);
-      };
-
-      checkMobile();
-      window.addEventListener("resize", checkMobile);
-
-      return () => window.removeEventListener("resize", checkMobile);
-    }
-  }, [breakpoint, setIsMobile]);
+    return () => mediaQuery.removeEventListener("change", updateState);
+  }, [breakpoint]);
 
   return isMobile;
 };

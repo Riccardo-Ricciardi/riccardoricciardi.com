@@ -12,20 +12,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Languages } from "lucide-react";
 import { GB, IT } from "country-flag-icons/react/3x2";
-import { useLoadingManager } from "@/components/loadingManager";
-
-const supportedLanguages = ["en", "it"];
+import { APP_CONFIG, type SupportedLanguage } from "@/utils/config/app";
 
 interface LanguageStore {
-  language: string;
-  setLanguage: (newLanguage: string) => void;
+  language: SupportedLanguage;
+  setLanguage: (newLanguage: SupportedLanguage) => void;
 }
 
 export const useLanguageStore = create<LanguageStore>()(
   persist(
     (set) => ({
-      language: "en",
-      setLanguage: (newLanguage: string) => set({ language: newLanguage }),
+      language: APP_CONFIG.defaultLanguage,
+      setLanguage: (newLanguage) => set({ language: newLanguage }),
     }),
     { name: "language-store" }
   )
@@ -33,16 +31,13 @@ export const useLanguageStore = create<LanguageStore>()(
 
 export function InitLanguage() {
   const setLanguage = useLanguageStore((state) => state.setLanguage);
-  const { registerLoader, hideLoader } = useLoadingManager();
 
   useEffect(() => {
-    registerLoader();
-    const browserLang = navigator.language.slice(0, 2);
-    if (supportedLanguages.includes(browserLang)) {
+    const browserLang = navigator.language.slice(0, 2) as SupportedLanguage;
+    if (APP_CONFIG.languages.includes(browserLang)) {
       setLanguage(browserLang);
     }
-    hideLoader();
-  }, [setLanguage, registerLoader, hideLoader]);
+  }, [setLanguage]);
 
   return null;
 }
