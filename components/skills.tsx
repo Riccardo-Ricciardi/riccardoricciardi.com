@@ -5,8 +5,8 @@ import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useLoadingManager } from "@/components/loadingManager";
+import { isSupabaseConfigured } from "@/utils/supabase/client";
 
-const supabase = createClient();
 const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL ?? "";
 
 type Skill = {
@@ -24,6 +24,12 @@ export default function Skills({ language }: { language: string }) {
 
   useEffect(() => {
     async function fetchSkills() {
+      if (!isSupabaseConfigured()) {
+        setSkills([]);
+        return;
+      }
+
+      const supabase = createClient();
       const { data, error } = await supabase
         .from("skills")
         .select("*")
@@ -34,9 +40,7 @@ export default function Skills({ language }: { language: string }) {
       } else {
         setSkills(data ?? []);
         if (data && data.length > 0) {
-          for (let i = 0; i < data.length; i++) {
-            registerLoader();
-          }
+          data.forEach(() => registerLoader());
         }
       }
     }
@@ -72,7 +76,6 @@ export default function Skills({ language }: { language: string }) {
                   fill
                   sizes="(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px"
                   className="object-contain"
-                  priority
                   onLoad={() => {
                     hideLoader();
                   }}

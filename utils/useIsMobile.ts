@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { createClient } from "@/utils/supabase/client";
+import { createClient, isSupabaseConfigured } from "@/utils/supabase/client";
 import { useLanguageStore } from "@/components/languageManager";
 
 interface DeviceStore {
@@ -28,6 +28,10 @@ export const useIsMobile = () => {
 
   useEffect(() => {
     const fetchBreakpoint = async () => {
+      if (!isSupabaseConfigured()) {
+        return;
+      }
+
       const supabase = createClient();
 
       const { data: langData, error: langError } = await supabase

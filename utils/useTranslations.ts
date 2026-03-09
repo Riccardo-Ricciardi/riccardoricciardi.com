@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/client";
+import { createClient, isSupabaseConfigured } from "@/utils/supabase/client";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -15,6 +15,10 @@ interface Translations {
 
 // Funzione per recuperare tutte le traduzioni dal database
 export async function fetchTranslations(): Promise<Translations> {
+  if (!isSupabaseConfigured()) {
+    return {};
+  }
+
   const supabase = createClient();
 
   // Recupera le lingue disponibili
