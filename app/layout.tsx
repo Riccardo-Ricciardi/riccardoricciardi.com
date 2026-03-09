@@ -35,7 +35,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
-            <SpeedInsights />
+            {process.env.NODE_ENV === "production" ? <SpeedInsights /> : null}
           </ThemeProvider>
           <GlobalLoader />
         </LoadingProvider>

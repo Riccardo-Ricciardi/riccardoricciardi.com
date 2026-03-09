@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { Bouncy } from "ldrs/react";
 import "ldrs/react/Bouncy.css";
 
@@ -25,22 +25,22 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [activeCount, setActiveCount] = useState(1);
 
-  const registerLoader = () => {
+  const registerLoader = useCallback(() => {
     setActiveCount((count) => count + 1);
-  };
+  }, []);
 
-  const hideLoader = () => {
+  const hideLoader = useCallback(() => {
     setActiveCount((count) => Math.max(count - 1, 0));
-  };
+  }, []);
 
-  const withLoader = async <T,>(task: Promise<T>) => {
+  const withLoader = useCallback(async <T,>(task: Promise<T>) => {
     registerLoader();
     try {
       return await task;
     } finally {
       hideLoader();
     }
-  };
+  }, [hideLoader, registerLoader]);
 
   const value = useMemo(
     () => ({
@@ -49,7 +49,7 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({
       hideLoader,
       withLoader,
     }),
-    [activeCount]
+    [activeCount, hideLoader, registerLoader, withLoader]
   );
 
   return (

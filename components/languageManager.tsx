@@ -33,6 +33,9 @@ export function InitLanguage() {
   const setLanguage = useLanguageStore((state) => state.setLanguage);
 
   useEffect(() => {
+    const persistedLanguage = localStorage.getItem("language-store");
+    if (persistedLanguage) return;
+
     const browserLang = navigator.language.slice(0, 2) as SupportedLanguage;
     if (APP_CONFIG.languages.includes(browserLang)) {
       setLanguage(browserLang);

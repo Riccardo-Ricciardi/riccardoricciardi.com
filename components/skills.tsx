@@ -7,6 +7,8 @@ import { useTheme } from "next-themes";
 import { useLoadingManager } from "@/components/loadingManager";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL ?? "";
+const SKILL_IMAGE_SIZES =
+  "(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px";
 
 type Skill = {
   id: number;
@@ -15,6 +17,26 @@ type Skill = {
   percentage: number;
   dark: boolean;
 };
+
+function getSkillSegmentStyles(percentage: number, segmentIndex: number) {
+  const exactSegments = (percentage / 100) * 4;
+  const filledSegments = Math.floor(exactSegments);
+  const partialFill = exactSegments - filledSegments;
+
+  let overlayWidth = 0;
+  if (segmentIndex < filledSegments) overlayWidth = 100;
+  else if (segmentIndex === filledSegments) overlayWidth = partialFill * 100;
+
+  const partialGradient =
+    overlayWidth > 0 && overlayWidth < 100
+      ? `linear-gradient(to right, #1e40af ${overlayWidth}%, transparent ${overlayWidth}%)`
+      : "none";
+
+  return {
+    backgroundColor: overlayWidth === 100 ? "#1e40af" : "#93c5fd",
+    backgroundImage: overlayWidth === 100 ? "none" : partialGradient,
+  };
+}
 
 export default function Skills({ language }: { language: string }) {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -31,28 +53,21 @@ export default function Skills({ language }: { language: string }) {
       const supabase = createClient();
       registerLoader();
 
-      let data: Skill[] | null = null;
-      let error: unknown = null;
-
       try {
-        const result = await supabase
+        const { data, error } = await supabase
           .from("skills")
-          .select("*")
+          .select("id, name, position, percentage, dark")
           .order("position", { ascending: true });
-        data = result.data;
-        error = result.error;
+
+        if (error) {
+          console.error("Errore nel recupero skills:", error);
+          return;
+        }
+
+        setSkills(data ?? []);
       } finally {
         hideLoader();
       }
-
-      if (error) {
-        console.error("Errore nel recupero skills:", error);
-        return;
-      }
-
-      const nextSkills = data ?? [];
-      setSkills(nextSkills);
-      nextSkills.forEach(() => registerLoader());
     }
 
     void fetchSkills();
@@ -66,10 +81,6 @@ export default function Skills({ language }: { language: string }) {
 
       <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(80px,1fr))]">
         {skills.map(({ id, name, percentage, dark }) => {
-          const exactSegments = (percentage / 100) * 4;
-          const filledSegments = Math.floor(exactSegments);
-          const partialFill = exactSegments - filledSegments;
-
           const imageUrl = `${BASE_URL}/${name}${
             dark && theme === "dark" ? "-dark" : ""
           }.png`;
@@ -84,43 +95,22 @@ export default function Skills({ language }: { language: string }) {
                   src={imageUrl}
                   alt={name}
                   fill
-                  sizes="(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px"
+                  sizes={SKILL_IMAGE_SIZES}
                   className="object-contain"
                   loading="lazy"
-                  onLoad={hideLoader}
                 />
               </div>
 
               <p className="mt-2 mb-1 text-xs font-medium text-primary">{name}</p>
 
               <div className="flex gap-x-2px justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded overflow-hidden">
-                {Array.from({ length: 4 }).map((_, i) => {
-                  let overlayWidth = 0;
-                  if (i < filledSegments) overlayWidth = 100;
-                  else if (i === filledSegments) overlayWidth = partialFill * 100;
-
-                  const partialGradient =
-                    overlayWidth > 0 && overlayWidth < 100
-                      ? `linear-gradient(to right, #1e40af ${overlayWidth}%, transparent ${overlayWidth}%)`
-                      : "none";
-
-                  return (
-                    <div
-                      key={i}
-                      className="flex-1 h-1 relative rounded bg-blue-300"
-                      style={{
-                        backgroundColor: "#93c5fd",
-                        backgroundImage:
-                          overlayWidth === 100 ? "none" : partialGradient,
-                        transition: "background-image 0.3s ease",
-                        ...(overlayWidth === 100 && {
-                          backgroundColor: "#1e40af",
-                          backgroundImage: "none",
-                        }),
-                      }}
-                    />
-                  );
-                })}
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex-1 h-1 relative rounded transition-[background-image] duration-300"
+                    style={getSkillSegmentStyles(percentage, i)}
+                  />
+                ))}
               </div>
             </div>
           );
