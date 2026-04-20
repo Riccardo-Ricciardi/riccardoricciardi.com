@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +11,7 @@ import {
 import { useTheme, ThemeProvider as NextThemesProvider } from "next-themes";
 import { useTranslationStore } from "@/utils/useTranslations";
 import { useLanguageStore } from "@/components/languageManager";
-import { useLoadingManager } from "@/components/loadingManager";
+import { useEnsureTranslations } from "@/utils/hooks/useEnsureTranslations";
 
 export function ThemeProvider({
   children,
@@ -24,26 +23,12 @@ export function ThemeProvider({
 export function ThemePicker() {
   const { setTheme } = useTheme();
   const { language } = useLanguageStore();
-  const { translations, loadTranslations } = useTranslationStore();
-  const { registerLoader, hideLoader } = useLoadingManager();
-
-  useEffect(() => {
-    if (Object.keys(translations).length === 0) {
-      registerLoader();
-      loadTranslations().then(() => hideLoader());
-    } else {
-      hideLoader();
-    }
-  }, [translations, loadTranslations, hideLoader, registerLoader]);
+  const { translations } = useTranslationStore();
+  useEnsureTranslations();
 
   const themeOptions = ["light", "dark", "system"];
-  const themeItems =
-    translations?.[language]?.["theme"] ??
-    themeOptions.map(capitalizeFirstLetter);
-
-  function capitalizeFirstLetter(str: string) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
+  const fallbackLabels = ["Light", "Dark", "System"];
+  const themeItems = translations?.[language]?.theme ?? fallbackLabels;
 
   return (
     <DropdownMenu>
@@ -57,10 +42,10 @@ export function ThemePicker() {
       <DropdownMenuContent align="end">
         {themeItems.map((item, index) => (
           <DropdownMenuItem
-            key={index}
-            onClick={() => setTheme(themeOptions[index].toLowerCase())}
+            key={themeOptions[index]}
+            onClick={() => setTheme(themeOptions[index])}
           >
-            {capitalizeFirstLetter(item)}
+            {item}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { createClient, isSupabaseConfigured } from "@/utils/supabase/client";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useLoadingManager } from "@/components/loadingManager";
 
-const supabase = createClient();
 const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL ?? "";
 
 type Skill = {
@@ -24,25 +23,40 @@ export default function Skills({ language }: { language: string }) {
 
   useEffect(() => {
     async function fetchSkills() {
-      const { data, error } = await supabase
-        .from("skills")
-        .select("*")
-        .order("position", { ascending: true });
+      if (!isSupabaseConfigured()) {
+        setSkills([]);
+        return;
+      }
+
+      const supabase = createClient();
+      registerLoader();
+
+      let data: Skill[] | null = null;
+      let error: unknown = null;
+
+      try {
+        const result = await supabase
+          .from("skills")
+          .select("*")
+          .order("position", { ascending: true });
+        data = result.data;
+        error = result.error;
+      } finally {
+        hideLoader();
+      }
 
       if (error) {
         console.error("Errore nel recupero skills:", error);
-      } else {
-        setSkills(data ?? []);
-        if (data && data.length > 0) {
-          for (let i = 0; i < data.length; i++) {
-            registerLoader();
-          }
-        }
+        return;
       }
+
+      const nextSkills = data ?? [];
+      setSkills(nextSkills);
+      nextSkills.forEach(() => registerLoader());
     }
 
-    fetchSkills();
-  }, [registerLoader]);
+    void fetchSkills();
+  }, [hideLoader, registerLoader]);
 
   return (
     <div style={{ width: "clamp(0px, 80%, 1200px)", margin: "0 auto" }}>
@@ -72,23 +86,18 @@ export default function Skills({ language }: { language: string }) {
                   fill
                   sizes="(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px"
                   className="object-contain"
-                  priority
-                  onLoad={() => {
-                    hideLoader();
-                  }}
+                  loading="lazy"
+                  onLoad={hideLoader}
                 />
               </div>
 
-              <p className="mt-2 mb-1 text-xs font-medium text-primary">
-                {name}
-              </p>
+              <p className="mt-2 mb-1 text-xs font-medium text-primary">{name}</p>
 
               <div className="flex gap-x-2px justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded overflow-hidden">
                 {Array.from({ length: 4 }).map((_, i) => {
                   let overlayWidth = 0;
                   if (i < filledSegments) overlayWidth = 100;
-                  else if (i === filledSegments)
-                    overlayWidth = partialFill * 100;
+                  else if (i === filledSegments) overlayWidth = partialFill * 100;
 
                   const partialGradient =
                     overlayWidth > 0 && overlayWidth < 100

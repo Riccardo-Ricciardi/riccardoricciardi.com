@@ -1,30 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 
 import { useTranslationStore } from "@/utils/useTranslations";
 import { useLanguageStore } from "@/components/languageManager";
-import { useLoadingManager } from "@/components/loadingManager";
+import { useEnsureTranslations } from "@/utils/hooks/useEnsureTranslations";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function NotFound() {
   const { language } = useLanguageStore();
-  const { translations, loadTranslations } = useTranslationStore();
-  const { registerLoader, hideLoader } = useLoadingManager();
-
-  useEffect(() => {
-    if (Object.keys(translations).length === 0) {
-      registerLoader();
-      loadTranslations().then(() => {
-        hideLoader();
-      });
-    } else {
-      hideLoader();
-    }
-  }, [translations, loadTranslations, hideLoader, registerLoader]);
+  const { translations } = useTranslationStore();
+  useEnsureTranslations();
 
   const translation = translations?.[language]?.["not-found"] ?? [];
 
