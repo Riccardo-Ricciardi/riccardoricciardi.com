@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { GlobalLoader } from "@/components/global-loader";
 import {
   APP_CONFIG,
   isSupportedLanguage,
@@ -54,6 +55,7 @@ export function LanguagePicker({ locale, ariaLabel }: LanguagePickerProps) {
 
   return (
     <DropdownMenu>
+      {isPending && <GlobalLoader fullscreen />}
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"

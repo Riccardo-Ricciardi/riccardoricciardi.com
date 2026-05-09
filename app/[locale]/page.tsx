@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { Skills } from "@/components/skills";
+import { GlobalLoader } from "@/components/global-loader";
 import { isSupportedLanguage } from "@/utils/config/app";
 import { APP_CONFIG } from "@/utils/config/app";
 
@@ -17,13 +18,7 @@ export default async function Page({ params }: PageProps) {
   const heading = locale === "it" ? "Le mie competenze" : "My skills";
 
   return (
-    <Suspense
-      fallback={
-        <section className="container-page py-10" aria-busy="true">
-          <div className="h-10 w-48 animate-pulse rounded bg-muted" />
-        </section>
-      }
-    >
+    <Suspense fallback={<GlobalLoader fullscreen />}>
       <Skills heading={heading} />
     </Suspense>
   );
