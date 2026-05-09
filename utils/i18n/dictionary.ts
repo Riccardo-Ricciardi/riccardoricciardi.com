@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { createClient } from "@/utils/supabase/server";
+import { createStaticClient } from "@/utils/supabase/static";
 import { isSupabaseConfigured } from "@/utils/supabase/client";
 import {
   APP_CONFIG,
@@ -21,13 +21,15 @@ export const getDictionary = cache(
   async (locale: SupportedLanguage): Promise<Dictionary> => {
     if (!isSupabaseConfigured()) return FALLBACK;
 
-    const supabase = await createClient();
+    const supabase = createStaticClient();
 
-    const { data: language, error: langError } = await supabase
+    const { data: languageRaw, error: langError } = await supabase
       .from("languages")
       .select("id")
       .eq("code", locale)
       .maybeSingle();
+
+    const language = languageRaw as { id: number } | null;
 
     if (langError || !language) {
       logger.warn("dictionary: language not found", { locale });

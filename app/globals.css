@@ -134,12 +134,24 @@
 
 @layer utilities {
   .container-page {
-    width: clamp(0px, 80%, 1200px);
+    width: 100%;
+    max-width: 1200px;
     margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 640px) {
+    .container-page {
+      padding-inline: 1.5rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
   }
   .border-grid {
-    border-style: dashed;
-    border-color: var(--ring);
+    border-style: solid;
+    border-color: var(--border);
   }
 }
 

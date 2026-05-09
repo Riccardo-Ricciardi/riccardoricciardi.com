@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { createClient } from "@/utils/supabase/server";
+import { createStaticClient } from "@/utils/supabase/static";
 import { isSupabaseConfigured } from "@/utils/supabase/client";
 import { logger } from "@/utils/logger";
 
@@ -14,7 +14,7 @@ export type Skill = {
 export const getSkills = cache(async (): Promise<Skill[]> => {
   if (!isSupabaseConfigured()) return [];
 
-  const supabase = await createClient();
+  const supabase = createStaticClient();
   const { data, error } = await supabase
     .from("skills")
     .select("id, name, position, percentage, dark")

@@ -5,6 +5,7 @@ import { GlobalLoader } from "@/components/global-loader";
 import { isSupportedLanguage } from "@/utils/config/app";
 import { APP_CONFIG } from "@/utils/config/app";
 
+export const dynamic = "force-static";
 export const revalidate = 3600;
 
 interface PageProps {

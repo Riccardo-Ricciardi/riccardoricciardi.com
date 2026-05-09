@@ -14,19 +14,21 @@ export async function Skills({ heading }: SkillsProps) {
   return (
     <section
       aria-labelledby="skills-heading"
-      className="container-page py-10"
+      className="container-page py-12 md:py-16"
     >
-      <h2
-        id="skills-heading"
-        className="text-4xl font-bold mb-6 text-card-foreground"
-      >
-        {heading}
-      </h2>
+      <header className="mb-8 md:mb-10">
+        <h1
+          id="skills-heading"
+          className="text-3xl md:text-4xl font-bold tracking-tight text-foreground"
+        >
+          {heading}
+        </h1>
+      </header>
 
       {skills.length === 0 ? (
         <p className="text-muted-foreground">—</p>
       ) : (
-        <ul className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(80px,1fr))] list-none p-0">
+        <ul className="grid gap-3 sm:gap-4 grid-cols-[repeat(auto-fit,minmax(96px,1fr))] list-none p-0">
           {skills.map(({ id, name, percentage, dark }, i) => {
             const lightSrc = `${BASE_URL}/${name}.png`;
             const darkSrc = `${BASE_URL}/${name}-dark.png`;
@@ -35,15 +37,19 @@ export async function Skills({ heading }: SkillsProps) {
             return (
               <li
                 key={id}
-                className="group relative rounded-lg border border-grid p-3 text-center bg-background"
+                className="group relative flex flex-col items-center justify-between rounded-lg border border-border bg-card p-3 text-center transition-all duration-200 hover:border-foreground/30 hover:shadow-sm hover:-translate-y-0.5"
               >
                 <div className="relative w-full pt-[75%]">
                   <Image
                     src={lightSrc}
                     alt={`${name} icon`}
                     fill
-                    sizes="(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px"
-                    className={dark ? "object-contain dark:hidden" : "object-contain"}
+                    sizes="(max-width: 768px) 30vw, (max-width: 1200px) 12vw, 96px"
+                    className={
+                      dark
+                        ? "object-contain dark:hidden"
+                        : "object-contain"
+                    }
                     priority={isAboveFold}
                   />
                   {dark && (
@@ -52,14 +58,14 @@ export async function Skills({ heading }: SkillsProps) {
                       alt=""
                       aria-hidden="true"
                       fill
-                      sizes="(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px"
+                      sizes="(max-width: 768px) 30vw, (max-width: 1200px) 12vw, 96px"
                       className="hidden object-contain dark:block"
                       priority={isAboveFold}
                     />
                   )}
                 </div>
 
-                <p className="mt-2 mb-1 text-xs font-medium text-primary">
+                <p className="mt-3 mb-2 text-xs font-medium text-foreground">
                   {name}
                 </p>
 
