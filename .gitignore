@@ -43,3 +43,6 @@ next-env.d.ts
 .aider.input.history
 et --hard 973d537
 .aider.tags.cache.v4/cache.db
+
+# graphify
+/graphify-out/

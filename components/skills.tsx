@@ -1,131 +1,74 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
-import { createClient, isSupabaseConfigured } from "@/utils/supabase/client";
 import Image from "next/image";
-import { useTheme } from "next-themes";
-import { useLoadingManager } from "@/components/loadingManager";
+import { getSkills } from "@/utils/skills/fetch";
+import { SkillMeter } from "@/components/skill-meter";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL ?? "";
 
-type Skill = {
-  id: number;
-  name: string;
-  position: number;
-  percentage: number;
-  dark: boolean;
-};
+interface SkillsProps {
+  heading: string;
+}
 
-export default function Skills({ language }: { language: string }) {
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const { theme } = useTheme();
-  const { registerLoader, hideLoader } = useLoadingManager();
-
-  useEffect(() => {
-    async function fetchSkills() {
-      if (!isSupabaseConfigured()) {
-        setSkills([]);
-        return;
-      }
-
-      const supabase = createClient();
-      registerLoader();
-
-      let data: Skill[] | null = null;
-      let error: unknown = null;
-
-      try {
-        const result = await supabase
-          .from("skills")
-          .select("*")
-          .order("position", { ascending: true });
-        data = result.data;
-        error = result.error;
-      } finally {
-        hideLoader();
-      }
-
-      if (error) {
-        console.error("Errore nel recupero skills:", error);
-        return;
-      }
-
-      const nextSkills = data ?? [];
-      setSkills(nextSkills);
-      nextSkills.forEach(() => registerLoader());
-    }
-
-    void fetchSkills();
-  }, [hideLoader, registerLoader]);
+export async function Skills({ heading }: SkillsProps) {
+  const skills = await getSkills();
 
   return (
-    <div style={{ width: "clamp(0px, 80%, 1200px)", margin: "0 auto" }}>
-      <h1 className="text-4xl font-bold my-6 text-card-foreground">
-        {language === "it" ? "Le mie Competenze" : "My Skills"}
-      </h1>
+    <section
+      aria-labelledby="skills-heading"
+      className="container-page py-10"
+    >
+      <h2
+        id="skills-heading"
+        className="text-4xl font-bold mb-6 text-card-foreground"
+      >
+        {heading}
+      </h2>
 
-      <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(80px,1fr))]">
-        {skills.map(({ id, name, percentage, dark }) => {
-          const exactSegments = (percentage / 100) * 4;
-          const filledSegments = Math.floor(exactSegments);
-          const partialFill = exactSegments - filledSegments;
+      {skills.length === 0 ? (
+        <p className="text-muted-foreground">—</p>
+      ) : (
+        <ul className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(80px,1fr))] list-none p-0">
+          {skills.map(({ id, name, percentage, dark }, i) => {
+            const lightSrc = `${BASE_URL}/${name}.png`;
+            const darkSrc = `${BASE_URL}/${name}-dark.png`;
+            const isAboveFold = i < 6;
 
-          const imageUrl = `${BASE_URL}/${name}${
-            dark && theme === "dark" ? "-dark" : ""
-          }.png`;
-
-          return (
-            <div
-              key={id}
-              className="group relative rounded-lg border border-grid p-3 text-center bg-background"
-            >
-              <div className="relative w-full pt-[75%]">
-                <Image
-                  src={imageUrl}
-                  alt={name}
-                  fill
-                  sizes="(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px"
-                  className="object-contain"
-                  loading="lazy"
-                  onLoad={hideLoader}
-                />
-              </div>
-
-              <p className="mt-2 mb-1 text-xs font-medium text-primary">{name}</p>
-
-              <div className="flex gap-x-2px justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded overflow-hidden">
-                {Array.from({ length: 4 }).map((_, i) => {
-                  let overlayWidth = 0;
-                  if (i < filledSegments) overlayWidth = 100;
-                  else if (i === filledSegments) overlayWidth = partialFill * 100;
-
-                  const partialGradient =
-                    overlayWidth > 0 && overlayWidth < 100
-                      ? `linear-gradient(to right, #1e40af ${overlayWidth}%, transparent ${overlayWidth}%)`
-                      : "none";
-
-                  return (
-                    <div
-                      key={i}
-                      className="flex-1 h-1 relative rounded bg-blue-300"
-                      style={{
-                        backgroundColor: "#93c5fd",
-                        backgroundImage:
-                          overlayWidth === 100 ? "none" : partialGradient,
-                        transition: "background-image 0.3s ease",
-                        ...(overlayWidth === 100 && {
-                          backgroundColor: "#1e40af",
-                          backgroundImage: "none",
-                        }),
-                      }}
+            return (
+              <li
+                key={id}
+                className="group relative rounded-lg border border-grid p-3 text-center bg-background"
+              >
+                <div className="relative w-full pt-[75%]">
+                  <Image
+                    src={lightSrc}
+                    alt={`${name} icon`}
+                    fill
+                    sizes="(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px"
+                    className={dark ? "object-contain dark:hidden" : "object-contain"}
+                    priority={isAboveFold}
+                  />
+                  {dark && (
+                    <Image
+                      src={darkSrc}
+                      alt=""
+                      aria-hidden="true"
+                      fill
+                      sizes="(max-width: 768px) 30vw, (max-width: 1200px) 10vw, 80px"
+                      className="hidden object-contain dark:block"
+                      priority={isAboveFold}
                     />
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
+                  )}
+                </div>
+
+                <p className="mt-2 mb-1 text-xs font-medium text-primary">
+                  {name}
+                </p>
+
+                <SkillMeter value={percentage} label={name} />
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
   );
 }

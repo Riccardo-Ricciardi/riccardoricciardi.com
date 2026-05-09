@@ -1,0 +1,80 @@
+import { cache } from "react";
+import { createClient } from "@/utils/supabase/server";
+import { isSupabaseConfigured } from "@/utils/supabase/client";
+import {
+  APP_CONFIG,
+  type SupportedLanguage,
+  type TranslationTable,
+} from "@/utils/config/app";
+import type { Dictionary, NavbarItem } from "@/utils/i18n/types";
+import { logger } from "@/utils/logger";
+
+const FALLBACK: Dictionary = {
+  navbar: [],
+  theme: ["Light", "Dark", "System"],
+  "not-found": ["Page not found", "Back to home"],
+};
+
+type RawRow = { value: string; position: number; slug?: string | null };
+
+export const getDictionary = cache(
+  async (locale: SupportedLanguage): Promise<Dictionary> => {
+    if (!isSupabaseConfigured()) return FALLBACK;
+
+    const supabase = await createClient();
+
+    const { data: language, error: langError } = await supabase
+      .from("languages")
+      .select("id")
+      .eq("code", locale)
+      .maybeSingle();
+
+    if (langError || !language) {
+      logger.warn("dictionary: language not found", { locale });
+      return FALLBACK;
+    }
+
+    const entries = await Promise.all(
+      APP_CONFIG.translationTables.map(async (table: TranslationTable) => {
+        const query = supabase
+          .from(table)
+          .select("*")
+          .eq("language_id", language.id)
+          .order("position", { ascending: true });
+
+        const { data, error } = await query;
+
+        if (error) {
+          logger.error("dictionary: translation fetch failed", {
+            locale,
+            table,
+            message: error.message,
+          });
+          return [table, []] as const;
+        }
+
+        const rows = (data ?? []) as unknown as RawRow[];
+
+        if (table === "navbar") {
+          const items: NavbarItem[] = rows.map((r, i) => {
+            const raw = (r.slug ?? "").trim().toLowerCase();
+            const isHome = raw === "" || raw === "home" || raw === "/" || i === 0;
+            return {
+              slug: isHome ? "" : raw,
+              label: r.value,
+              position: r.position,
+            };
+          });
+          return [table, items] as const;
+        }
+
+        return [table, rows.map((r) => r.value)] as const;
+      })
+    );
+
+    return {
+      ...FALLBACK,
+      ...Object.fromEntries(entries),
+    } as Dictionary;
+  }
+);
