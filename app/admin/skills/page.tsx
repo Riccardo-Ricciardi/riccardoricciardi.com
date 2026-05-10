@@ -8,6 +8,7 @@ import {
   uploadSkillIconAction,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
+import { FormField, FormToggle } from "@/components/admin/form-field";
 import Image from "next/image";
 
 export const dynamic = "force-dynamic";
@@ -38,7 +39,7 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
   const rows = ((data ?? []) as Row[]) ?? [];
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-8">
       <header>
         <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
           Content
@@ -56,104 +57,109 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
       )}
 
       <section>
-        <h2 className="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+        <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
           Add new
         </h2>
         <form
           action={createSkillAction}
-          className="grid grid-cols-1 gap-3 rounded-xl border border-dashed border-dashed-soft p-4 sm:grid-cols-6"
+          className="grid grid-cols-2 items-end gap-2 rounded-lg border border-dashed border-dashed-soft p-3 sm:grid-cols-12"
         >
-          <Field label="Name" name="name" required className="sm:col-span-2" />
-          <Field
-            label="Position"
+          <FormField label="Name" name="name" required className="sm:col-span-3" />
+          <FormField
+            label="Pos"
             name="position"
             type="number"
             defaultValue={rows.length.toString()}
+            className="sm:col-span-1"
           />
-          <Field
-            label="Percentage"
+          <FormField
+            label="%"
             name="percentage"
             type="number"
             min={0}
             max={100}
             defaultValue="80"
+            className="sm:col-span-1"
           />
-          <Field label="Category" name="category" />
-          <label className="flex items-center gap-2 self-end pb-2 sm:col-span-1">
-            <input type="checkbox" name="dark" />
-            <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
-              Dark
-            </span>
-          </label>
-          <div className="sm:col-span-6">
-            <Button type="submit" className="bg-accent-blue text-white">
-              Add skill
-            </Button>
-          </div>
+          <FormField label="Category" name="category" className="sm:col-span-3" />
+          <FormToggle label="Dark" name="dark" className="sm:col-span-2" />
+          <Button type="submit" size="sm" className="bg-accent-blue text-white sm:col-span-2">
+            Add
+          </Button>
         </form>
       </section>
 
       <section>
-        <h2 className="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+        <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
           {rows.length} item{rows.length === 1 ? "" : "s"}
         </h2>
         <ul className="flex flex-col gap-2 list-none p-0">
           {rows.map((row) => (
             <li
               key={row.id}
-              className="rounded-xl border border-dashed border-dashed-soft p-4"
+              className="rounded-lg border border-dashed border-dashed-soft p-3"
             >
               <form
                 action={updateSkillAction}
-                className="grid grid-cols-1 gap-3 sm:grid-cols-7"
+                className="grid grid-cols-2 items-end gap-2 sm:grid-cols-12"
               >
                 <input type="hidden" name="id" value={row.id} />
-                <Field label="Name" name="name" defaultValue={row.name} required className="sm:col-span-2" />
-                <Field
-                  label="Position"
+                <div className="flex items-center gap-2 sm:col-span-3">
+                  {row.icon_url && (
+                    <span className="relative h-7 w-7 shrink-0 rounded border border-dashed border-dashed-soft bg-background">
+                      <Image
+                        src={row.icon_url}
+                        alt=""
+                        fill
+                        sizes="28px"
+                        className="object-contain p-0.5"
+                      />
+                    </span>
+                  )}
+                  <FormField label="Name" name="name" defaultValue={row.name} required className="flex-1" />
+                </div>
+                <FormField
+                  label="Pos"
                   name="position"
                   type="number"
                   defaultValue={(row.position ?? 0).toString()}
+                  className="sm:col-span-1"
                 />
-                <Field
+                <FormField
                   label="%"
                   name="percentage"
                   type="number"
                   min={0}
                   max={100}
                   defaultValue={(row.percentage ?? 0).toString()}
+                  className="sm:col-span-1"
                 />
-                <Field
+                <FormField
                   label="Category"
                   name="category"
                   defaultValue={row.category ?? ""}
+                  className="sm:col-span-3"
                 />
-                <label className="flex items-center gap-2 self-end pb-2">
-                  <input type="checkbox" name="dark" defaultChecked={row.dark ?? false} />
-                  <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
-                    Dark
-                  </span>
-                </label>
-                <div className="flex items-end gap-2 sm:col-span-1">
-                  <Button type="submit" size="sm" variant="outline">
-                    Save
-                  </Button>
-                </div>
+                <FormToggle
+                  label="Dark"
+                  name="dark"
+                  defaultChecked={row.dark ?? false}
+                  className="sm:col-span-2"
+                />
+                <Button type="submit" size="sm" variant="outline" className="sm:col-span-2">
+                  Save
+                </Button>
               </form>
-              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <IconSlot
-                  rowId={row.id}
-                  variant="light"
-                  url={row.icon_url}
-                  fallbackName={row.name}
-                />
-                <IconSlot
-                  rowId={row.id}
-                  variant="dark"
-                  url={row.icon_dark_url}
-                  fallbackName={row.name}
-                />
-              </div>
+
+              <details className="mt-2">
+                <summary className="cursor-pointer font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground">
+                  Icons + delete
+                </summary>
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <IconSlot rowId={row.id} variant="light" url={row.icon_url} fallbackName={row.name} />
+                  <IconSlot rowId={row.id} variant="dark" url={row.icon_dark_url} fallbackName={row.name} />
+                </div>
+              </details>
 
               <form action={deleteSkillAction} className="mt-3 flex justify-end">
                 <input type="hidden" name="id" value={row.id} />
@@ -185,10 +191,9 @@ function IconSlot({
   url: string | null;
   fallbackName: string;
 }) {
-  const previewUrl = url;
   return (
-    <div className="rounded-lg border border-dashed border-dashed-soft p-3">
-      <div className="mb-3 flex items-center justify-between">
+    <div className="rounded-md border border-dashed border-dashed-soft p-2.5">
+      <div className="mb-2 flex items-center justify-between">
         <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
           Icon — {variant}
         </span>
@@ -205,19 +210,19 @@ function IconSlot({
           </form>
         )}
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <div
-          className={`relative h-12 w-12 shrink-0 rounded-md border border-dashed border-dashed-soft ${
+          className={`relative h-9 w-9 shrink-0 rounded-md border border-dashed border-dashed-soft ${
             variant === "dark" ? "bg-foreground/90" : "bg-background"
           }`}
         >
-          {previewUrl ? (
+          {url ? (
             <Image
-              src={previewUrl}
+              src={url}
               alt={`${fallbackName} ${variant}`}
               fill
-              sizes="48px"
-              className="object-contain p-1"
+              sizes="36px"
+              className="object-contain p-0.5"
             />
           ) : (
             <span className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
@@ -228,7 +233,7 @@ function IconSlot({
         <form
           action={uploadSkillIconAction}
           encType="multipart/form-data"
-          className="flex flex-1 flex-col gap-2"
+          className="flex flex-1 items-center gap-2"
         >
           <input type="hidden" name="id" value={rowId} />
           <input type="hidden" name="variant" value={variant} />
@@ -237,50 +242,13 @@ function IconSlot({
             name="file"
             accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml,image/gif"
             required
-            className="text-xs file:mr-2 file:rounded-md file:border file:border-dashed file:border-dashed-soft file:bg-background file:px-2 file:py-1 file:text-xs file:font-medium hover:file:border-accent-blue"
+            className="flex-1 text-xs file:mr-2 file:rounded file:border file:border-dashed file:border-dashed-soft file:bg-background file:px-2 file:py-0.5 file:text-[10px] hover:file:border-accent-blue"
           />
-          <Button type="submit" size="sm" variant="outline" className="self-start">
+          <Button type="submit" size="sm" variant="outline">
             Upload
           </Button>
         </form>
       </div>
     </div>
-  );
-}
-
-function Field({
-  label,
-  name,
-  type = "text",
-  defaultValue,
-  required,
-  min,
-  max,
-  className = "",
-}: {
-  label: string;
-  name: string;
-  type?: string;
-  defaultValue?: string;
-  required?: boolean;
-  min?: number;
-  max?: number;
-  className?: string;
-}) {
-  return (
-    <label className={`flex flex-col gap-1.5 ${className}`}>
-      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-        {label}
-      </span>
-      <input
-        name={name}
-        type={type}
-        defaultValue={defaultValue}
-        required={required}
-        min={min}
-        max={max}
-        className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      />
-    </label>
   );
 }

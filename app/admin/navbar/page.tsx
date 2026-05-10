@@ -7,6 +7,7 @@ import {
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
 import { LangTabs } from "@/components/admin/lang-tabs";
+import { FormField } from "@/components/admin/form-field";
 
 export const dynamic = "force-dynamic";
 
@@ -60,7 +61,7 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
     .sort();
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-8">
       <header>
         <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
           Content
@@ -78,39 +79,39 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
       )}
 
       <section>
-        <h2 className="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+        <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
           Add new
         </h2>
         <form
           action={createNavbarAction}
-          className="grid grid-cols-1 gap-3 rounded-xl border border-dashed border-dashed-soft p-4 sm:grid-cols-5"
+          className="grid grid-cols-2 items-end gap-2 rounded-lg border border-dashed border-dashed-soft p-3 sm:grid-cols-12"
         >
-          <label className="flex flex-col gap-1.5 sm:col-span-1">
+          <label className="flex flex-col gap-1 sm:col-span-2">
             <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              Language
+              Lang
             </span>
             <select
               name="language_id"
               required
-              className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded-md border border-dashed border-dashed-soft bg-background px-2.5 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {langs.map((l) => (
                 <option key={l.id} value={l.id}>
-                  {l.code} — {l.name}
+                  {l.code}
                 </option>
               ))}
             </select>
           </label>
-          <label className="flex flex-col gap-1.5">
+          <label className="flex flex-col gap-1 sm:col-span-3">
             <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              Slug (empty=home)
+              Slug
             </span>
             <input
               name="slug"
               type="text"
               list="known-slugs"
               placeholder="about"
-              className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded-md border border-dashed border-dashed-soft bg-background px-2.5 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
             <datalist id="known-slugs">
               {knownSlugs.map((s) => (
@@ -118,21 +119,22 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
               ))}
             </datalist>
           </label>
-          <Field label="Label" name="value" required />
-          <Field label="Position" name="position" type="number" defaultValue="0" />
-          <div className="self-end">
-            <Button type="submit" className="bg-accent-blue text-white">
-              Add
-            </Button>
-          </div>
+          <FormField label="Label" name="value" required className="sm:col-span-4" />
+          <FormField
+            label="Pos"
+            name="position"
+            type="number"
+            defaultValue="0"
+            className="sm:col-span-1"
+          />
+          <Button type="submit" size="sm" className="bg-accent-blue text-white sm:col-span-2">
+            Add
+          </Button>
         </form>
-        <p className="mt-2 text-xs text-muted-foreground">
-          Tip: add the same slug across all languages so the URL works.
-        </p>
       </section>
 
       <section>
-        <h2 className="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+        <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
           Items per language
         </h2>
         <LangTabs
@@ -151,58 +153,61 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
               {(grouped.get(lang.id) ?? []).map((row) => (
                 <li
                   key={row.id}
-                  className="rounded-xl border border-dashed border-dashed-soft p-4"
+                  className="rounded-lg border border-dashed border-dashed-soft p-3"
                 >
-                  <form
-                    action={updateNavbarAction}
-                    className="grid grid-cols-1 gap-3 sm:grid-cols-5"
-                  >
-                    <input type="hidden" name="id" value={row.id} />
-                    <label className="flex flex-col gap-1.5">
-                      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                        Slug
-                      </span>
-                      <input
-                        name="slug"
-                        type="text"
-                        list="known-slugs"
-                        defaultValue={row.slug ?? ""}
-                        className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  <div className="grid grid-cols-2 items-end gap-2 sm:grid-cols-12">
+                    <form
+                      action={updateNavbarAction}
+                      className="contents"
+                    >
+                      <input type="hidden" name="id" value={row.id} />
+                      <label className="flex flex-col gap-1 sm:col-span-3">
+                        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                          Slug
+                        </span>
+                        <input
+                          name="slug"
+                          type="text"
+                          list="known-slugs"
+                          defaultValue={row.slug ?? ""}
+                          className="rounded-md border border-dashed border-dashed-soft bg-background px-2.5 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        />
+                      </label>
+                      <FormField
+                        label="Label"
+                        name="value"
+                        defaultValue={row.value}
+                        required
+                        className="sm:col-span-5"
                       />
-                    </label>
-                    <Field
-                      label="Label"
-                      name="value"
-                      defaultValue={row.value}
-                      required
-                      className="sm:col-span-2"
-                    />
-                    <Field
-                      label="Position"
-                      name="position"
-                      type="number"
-                      defaultValue={(row.position ?? 0).toString()}
-                    />
-                    <div className="flex items-end gap-2">
-                      <Button type="submit" size="sm" variant="outline">
+                      <FormField
+                        label="Pos"
+                        name="position"
+                        type="number"
+                        defaultValue={(row.position ?? 0).toString()}
+                        className="sm:col-span-1"
+                      />
+                      <Button
+                        type="submit"
+                        size="sm"
+                        variant="outline"
+                        className="sm:col-span-1"
+                      >
                         Save
                       </Button>
-                    </div>
-                  </form>
-                  <form
-                    action={deleteNavbarAction}
-                    className="mt-3 flex justify-end"
-                  >
-                    <input type="hidden" name="id" value={row.id} />
-                    <Button
-                      type="submit"
-                      size="sm"
-                      variant="outline"
-                      className="border-red-500/40 text-red-600 hover:bg-red-500/5 hover:text-red-700"
-                    >
-                      Delete
-                    </Button>
-                  </form>
+                    </form>
+                    <form action={deleteNavbarAction} className="sm:col-span-2">
+                      <input type="hidden" name="id" value={row.id} />
+                      <Button
+                        type="submit"
+                        size="sm"
+                        variant="outline"
+                        className="w-full border-red-500/40 text-red-600 hover:bg-red-500/5 hover:text-red-700"
+                      >
+                        Delete
+                      </Button>
+                    </form>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -210,39 +215,5 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
         />
       </section>
     </div>
-  );
-}
-
-function Field({
-  label,
-  name,
-  type = "text",
-  defaultValue,
-  required,
-  placeholder,
-  className = "",
-}: {
-  label: string;
-  name: string;
-  type?: string;
-  defaultValue?: string;
-  required?: boolean;
-  placeholder?: string;
-  className?: string;
-}) {
-  return (
-    <label className={`flex flex-col gap-1.5 ${className}`}>
-      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-        {label}
-      </span>
-      <input
-        name={name}
-        type={type}
-        defaultValue={defaultValue}
-        required={required}
-        placeholder={placeholder}
-        className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      />
-    </label>
   );
 }
