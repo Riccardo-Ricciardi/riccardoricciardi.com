@@ -186,7 +186,7 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
                         />
                         <Checkbox
                           name={`skill[${row.id}][dark]`}
-                          defaultChecked={row.dark ?? false}
+                          defaultChecked={row.dark || !!row.icon_dark_url}
                           aria-label="Has dark icon variant"
                         />
                       </td>

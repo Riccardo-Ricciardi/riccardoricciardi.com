@@ -41,7 +41,10 @@ export async function uploadSkillIconAction(formData: FormData) {
     const previousUrl =
       variant === "dark" ? skill?.icon_dark_url : skill?.icon_url;
 
-    await supabase.from("skills").update({ [column]: url }).eq("id", id);
+    const update: Record<string, string | boolean> = { [column]: url };
+    if (variant === "dark") update.dark = true;
+
+    await supabase.from("skills").update(update).eq("id", id);
 
     if (previousUrl) {
       const oldPath = pathFromPublicUrl(previousUrl);
@@ -74,7 +77,10 @@ export async function clearSkillIconAction(formData: FormData) {
   const column = variant === "dark" ? "icon_dark_url" : "icon_url";
   const url = variant === "dark" ? skill?.icon_dark_url : skill?.icon_url;
 
-  await supabase.from("skills").update({ [column]: null }).eq("id", id);
+  const update: Record<string, string | boolean | null> = { [column]: null };
+  if (variant === "dark") update.dark = false;
+
+  await supabase.from("skills").update(update).eq("id", id);
 
   if (url) {
     const oldPath = pathFromPublicUrl(url);

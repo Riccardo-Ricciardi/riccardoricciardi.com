@@ -113,7 +113,7 @@ export default async function SkillDetailAdmin({ params }: PageProps) {
           <label className="flex items-center gap-2 self-end pb-2 sm:col-span-1">
             <Checkbox
               name="dark"
-              defaultChecked={skill.dark ?? false}
+              defaultChecked={skill.dark || !!skill.icon_dark_url}
               aria-label="Has dark icon variant"
             />
             <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
