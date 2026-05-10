@@ -15,7 +15,7 @@ export async function Skills({ heading }: SkillsProps) {
     <section
       id="skills"
       aria-labelledby="skills-heading"
-      className="container-page py-16 md:py-24 lg:py-28"
+      className="container-page section-divider-b py-16 md:py-24 lg:py-28"
     >
       <header className="mb-10 md:mb-14">
         <h2

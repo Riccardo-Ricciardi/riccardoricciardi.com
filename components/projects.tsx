@@ -17,7 +17,7 @@ export async function Projects({ heading, subtitle, locale }: ProjectsProps) {
     <section
       id="projects"
       aria-labelledby="projects-heading"
-      className="container-page py-16 md:py-24 lg:py-28 border-t"
+      className="container-page section-divider-b py-16 md:py-24 lg:py-28"
     >
       <header className="mb-10 md:mb-14 max-w-2xl">
         <h2

@@ -18,12 +18,12 @@ export function Footer({ locale }: FooterProps) {
       : `Built by ${APP_CONFIG.author.name}`;
 
   return (
-    <footer className="border-t mt-auto" role="contentinfo">
-      <div className="container-page flex flex-col items-center justify-between gap-4 py-8 text-sm text-muted-foreground sm:flex-row">
-        <p>
+    <footer className="section-divider-t mt-auto" role="contentinfo">
+      <div className="container-page flex flex-row items-center justify-between gap-4 py-6 text-xs text-muted-foreground sm:text-sm">
+        <p className="truncate">
           © {year} {built}.
         </p>
-        <ul className="flex items-center gap-4">
+        <ul className="flex shrink-0 items-center gap-3 sm:gap-4">
           {SOCIAL_LINKS.map(({ href, label, Icon }) => (
             <li key={label}>
               <a
