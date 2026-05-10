@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getDictionary } from "@/utils/i18n/dictionary";
 import { APP_CONFIG } from "@/utils/config/app";
 
@@ -12,25 +12,32 @@ export default async function LocaleNotFound() {
   const cta = messages?.[1] ?? "Back to home";
 
   return (
-    <div className="container-page flex min-h-[80vh] items-center justify-center py-12">
-      <Card className="flex w-full max-w-md flex-col items-center border-grid p-6 text-center shadow-none">
-        <CardHeader className="mb-6 w-full p-0">
-          <h1
-            className="w-full text-center font-extrabold leading-none text-red-600"
-            style={{ fontSize: "clamp(6rem, 20vw, 12rem)" }}
-          >
-            404
+    <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden">
+      <div
+        aria-hidden="true"
+        className="bg-dot bg-dot-mask pointer-events-none absolute inset-0 -z-10"
+      />
+      <div className="container-page py-20 md:py-28">
+        <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+          <p className="font-mono text-sm font-medium uppercase tracking-widest text-muted-foreground">
+            Error 404
+          </p>
+          <h1 className="mt-4 text-balance text-6xl font-semibold tracking-tight leading-[1.05] md:text-8xl">
+            {message}
           </h1>
-        </CardHeader>
-        <CardContent className="flex w-full flex-col gap-6 p-0">
-          <p className="text-base text-muted-foreground">{message}</p>
-          <Link href={`/${locale}`}>
-            <Button className="w-full rounded-md bg-red-600 px-8 py-4 text-lg text-white transition-colors hover:bg-red-700">
+          <p className="mt-6 max-w-md text-balance text-lg text-muted-foreground">
+            {(locale as string) === "it"
+              ? "La pagina che cercavi non esiste o è stata spostata."
+              : "The page you were looking for doesn't exist or has been moved."}
+          </p>
+          <Button asChild size="lg" className="mt-8">
+            <Link href={`/${locale}`}>
+              <ArrowLeft className="mr-1 h-4 w-4" aria-hidden="true" />
               {cta}
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
-    </div>
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </section>
   );
 }

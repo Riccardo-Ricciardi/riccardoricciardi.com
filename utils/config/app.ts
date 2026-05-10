@@ -8,7 +8,7 @@ export const APP_CONFIG = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://riccardoricciardi.com",
   author: {
     name: "Riccardo Ricciardi",
-    email: "riccardo.ricciardi2009@gmail.com",
+    email: "info@riccardoricciardi.com",
     sameAs: [] as string[],
   },
   revalidate: {

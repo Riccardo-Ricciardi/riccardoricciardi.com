@@ -49,3 +49,4 @@ et --hard 973d537
 
 # claude code local state
 .claude/
+.env*.local

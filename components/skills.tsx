@@ -29,7 +29,7 @@ export async function Skills({ heading }: SkillsProps) {
       {skills.length === 0 ? (
         <p className="text-muted-foreground">—</p>
       ) : (
-        <ul className="grid gap-3 sm:gap-4 grid-cols-[repeat(auto-fit,minmax(96px,1fr))] list-none p-0">
+        <ul className="grid gap-3 sm:gap-4 grid-cols-[repeat(auto-fit,minmax(140px,1fr))] list-none p-0">
           {skills.map(({ id, name, percentage, dark }, i) => {
             const lightSrc = `${BASE_URL}/${name}.png`;
             const darkSrc = `${BASE_URL}/${name}-dark.png`;
@@ -38,18 +38,16 @@ export async function Skills({ heading }: SkillsProps) {
             return (
               <li
                 key={id}
-                className="group relative flex flex-col items-center justify-between rounded-xl border border-border bg-card p-4 text-center transition-colors duration-200 hover:bg-accent/40 hover:border-foreground/20"
+                className="group relative flex flex-col items-stretch justify-between rounded-xl border border-border bg-card p-4 transition-colors duration-200 hover:bg-accent/40 hover:border-foreground/20"
               >
-                <div className="relative w-full pt-[75%]">
+                <div className="relative mx-auto h-12 w-12 sm:h-14 sm:w-14">
                   <Image
                     src={lightSrc}
                     alt={`${name} icon`}
                     fill
-                    sizes="(max-width: 768px) 30vw, (max-width: 1200px) 12vw, 96px"
+                    sizes="56px"
                     className={
-                      dark
-                        ? "object-contain dark:hidden"
-                        : "object-contain"
+                      dark ? "object-contain dark:hidden" : "object-contain"
                     }
                     priority={isAboveFold}
                   />
@@ -59,18 +57,28 @@ export async function Skills({ heading }: SkillsProps) {
                       alt=""
                       aria-hidden="true"
                       fill
-                      sizes="(max-width: 768px) 30vw, (max-width: 1200px) 12vw, 96px"
+                      sizes="56px"
                       className="hidden object-contain dark:block"
                       priority={isAboveFold}
                     />
                   )}
                 </div>
 
-                <p className="mt-3 mb-2 font-mono text-xs font-medium tracking-tight text-foreground">
-                  {name}
-                </p>
+                <div className="mt-4 flex items-baseline justify-between gap-2">
+                  <p className="truncate font-mono text-xs font-medium text-foreground">
+                    {name}
+                  </p>
+                  <span
+                    className="font-mono text-[10px] tabular-nums text-muted-foreground"
+                    aria-hidden="true"
+                  >
+                    {percentage}%
+                  </span>
+                </div>
 
-                <SkillMeter value={percentage} label={name} />
+                <div className="mt-2">
+                  <SkillMeter value={percentage} label={name} />
+                </div>
               </li>
             );
           })}

@@ -1,4 +1,4 @@
-import { Github, Linkedin, Mail } from "lucide-react";
+import { Github, Mail } from "lucide-react";
 import { APP_CONFIG } from "@/utils/config/app";
 
 interface FooterProps {
@@ -7,11 +7,6 @@ interface FooterProps {
 
 const SOCIAL_LINKS = [
   { href: "https://github.com/Riccardo-Ricciardi", label: "GitHub", Icon: Github },
-  {
-    href: "https://www.linkedin.com/in/riccardo-ricciardi/",
-    label: "LinkedIn",
-    Icon: Linkedin,
-  },
   { href: `mailto:${APP_CONFIG.author.email}`, label: "Email", Icon: Mail },
 ] as const;
 
