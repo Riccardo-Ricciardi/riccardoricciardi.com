@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Copy } from "lucide-react";
 
 interface Props {
-  formId: string;
+  /** Optional id of an external form. Omit/empty to use the nearest ancestor form. */
+  formId?: string;
   name?: string;
   multiline?: boolean;
   initialValue: string;
@@ -28,11 +29,13 @@ export function CopyableInput({
   const className =
     "w-full min-w-[160px] rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
+  const formAttr = formId ? { form: formId } : {};
+
   return (
     <div className="relative">
       {multiline ? (
         <textarea
-          form={formId}
+          {...formAttr}
           name={name}
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -41,7 +44,7 @@ export function CopyableInput({
         />
       ) : (
         <input
-          form={formId}
+          {...formAttr}
           name={name}
           type="text"
           value={value}

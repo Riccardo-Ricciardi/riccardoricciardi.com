@@ -1,7 +1,7 @@
 import { requireAdmin } from "@/utils/auth/admin";
 import { createAdminClient } from "@/utils/supabase/admin";
 import {
-  bulkUpdateNotFoundSlugAction,
+  bulkUpdateAllNotFoundAction,
   createNotFoundSlugAction,
   deleteNotFoundSlugAction,
 } from "@/app/admin/actions";
@@ -69,38 +69,29 @@ export default async function NotFoundAdmin() {
           404 strings
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Per-locale strings rendered on the 404 page. Edit all locales on a
-          row and click Save to push them at once.
+          Per-locale strings rendered on the 404 page. Edit every locale on
+          every row, then click Save all once.
         </p>
       </header>
 
-      {slugs.map((slug) => (
-        <form
-          key={`form-${slug}`}
-          action={bulkUpdateNotFoundSlugAction}
-          id={`nf-${slug}`}
-          className="hidden"
-        >
-          <input type="hidden" name="slug" value={slug} />
-        </form>
-      ))}
-
       {slugs.length > 0 && (
-        <div className="overflow-x-auto rounded-lg border border-dashed border-dashed-soft">
-          <table className="w-full min-w-[640px] text-sm">
-            <thead>
-              <tr className="border-b border-dashed border-dashed-soft text-left">
-                <Th className="w-44">Slug</Th>
-                {langs.map((l) => (
-                  <Th key={l.id}>{l.code}</Th>
-                ))}
-                <Th className="w-32" />
-              </tr>
-            </thead>
-            <tbody>
-              {slugs.map((slug) => {
-                const formId = `nf-${slug}`;
-                return (
+        <form
+          action={bulkUpdateAllNotFoundAction}
+          className="flex flex-col gap-3"
+        >
+          <div className="overflow-x-auto rounded-lg border border-dashed border-dashed-soft">
+            <table className="w-full min-w-[640px] text-sm">
+              <thead>
+                <tr className="border-b border-dashed border-dashed-soft text-left">
+                  <Th className="w-44">Slug</Th>
+                  {langs.map((l) => (
+                    <Th key={l.id}>{l.code}</Th>
+                  ))}
+                  <Th className="w-16" />
+                </tr>
+              </thead>
+              <tbody>
+                {slugs.map((slug) => (
                   <tr
                     key={slug}
                     className="border-b border-dashed border-dashed-soft last:border-b-0"
@@ -113,8 +104,7 @@ export default async function NotFoundAdmin() {
                       return (
                         <td key={l.id} className="px-3 py-2 align-top">
                           <input
-                            form={formId}
-                            name={`value_${l.id}`}
+                            name={`notfound[${slug}][value_${l.id}]`}
                             type="text"
                             defaultValue={row?.value ?? ""}
                             className="w-full min-w-[160px] rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -122,32 +112,28 @@ export default async function NotFoundAdmin() {
                         </td>
                       );
                     })}
-                    <td className="px-3 py-2 align-top">
-                      <div className="flex items-center justify-end gap-2">
-                        <SubmitButton
-                          form={formId}
-                          size="sm"
-                          variant="outline"
-                          className="h-7 px-2"
-                          pendingLabel="Saving…"
-                        >
-                          Save
-                        </SubmitButton>
-                        <DeleteButton
-                          action={deleteNotFoundSlugAction}
-                          fieldName="delete"
-                          fieldValue={slug}
-                          label={`404 string "${slug}"`}
-                          description="Removes the slug across all languages."
-                        />
-                      </div>
+                    <td className="px-3 py-2 align-top text-right">
+                      <DeleteButton
+                        action={deleteNotFoundSlugAction}
+                        fieldName="delete"
+                        fieldValue={slug}
+                        label={`404 string "${slug}"`}
+                        description="Removes the slug across all languages."
+                      />
                     </td>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <SubmitButton
+            className="w-full bg-accent-blue text-white"
+            pendingLabel="Saving…"
+          >
+            Save all
+          </SubmitButton>
+        </form>
       )}
 
       <section>

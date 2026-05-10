@@ -95,32 +95,55 @@ export async function deleteNotFoundSlugAction(formData: FormData) {
   redirect("/admin/not-found?ok=deleted");
 }
 
-export async function bulkUpdateNotFoundSlugAction(formData: FormData) {
+export async function bulkUpdateAllNotFoundAction(formData: FormData) {
   await requireAdmin();
   const supabase = createAdminClient();
 
-  const slug = String(formData.get("slug") ?? "").trim();
-  if (!slug) redirect("/admin/not-found?error=slug_required");
+  type Update = { slug: string; language_id: number; value: string };
+  const updates: Update[] = [];
 
-  const updates: Array<{ language_id: number; value: string }> = [];
   for (const [key, raw] of formData.entries()) {
-    const m = key.match(/^value_(\d+)$/);
+    const m = key.match(/^notfound\[(.+?)\]\[value_(\d+)\]$/);
     if (!m) continue;
     updates.push({
-      language_id: Number(m[1]),
+      slug: m[1],
+      language_id: Number(m[2]),
       value: String(typeof raw === "string" ? raw : "").trim(),
     });
   }
 
-  for (const u of updates) {
-    const { data: existing } = await supabase
-      .from("not_found")
-      .select("id, position")
-      .eq("slug", slug)
-      .eq("language_id", u.language_id)
-      .maybeSingle();
+  // Fetch all existing rows once
+  const slugs = Array.from(new Set(updates.map((u) => u.slug)));
+  const { data: existing } = await supabase
+    .from("not_found")
+    .select("id, slug, language_id, position")
+    .in("slug", slugs);
 
-    const existingRow = existing as { id: number; position: number | null } | null;
+  const existingMap = new Map<string, { id: number; position: number | null }>();
+  for (const r of (existing ?? []) as Array<{
+    id: number;
+    slug: string;
+    language_id: number;
+    position: number | null;
+  }>) {
+    existingMap.set(`${r.slug}::${r.language_id}`, {
+      id: r.id,
+      position: r.position,
+    });
+  }
+
+  const { data: maxRow } = await supabase
+    .from("not_found")
+    .select("position")
+    .order("position", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  let nextPos =
+    ((maxRow as { position: number | null } | null)?.position ?? -1) + 1;
+
+  for (const u of updates) {
+    const key = `${u.slug}::${u.language_id}`;
+    const existingRow = existingMap.get(key);
 
     if (!u.value) {
       if (existingRow) {
@@ -132,19 +155,11 @@ export async function bulkUpdateNotFoundSlugAction(formData: FormData) {
         .update({ value: u.value })
         .eq("id", existingRow.id);
     } else {
-      const { data: maxRow } = await supabase
-        .from("not_found")
-        .select("position")
-        .order("position", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      const maxPos =
-        (maxRow as { position: number | null } | null)?.position ?? -1;
       await supabase.from("not_found").insert({
-        slug,
+        slug: u.slug,
         value: u.value,
         language_id: u.language_id,
-        position: maxPos + 1,
+        position: nextPos++,
       });
     }
   }

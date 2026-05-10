@@ -1,7 +1,7 @@
 import { requireAdmin } from "@/utils/auth/admin";
 import { createAdminClient } from "@/utils/supabase/admin";
 import {
-  bulkUpdateContentSlugAction,
+  bulkUpdateAllContentAction,
   createContentSlugAction,
   deleteContentSlugAction,
 } from "@/app/admin/actions";
@@ -76,12 +76,6 @@ export default async function ContentAdmin() {
     }
   }
 
-  // Per-slug forms: one Save action for all locales.
-  const allSlugs = [
-    ...CONTENT_SCHEMA.flatMap((s) => s.fields.map((f) => f.slug)),
-    ...customSlugs,
-  ];
-
   return (
     <div className="flex flex-col gap-12">
       <header>
@@ -92,8 +86,8 @@ export default async function ContentAdmin() {
           Content blocks
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Site copy organized by section. Edit every locale on a row and click
-          Save to push them all at once.
+          Site copy organized by section. Edit every locale on every row, then
+          click Save all once.
         </p>
       </header>
 
@@ -112,45 +106,35 @@ export default async function ContentAdmin() {
         </div>
       )}
 
-      {/* One bulk-update form per slug — referenced by inputs/buttons via form id. */}
-      {allSlugs.map((slug) => (
-        <form
-          key={`form-${slug}`}
-          action={bulkUpdateContentSlugAction}
-          id={`content-${slug}`}
-          className="hidden"
-        >
-          <input type="hidden" name="slug" value={slug} />
-        </form>
-      ))}
-
-      {CONTENT_SCHEMA.map((section) => (
-        <section key={section.key} className="flex flex-col gap-3">
-          <header>
-            <h2 className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              {section.title}
-            </h2>
-            {section.description && (
-              <p className="mt-0.5 text-[11px] text-muted-foreground">
-                {section.description}
-              </p>
-            )}
-          </header>
-          <div className="overflow-x-auto rounded-lg border border-dashed border-dashed-soft">
-            <table className="w-full min-w-[640px] text-sm">
-              <thead>
-                <tr className="border-b border-dashed border-dashed-soft text-left">
-                  <Th className="w-44">Field</Th>
-                  {langs.map((l) => (
-                    <Th key={l.id}>{l.code}</Th>
-                  ))}
-                  <Th className="w-32" />
-                </tr>
-              </thead>
-              <tbody>
-                {section.fields.map((field) => {
-                  const formId = `content-${field.slug}`;
-                  return (
+      <form
+        action={bulkUpdateAllContentAction}
+        className="flex flex-col gap-6"
+      >
+        {CONTENT_SCHEMA.map((section) => (
+          <section key={section.key} className="flex flex-col gap-3">
+            <header>
+              <h2 className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                {section.title}
+              </h2>
+              {section.description && (
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  {section.description}
+                </p>
+              )}
+            </header>
+            <div className="overflow-x-auto rounded-lg border border-dashed border-dashed-soft">
+              <table className="w-full min-w-[640px] text-sm">
+                <thead>
+                  <tr className="border-b border-dashed border-dashed-soft text-left">
+                    <Th className="w-44">Field</Th>
+                    {langs.map((l) => (
+                      <Th key={l.id}>{l.code}</Th>
+                    ))}
+                    <Th className="w-16" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {section.fields.map((field) => (
                     <tr
                       key={field.slug}
                       className="border-b border-dashed border-dashed-soft last:border-b-0"
@@ -173,8 +157,7 @@ export default async function ContentAdmin() {
                         return (
                           <td key={l.id} className="px-3 py-2 align-top">
                             <CopyableInput
-                              formId={formId}
-                              name={`value_${l.id}`}
+                              name={`content[${field.slug}][value_${l.id}]`}
                               multiline={field.multiline}
                               initialValue={block?.value ?? ""}
                               copyFromValue={copyFromValue}
@@ -183,62 +166,47 @@ export default async function ContentAdmin() {
                           </td>
                         );
                       })}
-                      <td className="px-3 py-2 align-top">
-                        <div className="flex items-center justify-end gap-2">
-                          <SubmitButton
-                            form={formId}
-                            size="sm"
-                            variant="outline"
-                            className="h-7 px-2"
-                            pendingLabel="Saving…"
-                          >
-                            Save
-                          </SubmitButton>
-                          <DeleteButton
-                            action={deleteContentSlugAction}
-                            fieldName="delete"
-                            fieldValue={field.slug}
-                            label={`content "${field.slug}"`}
-                            description="Removes the slug across all languages."
-                          />
-                        </div>
+                      <td className="px-3 py-2 align-top text-right">
+                        <DeleteButton
+                          action={deleteContentSlugAction}
+                          fieldName="delete"
+                          fieldValue={field.slug}
+                          label={`content "${field.slug}"`}
+                          description="Removes the slug across all languages."
+                        />
                       </td>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      ))}
-
-      {customSlugs.length > 0 && (
-        <section className="flex flex-col gap-3">
-          <header>
-            <h2 className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              Custom slugs
-            </h2>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">
-              Slugs in the DB but not declared in{" "}
-              <code className="font-mono">utils/content/schema.ts</code>. Promote
-              them to the schema to give them section + label metadata.
-            </p>
-          </header>
-          <div className="overflow-x-auto rounded-lg border border-dashed border-dashed-soft">
-            <table className="w-full min-w-[640px] text-sm">
-              <thead>
-                <tr className="border-b border-dashed border-dashed-soft text-left">
-                  <Th className="w-44">Slug</Th>
-                  {langs.map((l) => (
-                    <Th key={l.id}>{l.code}</Th>
                   ))}
-                  <Th className="w-32" />
-                </tr>
-              </thead>
-              <tbody>
-                {customSlugs.map((slug) => {
-                  const formId = `content-${slug}`;
-                  return (
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ))}
+
+        {customSlugs.length > 0 && (
+          <section className="flex flex-col gap-3">
+            <header>
+              <h2 className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                Custom slugs
+              </h2>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">
+                Slugs in the DB but not declared in{" "}
+                <code className="font-mono">utils/content/schema.ts</code>.
+              </p>
+            </header>
+            <div className="overflow-x-auto rounded-lg border border-dashed border-dashed-soft">
+              <table className="w-full min-w-[640px] text-sm">
+                <thead>
+                  <tr className="border-b border-dashed border-dashed-soft text-left">
+                    <Th className="w-44">Slug</Th>
+                    {langs.map((l) => (
+                      <Th key={l.id}>{l.code}</Th>
+                    ))}
+                    <Th className="w-16" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {customSlugs.map((slug) => (
                     <tr
                       key={slug}
                       className="border-b border-dashed border-dashed-soft last:border-b-0"
@@ -258,8 +226,7 @@ export default async function ContentAdmin() {
                         return (
                           <td key={l.id} className="px-3 py-2 align-top">
                             <CopyableInput
-                              formId={formId}
-                              name={`value_${l.id}`}
+                              name={`content[${slug}][value_${l.id}]`}
                               multiline
                               initialValue={block?.value ?? ""}
                               copyFromValue={copyFromValue}
@@ -268,34 +235,30 @@ export default async function ContentAdmin() {
                           </td>
                         );
                       })}
-                      <td className="px-3 py-2 align-top">
-                        <div className="flex items-center justify-end gap-2">
-                          <SubmitButton
-                            form={formId}
-                            size="sm"
-                            variant="outline"
-                            className="h-7 px-2"
-                            pendingLabel="Saving…"
-                          >
-                            Save
-                          </SubmitButton>
-                          <DeleteButton
-                            action={deleteContentSlugAction}
-                            fieldName="delete"
-                            fieldValue={slug}
-                            label={`content "${slug}"`}
-                            description="Removes the slug across all languages."
-                          />
-                        </div>
+                      <td className="px-3 py-2 align-top text-right">
+                        <DeleteButton
+                          action={deleteContentSlugAction}
+                          fieldName="delete"
+                          fieldValue={slug}
+                          label={`content "${slug}"`}
+                          description="Removes the slug across all languages."
+                        />
                       </td>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
+        <SubmitButton
+          className="w-full bg-accent-blue text-white"
+          pendingLabel="Saving…"
+        >
+          Save all
+        </SubmitButton>
+      </form>
 
       <section>
         <h2 className="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">

@@ -68,37 +68,56 @@ export async function deleteContentSlugAction(formData: FormData) {
   redirect("/admin/content?ok=deleted");
 }
 
-export async function bulkUpdateContentSlugAction(formData: FormData) {
+export async function bulkUpdateAllContentAction(formData: FormData) {
   await requireAdmin();
   const supabase = createAdminClient();
 
-  const slug = String(formData.get("slug") ?? "").trim();
-  if (!slug) redirect("/admin/content?error=slug_required");
+  type Update = { slug: string; language_id: number; value: string };
+  const updates: Update[] = [];
 
-  const updates: Array<{ language_id: number; value: string }> = [];
   for (const [key, raw] of formData.entries()) {
-    const m = key.match(/^value_(\d+)$/);
+    const m = key.match(/^content\[(.+?)\]\[value_(\d+)\]$/);
     if (!m) continue;
     updates.push({
-      language_id: Number(m[1]),
+      slug: m[1],
+      language_id: Number(m[2]),
       value: String(typeof raw === "string" ? raw : "").trim(),
     });
   }
 
   const now = new Date().toISOString();
+  const upserts: Array<{
+    slug: string;
+    language_id: number;
+    value: string;
+    updated_at: string;
+  }> = [];
+  const deletes: Array<{ slug: string; language_id: number }> = [];
+
   for (const u of updates) {
     if (!u.value) {
-      await supabase
-        .from("content_blocks")
-        .delete()
-        .eq("slug", slug)
-        .eq("language_id", u.language_id);
+      deletes.push({ slug: u.slug, language_id: u.language_id });
     } else {
-      await supabase.from("content_blocks").upsert(
-        { slug, language_id: u.language_id, value: u.value, updated_at: now },
-        { onConflict: "slug,language_id" }
-      );
+      upserts.push({
+        slug: u.slug,
+        language_id: u.language_id,
+        value: u.value,
+        updated_at: now,
+      });
     }
+  }
+
+  if (upserts.length > 0) {
+    await supabase
+      .from("content_blocks")
+      .upsert(upserts, { onConflict: "slug,language_id" });
+  }
+  for (const d of deletes) {
+    await supabase
+      .from("content_blocks")
+      .delete()
+      .eq("slug", d.slug)
+      .eq("language_id", d.language_id);
   }
 
   revalidatePath("/", "layout");
