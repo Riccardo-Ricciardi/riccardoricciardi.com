@@ -19,8 +19,14 @@ function detectLocale(request: NextRequest): string {
   return APP_CONFIG.defaultLanguage;
 }
 
+const SKIP_LOCALE_PREFIXES = ["/admin", "/api"];
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (SKIP_LOCALE_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+    return updateSession(request);
+  }
 
   const firstSegment = pathname.split("/")[1] ?? "";
   const hasLocale = isSupportedLanguage(firstSegment);
