@@ -292,21 +292,10 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
               className="rounded-md border border-dashed border-dashed-soft bg-background px-2.5 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </label>
-          <label className="flex flex-col gap-1 sm:col-span-1">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              Pos
-            </span>
-            <input
-              name="position"
-              type="number"
-              defaultValue="0"
-              className="rounded-md border border-dashed border-dashed-soft bg-background px-2.5 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </label>
           <Button
             type="submit"
             size="sm"
-            className="bg-accent-blue text-white sm:col-span-2"
+            className="bg-accent-blue text-white sm:col-span-3"
           >
             Add
           </Button>

@@ -181,12 +181,20 @@ export async function createSkillAction(formData: FormData) {
   const supabase = createAdminClient();
 
   const name = String(formData.get("name") ?? "").trim();
-  const position = Number(formData.get("position") ?? 0);
   const percentage = Number(formData.get("percentage") ?? 0);
   const dark = formData.get("dark") === "on";
   const category = String(formData.get("category") ?? "").trim() || null;
 
   if (!name) redirect("/admin/skills?error=name_required");
+
+  const { data: maxRow } = await supabase
+    .from("skills")
+    .select("position")
+    .order("position", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const maxPos = (maxRow as { position: number | null } | null)?.position ?? -1;
+  const position = maxPos + 1;
 
   const { error } = await supabase.from("skills").insert({
     name,
@@ -464,10 +472,18 @@ export async function createProjectAction(formData: FormData) {
   const supabase = createAdminClient();
 
   const repo = String(formData.get("repo") ?? "").trim();
-  const position = Number(formData.get("position") ?? 0);
   const visible = formData.get("visible") === "on";
 
   if (!repo) redirect("/admin/projects?error=repo_required");
+
+  const { data: maxRow } = await supabase
+    .from("projects")
+    .select("position")
+    .order("position", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const maxPos = (maxRow as { position: number | null } | null)?.position ?? -1;
+  const position = maxPos + 1;
 
   const { error } = await supabase.from("projects").insert({
     repo,
@@ -543,9 +559,30 @@ export async function createNavbarAction(formData: FormData) {
   const slug = String(formData.get("slug") ?? "").trim();
   const value = String(formData.get("value") ?? "").trim();
   const language_id = Number(formData.get("language_id"));
-  const position = Number(formData.get("position") ?? 0);
 
   if (!value) redirect("/admin/navbar?error=label_required");
+
+  // Reuse existing slug's position if any, else append at end
+  let position = 0;
+  const { data: existing } = await supabase
+    .from("navbar")
+    .select("position")
+    .eq("slug", slug)
+    .limit(1)
+    .maybeSingle();
+  const existingPos = (existing as { position: number | null } | null)?.position;
+  if (existingPos !== undefined && existingPos !== null) {
+    position = existingPos;
+  } else {
+    const { data: maxRow } = await supabase
+      .from("navbar")
+      .select("position")
+      .order("position", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const maxPos = (maxRow as { position: number | null } | null)?.position ?? -1;
+    position = maxPos + 1;
+  }
 
   const { error } = await supabase.from("navbar").insert({
     slug,

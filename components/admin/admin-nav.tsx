@@ -43,36 +43,42 @@ export function AdminNav({ groups, email, logoutSlot }: AdminNavProps) {
   return (
     <>
       <header className="section-divider-b sticky top-0 z-40 bg-background/90 backdrop-blur">
-        <div className="container-page flex h-14 items-center justify-between gap-4">
+        <div className="container-page flex h-16 items-center justify-between gap-6">
           <Link
             href="/admin"
-            className="font-mono text-sm font-medium tracking-tight"
+            className="shrink-0 font-mono text-sm font-medium tracking-tight hover:text-accent-blue"
           >
             admin
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-6">
-            {groups.map((group) => (
-              <div key={group.label} className="flex items-center gap-1">
-                <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">
-                  {group.label}
-                </span>
-                {group.items.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`rounded px-2 py-1 text-sm transition-colors ${
-                      isActive(item.href)
-                        ? "text-accent-blue"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            ))}
+          <nav className="hidden md:flex flex-1 items-center justify-center">
+            <ul className="flex items-center gap-1 lg:gap-2">
+              {groups.flatMap((group, gi) => {
+                const sep = gi > 0 ? [
+                  <li
+                    key={`sep-${gi}`}
+                    aria-hidden="true"
+                    className="h-4 w-px bg-border mx-2"
+                  />
+                ] : [];
+                const items = group.items.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className={`block rounded-md px-3 py-2 text-sm transition-colors ${
+                        isActive(item.href)
+                          ? "bg-accent-blue-soft text-accent-blue"
+                          : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ));
+                return [...sep, ...items];
+              })}
+            </ul>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -99,8 +105,8 @@ export function AdminNav({ groups, email, logoutSlot }: AdminNavProps) {
 
       {/* Mobile drawer */}
       {open && (
-        <div className="md:hidden fixed inset-0 top-14 z-30 bg-background/95 backdrop-blur">
-          <nav className="container-page flex flex-col gap-6 py-6 overflow-y-auto h-[calc(100vh-3.5rem)]">
+        <div className="md:hidden fixed inset-0 top-16 z-30 bg-background/95 backdrop-blur">
+          <nav className="container-page flex flex-col gap-6 py-6 overflow-y-auto h-[calc(100vh-4rem)]">
             {groups.map((group) => (
               <section key={group.label}>
                 <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">

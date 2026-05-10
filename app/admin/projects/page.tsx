@@ -265,7 +265,6 @@ export default async function ProjectsAdmin({ searchParams }: PageProps) {
             placeholder="Riccardo-Ricciardi/repo-name"
             className="sm:col-span-7"
           />
-          <input type="hidden" name="position" value={rows.length} />
           <label className="flex items-center gap-2 self-end pb-2 sm:col-span-3">
             <Checkbox name="visible" defaultChecked aria-label="Show on site" />
             <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">

@@ -237,11 +237,6 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
               Dark icon
             </span>
           </label>
-          <input
-            type="hidden"
-            name="position"
-            value={rows.length}
-          />
           <Button
             type="submit"
             size="sm"
