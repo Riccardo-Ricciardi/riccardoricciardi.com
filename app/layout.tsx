@@ -2,6 +2,7 @@ import "@/app/globals.css";
 import type { Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { DynamicThemeVars } from "@/components/dynamic-theme-vars";
 import { APP_CONFIG } from "@/utils/config/app";
 
 const geistSans = Geist({ subsets: ["latin"], variable: "--font-sans" });
@@ -28,6 +29,9 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
+      <head>
+        <DynamicThemeVars />
+      </head>
       <body
         suppressHydrationWarning
         className="flex min-h-screen flex-col bg-background text-foreground"

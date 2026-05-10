@@ -5,8 +5,10 @@ import { createClient } from "@/utils/supabase/server";
 export const dynamic = "force-dynamic";
 
 const CARDS = [
-  { href: "/admin/skills", title: "Skills", desc: "Tech stack with proficiency" },
-  { href: "/admin/projects", title: "Projects", desc: "GitHub repos + i18n" },
+  { href: "/admin/theme", title: "Theme", desc: "Colors, dimensions, design tokens" },
+  { href: "/admin/content", title: "Content", desc: "Hero, headings, CTAs per locale" },
+  { href: "/admin/skills", title: "Skills", desc: "Tech stack with proficiency + icons" },
+  { href: "/admin/projects", title: "Projects", desc: "GitHub repos + i18n + screenshots" },
   { href: "/admin/navbar", title: "Navbar", desc: "Menu items per language" },
   { href: "/admin/languages", title: "Languages", desc: "Add or remove locales" },
 ];
@@ -15,11 +17,13 @@ export default async function AdminDashboard() {
   await requireAdmin();
   const supabase = await createClient();
 
-  const [skills, projects, navbar, languages] = await Promise.all([
+  const [skills, projects, navbar, languages, theme, content] = await Promise.all([
     supabase.from("skills").select("*", { count: "exact", head: true }),
     supabase.from("projects").select("*", { count: "exact", head: true }),
     supabase.from("navbar").select("*", { count: "exact", head: true }),
     supabase.from("languages").select("*", { count: "exact", head: true }),
+    supabase.from("theme_settings").select("*", { count: "exact", head: true }),
+    supabase.from("content_blocks").select("*", { count: "exact", head: true }),
   ]);
 
   const counts: Record<string, number | null> = {
@@ -27,6 +31,8 @@ export default async function AdminDashboard() {
     "/admin/projects": projects.count,
     "/admin/navbar": navbar.count,
     "/admin/languages": languages.count,
+    "/admin/theme": theme.count,
+    "/admin/content": content.count,
   };
 
   return (

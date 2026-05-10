@@ -4,8 +4,9 @@ import { Hero } from "@/components/hero";
 import { Skills } from "@/components/skills";
 import { Projects } from "@/components/projects";
 import { GlobalLoader } from "@/components/global-loader";
-import { isSupportedLanguage } from "@/utils/config/app";
+import { isSupportedLanguage, type SupportedLanguage } from "@/utils/config/app";
 import { APP_CONFIG } from "@/utils/config/app";
+import { content, getContentBlocks } from "@/utils/content/fetch";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
@@ -19,39 +20,63 @@ export default async function Page({ params }: PageProps) {
   if (!isSupportedLanguage(locale)) notFound();
 
   const isIt = locale === "it";
+  const blocks = await getContentBlocks(locale as SupportedLanguage);
 
-  const heroCopy = isIt
-    ? {
-        eyebrow: "Disponibile per nuovi progetti",
-        title: "Costruisco prodotti web moderni e accessibili.",
-        subtitle:
-          "Sviluppatore full-stack focalizzato su React, Next.js e architetture serverless. Design pulito, performance attenta, codice manutenibile.",
-        primary: { label: "Vedi i progetti", href: "#projects" },
-        secondary: { label: "Le mie competenze", href: "#skills" },
-      }
-    : {
-        eyebrow: "Available for new projects",
-        title: "I build modern, accessible web products.",
-        subtitle:
-          "Full-stack developer focused on React, Next.js, and serverless architectures. Clean design, performance-minded, maintainable code.",
-        primary: { label: "View projects", href: "#projects" },
-        secondary: { label: "My skills", href: "#skills" },
-      };
-
-  const skillsHeading = isIt ? "Le mie competenze" : "My skills";
-  const projectsHeading = isIt ? "I miei progetti" : "My projects";
-  const projectsSubtitle = isIt
-    ? "Una selezione di lavori recenti, sincronizzata da GitHub."
-    : "A selection of recent work, synced from GitHub.";
+  const heroEyebrow = content(
+    blocks,
+    "hero_eyebrow",
+    isIt ? "Disponibile per nuovi progetti" : "Available for new projects"
+  );
+  const heroTitle = content(
+    blocks,
+    "hero_title",
+    isIt
+      ? "Costruisco prodotti web moderni e accessibili."
+      : "I build modern, accessible web products."
+  );
+  const heroSubtitle = content(
+    blocks,
+    "hero_subtitle",
+    isIt
+      ? "Sviluppatore full-stack focalizzato su React, Next.js e architetture serverless."
+      : "Full-stack developer focused on React, Next.js, and serverless architectures."
+  );
+  const heroPrimary = content(
+    blocks,
+    "hero_primary_cta",
+    isIt ? "Vedi i progetti" : "View projects"
+  );
+  const heroSecondary = content(
+    blocks,
+    "hero_secondary_cta",
+    isIt ? "Le mie competenze" : "My skills"
+  );
+  const skillsHeading = content(
+    blocks,
+    "skills_heading",
+    isIt ? "Le mie competenze" : "My skills"
+  );
+  const projectsHeading = content(
+    blocks,
+    "projects_heading",
+    isIt ? "I miei progetti" : "My projects"
+  );
+  const projectsSubtitle = content(
+    blocks,
+    "projects_subtitle",
+    isIt
+      ? "Una selezione di lavori recenti, sincronizzata da GitHub."
+      : "A selection of recent work, synced from GitHub."
+  );
 
   return (
     <>
       <Hero
-        eyebrow={heroCopy.eyebrow}
-        title={heroCopy.title}
-        subtitle={heroCopy.subtitle}
-        primaryCta={heroCopy.primary}
-        secondaryCta={heroCopy.secondary}
+        eyebrow={heroEyebrow}
+        title={heroTitle}
+        subtitle={heroSubtitle}
+        primaryCta={{ label: heroPrimary, href: "#projects" }}
+        secondaryCta={{ label: heroSecondary, href: "#skills" }}
         locale={locale}
       />
       <Suspense fallback={<GlobalLoader />}>
@@ -61,7 +86,7 @@ export default async function Page({ params }: PageProps) {
         <Projects
           heading={projectsHeading}
           subtitle={projectsSubtitle}
-          locale={locale}
+          locale={locale as SupportedLanguage}
         />
       </Suspense>
     </>

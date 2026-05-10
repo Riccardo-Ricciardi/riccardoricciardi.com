@@ -166,7 +166,7 @@
 @layer utilities {
   .container-page {
     width: 100%;
-    max-width: 1400px;
+    max-width: var(--container-max-width, 1400px);
     margin-inline: auto;
     padding-inline: 1rem;
     border-left: 1px dashed var(--border-dashed);
@@ -253,7 +253,7 @@
       var(--accent-blue-soft),
       transparent 70%
     );
-    opacity: 0.45;
+    opacity: var(--hero-glow-opacity, 0.45);
   }
 }
 
