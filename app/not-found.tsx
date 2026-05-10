@@ -6,6 +6,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { SkipLink } from "@/components/skip-link";
 import { HtmlLangUpdater } from "@/components/html-lang-updater";
+import { MouseParticles } from "@/components/mouse-particles";
 import { getDictionary } from "@/utils/i18n/dictionary";
 import {
   APP_CONFIG,
@@ -71,8 +72,18 @@ export default async function NotFound() {
         <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden">
           <div
             aria-hidden="true"
-            className="bg-dot bg-dot-mask pointer-events-none absolute inset-0 -z-10"
+            className="bg-dot bg-dot-mask pointer-events-none absolute inset-0 -z-20"
           />
+          <div
+            aria-hidden="true"
+            className="gradient-glow pointer-events-none absolute inset-0 -z-10"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -z-10"
+          >
+            <MouseParticles count={40} linkDistance={100} repelRadius={120} />
+          </div>
           <div className="container-page py-20 md:py-28">
             <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
               <p className="font-mono text-sm font-medium uppercase tracking-widest text-muted-foreground">
@@ -84,7 +95,11 @@ export default async function NotFound() {
               <p className="mt-6 max-w-md text-balance text-lg text-muted-foreground">
                 {copy.description}
               </p>
-              <Button asChild size="lg" className="mt-8">
+              <Button
+                asChild
+                size="lg"
+                className="mt-8 bg-accent-blue text-white shadow-sm hover:bg-[var(--accent-blue-hover)]"
+              >
                 <Link href={`/${locale}`}>
                   <ArrowLeft className="mr-1 h-4 w-4" aria-hidden="true" />
                   {copy.cta}

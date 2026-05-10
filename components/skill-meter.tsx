@@ -32,10 +32,10 @@ export function SkillMeter({ value, label, segments = 4 }: SkillMeterProps) {
             className="h-1.5 flex-1 rounded-full bg-muted"
             style={
               isFull
-                ? { backgroundColor: "var(--color-foreground)" }
+                ? { backgroundColor: "var(--accent-blue)" }
                 : isPartial
                 ? {
-                    backgroundImage: `linear-gradient(to right, var(--color-foreground) ${overlay}%, var(--color-muted) ${overlay}%)`,
+                    backgroundImage: `linear-gradient(to right, var(--accent-blue) ${overlay}%, var(--color-muted) ${overlay}%)`,
                   }
                 : undefined
             }

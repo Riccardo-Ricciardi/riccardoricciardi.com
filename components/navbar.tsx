@@ -52,7 +52,7 @@ export function Navbar({ locale, dictionary, ariaLabels }: NavbarProps) {
               <li key={slug || "home"}>
                 <Link
                   href={slug ? `/${locale}/${slug}` : `/${locale}`}
-                  className="whitespace-nowrap rounded px-2 py-1 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="whitespace-nowrap rounded px-2 py-1 transition-colors hover:text-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {label}
                 </Link>

@@ -30,7 +30,7 @@ export function Footer({ locale }: FooterProps) {
                 href={href}
                 target={href.startsWith("http") ? "_blank" : undefined}
                 rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="inline-flex items-center justify-center rounded p-1 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="inline-flex items-center justify-center rounded p-1 transition-colors hover:text-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 aria-label={label}
               >
                 <Icon className="h-4 w-4" aria-hidden="true" />

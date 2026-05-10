@@ -39,8 +39,11 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --accent-blue: #087EA4;
-  --accent-blue-hover: #149ECA;
+  --accent-blue: #2563eb;
+  --accent-blue-hover: #3b82f6;
+  --accent-blue-soft: #dbeafe;
+  --ring: oklch(0.546 0.245 262.881);
+  --sidebar-ring: oklch(0.546 0.245 262.881);
 }
 
 .dark {
@@ -77,9 +80,11 @@
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
-  --accent-blue: #149ECA;
-  --accent-blue-hover: #58C4DC;
+  --sidebar-ring: oklch(0.546 0.245 262.881);
+  --accent-blue: #3b82f6;
+  --accent-blue-hover: #60a5fa;
+  --accent-blue-soft: oklch(0.546 0.245 262.881 / 0.15);
+  --ring: oklch(0.623 0.214 259.815);
 }
 
 @theme inline {
@@ -123,6 +128,7 @@
   --font-mono: var(--font-mono);
   --color-accent-blue: var(--accent-blue);
   --color-accent-blue-hover: var(--accent-blue-hover);
+  --color-accent-blue-soft: var(--accent-blue-soft);
 }
 
 @layer base {
@@ -198,6 +204,28 @@
   }
   .link-accent:hover {
     color: var(--accent-blue-hover);
+  }
+  .text-accent-blue {
+    color: var(--accent-blue);
+  }
+  .bg-accent-blue {
+    background-color: var(--accent-blue);
+  }
+  .bg-accent-blue-soft {
+    background-color: var(--accent-blue-soft);
+  }
+  .border-accent-blue {
+    border-color: var(--accent-blue);
+  }
+  .ring-accent-blue {
+    --tw-ring-color: var(--accent-blue);
+  }
+  .gradient-glow {
+    background: radial-gradient(
+      ellipse 80% 50% at 50% 0%,
+      var(--accent-blue-soft),
+      transparent 70%
+    );
   }
 }
 
