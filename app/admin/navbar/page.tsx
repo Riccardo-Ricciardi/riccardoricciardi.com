@@ -53,6 +53,11 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
     arr.push(r);
     grouped.set(r.language_id, arr);
   }
+  const knownSlugs = Array.from(
+    new Set(navRows.map((r) => (r.slug ?? "").trim()))
+  )
+    .filter(Boolean)
+    .sort();
 
   return (
     <div className="flex flex-col gap-10">
@@ -96,11 +101,23 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
               ))}
             </select>
           </label>
-          <Field
-            label="Slug (empty=home)"
-            name="slug"
-            placeholder="about"
-          />
+          <label className="flex flex-col gap-1.5">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Slug (empty=home)
+            </span>
+            <input
+              name="slug"
+              type="text"
+              list="known-slugs"
+              placeholder="about"
+              className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+            <datalist id="known-slugs">
+              {knownSlugs.map((s) => (
+                <option key={s} value={s} />
+              ))}
+            </datalist>
+          </label>
           <Field label="Label" name="value" required />
           <Field label="Position" name="position" type="number" defaultValue="0" />
           <div className="self-end">
@@ -141,11 +158,18 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
                     className="grid grid-cols-1 gap-3 sm:grid-cols-5"
                   >
                     <input type="hidden" name="id" value={row.id} />
-                    <Field
-                      label="Slug"
-                      name="slug"
-                      defaultValue={row.slug ?? ""}
-                    />
+                    <label className="flex flex-col gap-1.5">
+                      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                        Slug
+                      </span>
+                      <input
+                        name="slug"
+                        type="text"
+                        list="known-slugs"
+                        defaultValue={row.slug ?? ""}
+                        className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      />
+                    </label>
                     <Field
                       label="Label"
                       name="value"
