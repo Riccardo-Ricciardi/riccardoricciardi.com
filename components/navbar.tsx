@@ -29,7 +29,7 @@ export function Navbar({ locale, dictionary, ariaLabels }: NavbarProps) {
   return (
     <ScrolledHeader
       ariaLabel={ariaLabels.nav}
-      className="navbar-shell sticky top-0 z-50 w-full transition-colors duration-200"
+      className="navbar-shell fixed inset-x-0 top-0 z-50 w-full"
     >
       <div className="container-page flex h-14 items-center justify-between">
         <Link
