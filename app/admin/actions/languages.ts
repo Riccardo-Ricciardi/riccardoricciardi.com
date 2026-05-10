@@ -39,3 +39,30 @@ export async function deleteLanguageAction(formData: FormData) {
   revalidatePath("/", "layout");
   redirect("/admin/languages?ok=deleted");
 }
+
+export async function renameLanguageAction(formData: FormData) {
+  await requireAdmin();
+  const supabase = createAdminClient();
+
+  const id = Number(formData.get("id"));
+  const code = String(formData.get("code") ?? "").trim().toLowerCase();
+  const name = String(formData.get("name") ?? "").trim();
+
+  if (!id || !code || !name) {
+    redirect("/admin/languages?error=fields_required");
+  }
+
+  if (!/^[a-z]{2}([_-][a-z0-9]+)?$/i.test(code)) {
+    redirect("/admin/languages?error=invalid_code");
+  }
+
+  const { error } = await supabase
+    .from("languages")
+    .update({ code, name })
+    .eq("id", id);
+  if (error)
+    redirect(`/admin/languages?error=${encodeURIComponent(error.message)}`);
+
+  revalidatePath("/", "layout");
+  redirect("/admin/languages?ok=updated");
+}
