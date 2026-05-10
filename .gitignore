@@ -49,4 +49,8 @@ et --hard 973d537
 
 # claude code local state
 .claude/
+
+# supabase cli local state
+supabase/.temp/
+supabase/.branches/
 .env*.local
