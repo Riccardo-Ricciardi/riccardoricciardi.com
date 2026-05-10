@@ -8,6 +8,7 @@ import {
   deleteSkillAction,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/admin/toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -73,10 +74,10 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
                 <tr className="border-b border-dashed border-dashed-soft text-left">
                   <Th>Icon</Th>
                   <Th>Name</Th>
-                  <Th className="w-16">Pos</Th>
-                  <Th className="w-16">%</Th>
+                  <Th className="w-20">Order</Th>
+                  <Th className="w-24">Level</Th>
                   <Th>Category</Th>
-                  <Th className="w-16">Dark</Th>
+                  <Th className="w-20">Dark icon</Th>
                   <Th className="w-20" />
                 </tr>
               </thead>
@@ -127,18 +128,25 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
                         name={`skill[${row.id}][position]`}
                         type="number"
                         defaultValue={(row.position ?? 0).toString()}
-                        className="w-14 rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        aria-label="Display order"
+                        className="w-16 rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm tabular-nums focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       />
                     </td>
                     <td className="px-3 py-2">
-                      <input
-                        name={`skill[${row.id}][percentage]`}
-                        type="number"
-                        min={0}
-                        max={100}
-                        defaultValue={(row.percentage ?? 0).toString()}
-                        className="w-14 rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      />
+                      <div className="relative w-20">
+                        <input
+                          name={`skill[${row.id}][percentage]`}
+                          type="number"
+                          min={0}
+                          max={100}
+                          defaultValue={(row.percentage ?? 0).toString()}
+                          aria-label="Proficiency level 0-100"
+                          className="w-full rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 pr-6 text-sm tabular-nums focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        />
+                        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 font-mono text-[10px] text-muted-foreground">
+                          %
+                        </span>
+                      </div>
                     </td>
                     <td className="px-3 py-2">
                       <input
@@ -148,11 +156,10 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
                       />
                     </td>
                     <td className="px-3 py-2">
-                      <input
+                      <Toggle
                         name={`skill[${row.id}][dark]`}
-                        type="checkbox"
                         defaultChecked={row.dark ?? false}
-                        className="h-4 w-4"
+                        ariaLabel="Has dark mode icon variant"
                       />
                     </td>
                     <td className="px-3 py-2 text-right">
@@ -189,26 +196,26 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
         >
           <Field label="Name" name="name" required className="sm:col-span-3" />
           <Field
-            label="Pos"
+            label="Order"
             name="position"
             type="number"
             defaultValue={rows.length.toString()}
             className="sm:col-span-1"
           />
           <Field
-            label="%"
+            label="Level (0-100)"
             name="percentage"
             type="number"
             min={0}
             max={100}
             defaultValue="80"
-            className="sm:col-span-1"
+            className="sm:col-span-2"
           />
-          <Field label="Category" name="category" className="sm:col-span-3" />
-          <label className="flex items-center gap-2 self-end pb-1.5 sm:col-span-2">
-            <input type="checkbox" name="dark" className="h-4 w-4" />
+          <Field label="Category" name="category" className="sm:col-span-2" />
+          <label className="flex items-center gap-2 self-end pb-2 sm:col-span-2">
+            <Toggle name="dark" ariaLabel="Has dark mode icon" />
             <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              Dark
+              Dark icon
             </span>
           </label>
           <Button

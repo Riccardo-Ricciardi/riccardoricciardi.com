@@ -8,6 +8,7 @@ import {
   triggerSyncAction,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/admin/toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -148,10 +149,10 @@ export default async function ProjectsAdmin({ searchParams }: PageProps) {
             <table className="w-full min-w-[640px] text-sm">
               <thead>
                 <tr className="border-b border-dashed border-dashed-soft text-left">
-                  <Th>Repo</Th>
-                  <Th>Stats</Th>
-                  <Th className="w-16">Pos</Th>
-                  <Th className="w-20">Visible</Th>
+                  <Th>Repository</Th>
+                  <Th>Lang · Stars</Th>
+                  <Th className="w-20">Order</Th>
+                  <Th className="w-20">Show</Th>
                   <Th className="w-32" />
                 </tr>
               </thead>
@@ -187,15 +188,15 @@ export default async function ProjectsAdmin({ searchParams }: PageProps) {
                         name={`project[${row.id}][position]`}
                         type="number"
                         defaultValue={(row.position ?? 0).toString()}
-                        className="w-14 rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        aria-label="Display order"
+                        className="w-16 rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm tabular-nums focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       />
                     </td>
                     <td className="px-3 py-2">
-                      <input
+                      <Toggle
                         name={`project[${row.id}][visible]`}
-                        type="checkbox"
                         defaultChecked={row.visible ?? false}
-                        className="h-4 w-4"
+                        ariaLabel="Show project"
                       />
                     </td>
                     <td className="px-3 py-2 text-right">
@@ -244,16 +245,16 @@ export default async function ProjectsAdmin({ searchParams }: PageProps) {
             className="sm:col-span-7"
           />
           <Field
-            label="Pos"
+            label="Order"
             name="position"
             type="number"
             defaultValue={rows.length.toString()}
             className="sm:col-span-1"
           />
-          <label className="flex items-center gap-2 self-end pb-1.5 sm:col-span-2">
-            <input type="checkbox" name="visible" defaultChecked className="h-4 w-4" />
+          <label className="flex items-center gap-2 self-end pb-2 sm:col-span-2">
+            <Toggle name="visible" defaultChecked ariaLabel="Show on site" />
             <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              Visible
+              Show
             </span>
           </label>
           <Button
