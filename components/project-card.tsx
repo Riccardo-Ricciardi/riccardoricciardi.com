@@ -10,6 +10,7 @@ interface ProjectCardProps {
 export function ProjectCard({ project, priority = false }: ProjectCardProps) {
   const href = project.homepage || project.url || "#";
   const ogImage =
+    project.screenshot_url ||
     project.og_image ||
     `https://opengraph.githubassets.com/1/${project.repo}`;
 

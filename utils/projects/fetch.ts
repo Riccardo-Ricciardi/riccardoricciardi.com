@@ -16,6 +16,7 @@ export type Project = {
   language: string | null;
   topics: string[] | null;
   og_image: string | null;
+  screenshot_url: string | null;
   position: number;
 };
 
@@ -34,7 +35,7 @@ export const getProjects = cache(
     const { data, error } = await supabase
       .from("projects")
       .select(
-        "id, repo, name, description, url, homepage, stars, forks, language, topics, og_image, position"
+        "id, repo, name, description, url, homepage, stars, forks, language, topics, og_image, screenshot_url, position"
       )
       .eq("visible", true)
       .order("position", { ascending: true });

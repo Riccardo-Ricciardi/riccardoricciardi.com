@@ -30,9 +30,9 @@ export async function Skills({ heading }: SkillsProps) {
         <p className="text-muted-foreground">—</p>
       ) : (
         <ul className="grid gap-3 sm:gap-4 grid-cols-[repeat(auto-fit,minmax(140px,1fr))] list-none p-0">
-          {skills.map(({ id, name, percentage, dark }, i) => {
-            const lightSrc = `${BASE_URL}/${name}.png`;
-            const darkSrc = `${BASE_URL}/${name}-dark.png`;
+          {skills.map(({ id, name, percentage, dark, icon_url, icon_dark_url }, i) => {
+            const lightSrc = icon_url ?? `${BASE_URL}/${name}.png`;
+            const darkSrc = icon_dark_url ?? `${BASE_URL}/${name}-dark.png`;
             const isAboveFold = i < 6;
 
             return (

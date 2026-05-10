@@ -1,11 +1,14 @@
 import { requireAdmin } from "@/utils/auth/admin";
 import { createClient } from "@/utils/supabase/server";
 import {
+  clearSkillIconAction,
   createSkillAction,
   deleteSkillAction,
   updateSkillAction,
+  uploadSkillIconAction,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +19,8 @@ interface Row {
   percentage: number | null;
   dark: boolean | null;
   category: string | null;
+  icon_url: string | null;
+  icon_dark_url: string | null;
 }
 
 interface PageProps {
@@ -28,7 +33,7 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("skills")
-    .select("id, name, position, percentage, dark, category")
+    .select("id, name, position, percentage, dark, category, icon_url, icon_dark_url")
     .order("position", { ascending: true });
   const rows = ((data ?? []) as Row[]) ?? [];
 
@@ -135,6 +140,21 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
                   </Button>
                 </div>
               </form>
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <IconSlot
+                  rowId={row.id}
+                  variant="light"
+                  url={row.icon_url}
+                  fallbackName={row.name}
+                />
+                <IconSlot
+                  rowId={row.id}
+                  variant="dark"
+                  url={row.icon_dark_url}
+                  fallbackName={row.name}
+                />
+              </div>
+
               <form action={deleteSkillAction} className="mt-3 flex justify-end">
                 <input type="hidden" name="id" value={row.id} />
                 <Button
@@ -150,6 +170,80 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
           ))}
         </ul>
       </section>
+    </div>
+  );
+}
+
+function IconSlot({
+  rowId,
+  variant,
+  url,
+  fallbackName,
+}: {
+  rowId: number;
+  variant: "light" | "dark";
+  url: string | null;
+  fallbackName: string;
+}) {
+  const previewUrl = url;
+  return (
+    <div className="rounded-lg border border-dashed border-dashed-soft p-3">
+      <div className="mb-3 flex items-center justify-between">
+        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          Icon — {variant}
+        </span>
+        {url && (
+          <form action={clearSkillIconAction}>
+            <input type="hidden" name="id" value={rowId} />
+            <input type="hidden" name="variant" value={variant} />
+            <button
+              type="submit"
+              className="font-mono text-[10px] uppercase tracking-wider text-red-600 hover:underline"
+            >
+              Remove
+            </button>
+          </form>
+        )}
+      </div>
+      <div className="flex items-center gap-3">
+        <div
+          className={`relative h-12 w-12 shrink-0 rounded-md border border-dashed border-dashed-soft ${
+            variant === "dark" ? "bg-foreground/90" : "bg-background"
+          }`}
+        >
+          {previewUrl ? (
+            <Image
+              src={previewUrl}
+              alt={`${fallbackName} ${variant}`}
+              fill
+              sizes="48px"
+              className="object-contain p-1"
+            />
+          ) : (
+            <span className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
+              ?
+            </span>
+          )}
+        </div>
+        <form
+          action={uploadSkillIconAction}
+          encType="multipart/form-data"
+          className="flex flex-1 flex-col gap-2"
+        >
+          <input type="hidden" name="id" value={rowId} />
+          <input type="hidden" name="variant" value={variant} />
+          <input
+            type="file"
+            name="file"
+            accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml,image/gif"
+            required
+            className="text-xs file:mr-2 file:rounded-md file:border file:border-dashed file:border-dashed-soft file:bg-background file:px-2 file:py-1 file:text-xs file:font-medium hover:file:border-accent-blue"
+          />
+          <Button type="submit" size="sm" variant="outline" className="self-start">
+            Upload
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
