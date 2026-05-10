@@ -9,6 +9,7 @@ interface Props {
   initialValue: string;
   copyFromValue: string;
   copyFromLabel: string;
+  showCharCount?: boolean;
 }
 
 export function CopyableInput({
@@ -17,6 +18,7 @@ export function CopyableInput({
   initialValue,
   copyFromValue,
   copyFromLabel,
+  showCharCount = true,
 }: Props) {
   const [value, setValue] = useState(initialValue);
   const showCopy = !value.trim() && copyFromValue.trim().length > 0;
@@ -55,6 +57,11 @@ export function CopyableInput({
           <Copy className="h-2.5 w-2.5" />
           {copyFromLabel}
         </button>
+      )}
+      {showCharCount && value.length > 0 && (
+        <span className="mt-0.5 block font-mono text-[9px] tabular-nums text-muted-foreground">
+          {value.length} chars
+        </span>
       )}
     </div>
   );
