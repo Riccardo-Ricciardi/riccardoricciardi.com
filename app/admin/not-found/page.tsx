@@ -1,11 +1,10 @@
 import { requireAdmin } from "@/utils/auth/admin";
 import { createAdminClient } from "@/utils/supabase/admin";
 import {
+  bulkUpdateNotFoundSlugAction,
   createNotFoundSlugAction,
   deleteNotFoundSlugAction,
-  updateNotFoundAction,
 } from "@/app/admin/actions";
-import { Button } from "@/components/ui/button";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { SubmitButton } from "@/components/admin/submit-button";
 
@@ -70,25 +69,21 @@ export default async function NotFoundAdmin() {
           404 strings
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Per-locale strings rendered on the 404 page. Empty cell = removes the
-          row for that locale; filled cell = creates or updates.
+          Per-locale strings rendered on the 404 page. Edit all locales on a
+          row and click Save to push them at once.
         </p>
       </header>
 
-      {/* Stable forms per cell */}
-      {slugs.flatMap((slug) =>
-        langs.map((l) => (
-          <form
-            key={`form-${slug}-${l.id}`}
-            action={updateNotFoundAction}
-            id={`nf-${slug}-${l.id}`}
-            className="hidden"
-          >
-            <input type="hidden" name="slug" value={slug} />
-            <input type="hidden" name="language_id" value={l.id} />
-          </form>
-        ))
-      )}
+      {slugs.map((slug) => (
+        <form
+          key={`form-${slug}`}
+          action={bulkUpdateNotFoundSlugAction}
+          id={`nf-${slug}`}
+          className="hidden"
+        >
+          <input type="hidden" name="slug" value={slug} />
+        </form>
+      ))}
 
       {slugs.length > 0 && (
         <div className="overflow-x-auto rounded-lg border border-dashed border-dashed-soft">
@@ -99,59 +94,57 @@ export default async function NotFoundAdmin() {
                 {langs.map((l) => (
                   <Th key={l.id}>{l.code}</Th>
                 ))}
-                <Th className="w-20" />
+                <Th className="w-32" />
               </tr>
             </thead>
             <tbody>
-              {slugs.map((slug) => (
-                <tr
-                  key={slug}
-                  className="border-b border-dashed border-dashed-soft last:border-b-0"
-                >
-                  <td className="px-3 py-2 align-top">
-                    <p className="font-mono text-xs">{slug}</p>
-                  </td>
-                  {langs.map((l) => {
-                    const row = bySlug.get(slug)?.get(l.id);
-                    const formId = `nf-${slug}-${l.id}`;
-                    return (
-                      <td key={l.id} className="px-3 py-2 align-top">
-                        <input
+              {slugs.map((slug) => {
+                const formId = `nf-${slug}`;
+                return (
+                  <tr
+                    key={slug}
+                    className="border-b border-dashed border-dashed-soft last:border-b-0"
+                  >
+                    <td className="px-3 py-2 align-top">
+                      <p className="font-mono text-xs">{slug}</p>
+                    </td>
+                    {langs.map((l) => {
+                      const row = bySlug.get(slug)?.get(l.id);
+                      return (
+                        <td key={l.id} className="px-3 py-2 align-top">
+                          <input
+                            form={formId}
+                            name={`value_${l.id}`}
+                            type="text"
+                            defaultValue={row?.value ?? ""}
+                            className="w-full min-w-[160px] rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          />
+                        </td>
+                      );
+                    })}
+                    <td className="px-3 py-2 align-top">
+                      <div className="flex items-center justify-end gap-2">
+                        <SubmitButton
                           form={formId}
-                          name="value"
-                          type="text"
-                          defaultValue={row?.value ?? ""}
-                          className="w-full min-w-[160px] rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        />
-                      </td>
-                    );
-                  })}
-                  <td className="px-3 py-2 align-top">
-                    <div className="flex flex-col gap-1">
-                      {langs.map((l) => (
-                        <Button
-                          key={l.id}
-                          type="submit"
-                          form={`nf-${slug}-${l.id}`}
                           size="sm"
                           variant="outline"
-                          className="h-7 px-2 font-mono text-[10px] uppercase tracking-wider"
-                          title={`Save ${l.code}`}
+                          className="h-7 px-2"
+                          pendingLabel="Saving…"
                         >
-                          {l.code}
-                        </Button>
-                      ))}
-                      <DeleteButton
-                        action={deleteNotFoundSlugAction}
-                        fieldName="slug"
-                        fieldValue={slug}
-                        label={`404 string "${slug}"`}
-                        description="Removes the slug across all languages."
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                          Save
+                        </SubmitButton>
+                        <DeleteButton
+                          action={deleteNotFoundSlugAction}
+                          fieldName="delete"
+                          fieldValue={slug}
+                          label={`404 string "${slug}"`}
+                          description="Removes the slug across all languages."
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

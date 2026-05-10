@@ -1,15 +1,14 @@
 import { requireAdmin } from "@/utils/auth/admin";
 import { createAdminClient } from "@/utils/supabase/admin";
 import {
+  bulkUpdateContentSlugAction,
   createContentSlugAction,
   deleteContentSlugAction,
-  updateContentAction,
 } from "@/app/admin/actions";
-import { Button } from "@/components/ui/button";
-import { LangTabs } from "@/components/admin/lang-tabs";
 import { CopyableInput } from "@/components/admin/copyable-input";
+import { DeleteButton } from "@/components/admin/delete-button";
 import { SubmitButton } from "@/components/admin/submit-button";
-import { CONTENT_SCHEMA, KNOWN_SLUGS, type ContentField } from "@/utils/content/schema";
+import { CONTENT_SCHEMA, KNOWN_SLUGS } from "@/utils/content/schema";
 import { APP_CONFIG } from "@/utils/config/app";
 
 export const dynamic = "force-dynamic";
@@ -60,7 +59,6 @@ export default async function ContentAdmin() {
     .filter((s) => !KNOWN_SLUGS.has(s))
     .sort();
 
-  // Detect missing translations for known schema fields
   const missing: { slug: string; label: string; missing: string[] }[] = [];
   for (const section of CONTENT_SCHEMA) {
     for (const field of section.fields) {
@@ -78,17 +76,24 @@ export default async function ContentAdmin() {
     }
   }
 
+  // Per-slug forms: one Save action for all locales.
+  const allSlugs = [
+    ...CONTENT_SCHEMA.flatMap((s) => s.fields.map((f) => f.slug)),
+    ...customSlugs,
+  ];
+
   return (
     <div className="flex flex-col gap-12">
       <header>
         <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-          Content
+          Translations
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">
           Content blocks
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Site copy organized by section. Each field is editable per locale via tabs.
+          Site copy organized by section. Edit every locale on a row and click
+          Save to push them all at once.
         </p>
       </header>
 
@@ -107,22 +112,17 @@ export default async function ContentAdmin() {
         </div>
       )}
 
-      {/* Stable forms per cell — referenced by id from inputs/buttons in the table */}
-      {CONTENT_SCHEMA.flatMap((section) =>
-        section.fields.flatMap((field) =>
-          langs.map((l) => (
-            <form
-              key={`form-${field.slug}-${l.id}`}
-              action={updateContentAction}
-              id={`content-${field.slug}-${l.id}`}
-              className="hidden"
-            >
-              <input type="hidden" name="slug" value={field.slug} />
-              <input type="hidden" name="language_id" value={l.id} />
-            </form>
-          ))
-        )
-      )}
+      {/* One bulk-update form per slug — referenced by inputs/buttons via form id. */}
+      {allSlugs.map((slug) => (
+        <form
+          key={`form-${slug}`}
+          action={bulkUpdateContentSlugAction}
+          id={`content-${slug}`}
+          className="hidden"
+        >
+          <input type="hidden" name="slug" value={slug} />
+        </form>
+      ))}
 
       {CONTENT_SCHEMA.map((section) => (
         <section key={section.key} className="flex flex-col gap-3">
@@ -144,62 +144,68 @@ export default async function ContentAdmin() {
                   {langs.map((l) => (
                     <Th key={l.id}>{l.code}</Th>
                   ))}
-                  <Th className="w-20" />
+                  <Th className="w-32" />
                 </tr>
               </thead>
               <tbody>
-                {section.fields.map((field) => (
-                  <tr
-                    key={field.slug}
-                    className="border-b border-dashed border-dashed-soft last:border-b-0"
-                  >
-                    <td className="px-3 py-2 align-top">
-                      <p className="text-sm font-medium">{field.label}</p>
-                      <p className="font-mono text-[10px] text-muted-foreground">
-                        {field.slug}
-                      </p>
-                    </td>
-                    {langs.map((l) => {
-                      const block = bySlug.get(field.slug)?.get(l.id);
-                      const formId = `content-${field.slug}-${l.id}`;
-                      const isDefault = l.id === defaultLangId;
-                      const defaultBlock =
-                        defaultLangId !== null
-                          ? bySlug.get(field.slug)?.get(defaultLangId)
-                          : undefined;
-                      const copyFromValue =
-                        !isDefault && defaultBlock ? defaultBlock.value : "";
-                      return (
-                        <td key={l.id} className="px-3 py-2 align-top">
-                          <CopyableInput
-                            formId={formId}
-                            multiline={field.multiline}
-                            initialValue={block?.value ?? ""}
-                            copyFromValue={copyFromValue}
-                            copyFromLabel={`Copy ${defaultLangCode}`}
-                          />
-                        </td>
-                      );
-                    })}
-                    <td className="px-3 py-2 align-top">
-                      <div className="flex flex-col gap-1">
-                        {langs.map((l) => (
-                          <Button
-                            key={l.id}
-                            type="submit"
-                            form={`content-${field.slug}-${l.id}`}
+                {section.fields.map((field) => {
+                  const formId = `content-${field.slug}`;
+                  return (
+                    <tr
+                      key={field.slug}
+                      className="border-b border-dashed border-dashed-soft last:border-b-0"
+                    >
+                      <td className="px-3 py-2 align-top">
+                        <p className="text-sm font-medium">{field.label}</p>
+                        <p className="font-mono text-[10px] text-muted-foreground">
+                          {field.slug}
+                        </p>
+                      </td>
+                      {langs.map((l) => {
+                        const block = bySlug.get(field.slug)?.get(l.id);
+                        const isDefault = l.id === defaultLangId;
+                        const defaultBlock =
+                          defaultLangId !== null
+                            ? bySlug.get(field.slug)?.get(defaultLangId)
+                            : undefined;
+                        const copyFromValue =
+                          !isDefault && defaultBlock ? defaultBlock.value : "";
+                        return (
+                          <td key={l.id} className="px-3 py-2 align-top">
+                            <CopyableInput
+                              formId={formId}
+                              name={`value_${l.id}`}
+                              multiline={field.multiline}
+                              initialValue={block?.value ?? ""}
+                              copyFromValue={copyFromValue}
+                              copyFromLabel={`Copy ${defaultLangCode}`}
+                            />
+                          </td>
+                        );
+                      })}
+                      <td className="px-3 py-2 align-top">
+                        <div className="flex items-center justify-end gap-2">
+                          <SubmitButton
+                            form={formId}
                             size="sm"
                             variant="outline"
-                            className="h-7 px-2 font-mono text-[10px] uppercase tracking-wider"
-                            title={`Save ${l.code}`}
+                            className="h-7 px-2"
+                            pendingLabel="Saving…"
                           >
-                            {l.code}
-                          </Button>
-                        ))}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                            Save
+                          </SubmitButton>
+                          <DeleteButton
+                            action={deleteContentSlugAction}
+                            fieldName="delete"
+                            fieldValue={field.slug}
+                            label={`content "${field.slug}"`}
+                            description="Removes the slug across all languages."
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -207,43 +213,87 @@ export default async function ContentAdmin() {
       ))}
 
       {customSlugs.length > 0 && (
-        <section>
-          <header className="mb-3">
-            <h2 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+        <section className="flex flex-col gap-3">
+          <header>
+            <h2 className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
               Custom slugs
             </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Slugs that exist in the DB but are not declared in the schema.
-              Add them to <code className="font-mono text-[10px]">utils/content/schema.ts</code> to organize them above.
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              Slugs in the DB but not declared in{" "}
+              <code className="font-mono">utils/content/schema.ts</code>. Promote
+              them to the schema to give them section + label metadata.
             </p>
           </header>
-          <ul className="flex flex-col gap-3 list-none p-0">
-            {customSlugs.map((slug) => (
-              <li
-                key={slug}
-                className="rounded-xl border border-dashed border-dashed-soft p-4"
-              >
-                <div className="mb-3 flex items-center justify-between">
-                  <p className="font-mono text-sm">{slug}</p>
-                  <form action={deleteContentSlugAction}>
-                    <input type="hidden" name="slug" value={slug} />
-                    <button
-                      type="submit"
-                      className="font-mono text-[10px] uppercase tracking-wider text-red-600 hover:underline"
+          <div className="overflow-x-auto rounded-lg border border-dashed border-dashed-soft">
+            <table className="w-full min-w-[640px] text-sm">
+              <thead>
+                <tr className="border-b border-dashed border-dashed-soft text-left">
+                  <Th className="w-44">Slug</Th>
+                  {langs.map((l) => (
+                    <Th key={l.id}>{l.code}</Th>
+                  ))}
+                  <Th className="w-32" />
+                </tr>
+              </thead>
+              <tbody>
+                {customSlugs.map((slug) => {
+                  const formId = `content-${slug}`;
+                  return (
+                    <tr
+                      key={slug}
+                      className="border-b border-dashed border-dashed-soft last:border-b-0"
                     >
-                      Delete slug
-                    </button>
-                  </form>
-                </div>
-                <FieldEditor
-                  field={{ slug, label: slug, multiline: true }}
-                  langs={langs}
-                  blocksForSlug={bySlug.get(slug)}
-                  hideLabel
-                />
-              </li>
-            ))}
-          </ul>
+                      <td className="px-3 py-2 align-top">
+                        <p className="font-mono text-xs">{slug}</p>
+                      </td>
+                      {langs.map((l) => {
+                        const block = bySlug.get(slug)?.get(l.id);
+                        const isDefault = l.id === defaultLangId;
+                        const defaultBlock =
+                          defaultLangId !== null
+                            ? bySlug.get(slug)?.get(defaultLangId)
+                            : undefined;
+                        const copyFromValue =
+                          !isDefault && defaultBlock ? defaultBlock.value : "";
+                        return (
+                          <td key={l.id} className="px-3 py-2 align-top">
+                            <CopyableInput
+                              formId={formId}
+                              name={`value_${l.id}`}
+                              multiline
+                              initialValue={block?.value ?? ""}
+                              copyFromValue={copyFromValue}
+                              copyFromLabel={`Copy ${defaultLangCode}`}
+                            />
+                          </td>
+                        );
+                      })}
+                      <td className="px-3 py-2 align-top">
+                        <div className="flex items-center justify-end gap-2">
+                          <SubmitButton
+                            form={formId}
+                            size="sm"
+                            variant="outline"
+                            className="h-7 px-2"
+                            pendingLabel="Saving…"
+                          >
+                            Save
+                          </SubmitButton>
+                          <DeleteButton
+                            action={deleteContentSlugAction}
+                            fieldName="delete"
+                            fieldValue={slug}
+                            label={`content "${slug}"`}
+                            description="Removes the slug across all languages."
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
 
@@ -277,79 +327,18 @@ export default async function ContentAdmin() {
   );
 }
 
-function Th({ children, className = "" }: { children?: React.ReactNode; className?: string }) {
+function Th({
+  children,
+  className = "",
+}: {
+  children?: React.ReactNode;
+  className?: string;
+}) {
   return (
     <th
       className={`px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground ${className}`}
     >
       {children}
     </th>
-  );
-}
-
-function FieldEditor({
-  field,
-  langs,
-  blocksForSlug,
-  hideLabel = false,
-}: {
-  field: ContentField;
-  langs: Lang[];
-  blocksForSlug: Map<number, Block> | undefined;
-  hideLabel?: boolean;
-}) {
-  return (
-    <div>
-      {!hideLabel && (
-        <header className="mb-3">
-          <p className="text-sm font-medium tracking-tight">{field.label}</p>
-          {field.description && (
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {field.description}
-            </p>
-          )}
-          <p className="mt-1 font-mono text-[10px] text-muted-foreground/70">
-            {field.slug}
-          </p>
-        </header>
-      )}
-      <LangTabs
-        storageKey="admin.lang"
-        langs={langs}
-        panels={langs.map((lang) => {
-          const block = blocksForSlug?.get(lang.id);
-          return (
-            <form
-              key={lang.id}
-              action={updateContentAction}
-              className="flex flex-col gap-2"
-            >
-              <input type="hidden" name="slug" value={field.slug} />
-              <input type="hidden" name="language_id" value={lang.id} />
-              {field.multiline ? (
-                <textarea
-                  name="value"
-                  defaultValue={block?.value ?? ""}
-                  rows={3}
-                  placeholder={`${field.label} — ${lang.code}`}
-                  className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-2 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-              ) : (
-                <input
-                  name="value"
-                  type="text"
-                  defaultValue={block?.value ?? ""}
-                  placeholder={`${field.label} — ${lang.code}`}
-                  className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-              )}
-              <Button type="submit" size="sm" variant="outline" className="self-start">
-                Save
-              </Button>
-            </form>
-          );
-        })}
-      />
-    </div>
   );
 }

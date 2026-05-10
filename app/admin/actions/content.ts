@@ -60,9 +60,47 @@ export async function createContentSlugAction(formData: FormData) {
 
 export async function deleteContentSlugAction(formData: FormData) {
   await requireAdmin();
-  const slug = String(formData.get("slug") ?? "");
+  const slug = String(formData.get("slug") ?? formData.get("delete") ?? "");
+  if (!slug) redirect("/admin/content");
   const supabase = createAdminClient();
   await supabase.from("content_blocks").delete().eq("slug", slug);
   revalidatePath("/", "layout");
   redirect("/admin/content?ok=deleted");
+}
+
+export async function bulkUpdateContentSlugAction(formData: FormData) {
+  await requireAdmin();
+  const supabase = createAdminClient();
+
+  const slug = String(formData.get("slug") ?? "").trim();
+  if (!slug) redirect("/admin/content?error=slug_required");
+
+  const updates: Array<{ language_id: number; value: string }> = [];
+  for (const [key, raw] of formData.entries()) {
+    const m = key.match(/^value_(\d+)$/);
+    if (!m) continue;
+    updates.push({
+      language_id: Number(m[1]),
+      value: String(typeof raw === "string" ? raw : "").trim(),
+    });
+  }
+
+  const now = new Date().toISOString();
+  for (const u of updates) {
+    if (!u.value) {
+      await supabase
+        .from("content_blocks")
+        .delete()
+        .eq("slug", slug)
+        .eq("language_id", u.language_id);
+    } else {
+      await supabase.from("content_blocks").upsert(
+        { slug, language_id: u.language_id, value: u.value, updated_at: now },
+        { onConflict: "slug,language_id" }
+      );
+    }
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/admin/content?ok=saved");
 }

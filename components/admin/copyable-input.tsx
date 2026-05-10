@@ -5,6 +5,7 @@ import { Copy } from "lucide-react";
 
 interface Props {
   formId: string;
+  name?: string;
   multiline?: boolean;
   initialValue: string;
   copyFromValue: string;
@@ -14,6 +15,7 @@ interface Props {
 
 export function CopyableInput({
   formId,
+  name = "value",
   multiline = false,
   initialValue,
   copyFromValue,
@@ -31,7 +33,7 @@ export function CopyableInput({
       {multiline ? (
         <textarea
           form={formId}
-          name="value"
+          name={name}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           rows={2}
@@ -40,7 +42,7 @@ export function CopyableInput({
       ) : (
         <input
           form={formId}
-          name="value"
+          name={name}
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}

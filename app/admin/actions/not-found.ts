@@ -87,9 +87,68 @@ export async function createNotFoundSlugAction(formData: FormData) {
 
 export async function deleteNotFoundSlugAction(formData: FormData) {
   await requireAdmin();
-  const slug = String(formData.get("slug") ?? "");
+  const slug = String(formData.get("slug") ?? formData.get("delete") ?? "");
+  if (!slug) redirect("/admin/not-found");
   const supabase = createAdminClient();
   await supabase.from("not_found").delete().eq("slug", slug);
   revalidatePath("/", "layout");
   redirect("/admin/not-found?ok=deleted");
+}
+
+export async function bulkUpdateNotFoundSlugAction(formData: FormData) {
+  await requireAdmin();
+  const supabase = createAdminClient();
+
+  const slug = String(formData.get("slug") ?? "").trim();
+  if (!slug) redirect("/admin/not-found?error=slug_required");
+
+  const updates: Array<{ language_id: number; value: string }> = [];
+  for (const [key, raw] of formData.entries()) {
+    const m = key.match(/^value_(\d+)$/);
+    if (!m) continue;
+    updates.push({
+      language_id: Number(m[1]),
+      value: String(typeof raw === "string" ? raw : "").trim(),
+    });
+  }
+
+  for (const u of updates) {
+    const { data: existing } = await supabase
+      .from("not_found")
+      .select("id, position")
+      .eq("slug", slug)
+      .eq("language_id", u.language_id)
+      .maybeSingle();
+
+    const existingRow = existing as { id: number; position: number | null } | null;
+
+    if (!u.value) {
+      if (existingRow) {
+        await supabase.from("not_found").delete().eq("id", existingRow.id);
+      }
+    } else if (existingRow) {
+      await supabase
+        .from("not_found")
+        .update({ value: u.value })
+        .eq("id", existingRow.id);
+    } else {
+      const { data: maxRow } = await supabase
+        .from("not_found")
+        .select("position")
+        .order("position", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const maxPos =
+        (maxRow as { position: number | null } | null)?.position ?? -1;
+      await supabase.from("not_found").insert({
+        slug,
+        value: u.value,
+        language_id: u.language_id,
+        position: maxPos + 1,
+      });
+    }
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/admin/not-found?ok=saved");
 }
