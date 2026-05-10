@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { requireAdmin } from "@/utils/auth/admin";
-import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 import {
   bulkUpdateSkillsAction,
   createSkillAction,
@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DeleteButton } from "@/components/admin/delete-button";
+import { SubmitButton } from "@/components/admin/submit-button";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,7 @@ interface Row {
 
 export default async function SkillsAdmin() {
   await requireAdmin();
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("skills")
     .select("id, name, position, percentage, dark, category, icon_url, icon_dark_url")
@@ -181,9 +182,12 @@ export default async function SkillsAdmin() {
             </table>
           </div>
 
-          <Button type="submit" className="w-full bg-accent-blue text-white">
+          <SubmitButton
+            className="w-full bg-accent-blue text-white"
+            pendingLabel="Saving…"
+          >
             Save all
-          </Button>
+          </SubmitButton>
         </form>
       )}
 
@@ -212,13 +216,13 @@ export default async function SkillsAdmin() {
               Dark icon
             </span>
           </label>
-          <Button
-            type="submit"
+          <SubmitButton
             size="sm"
             className="bg-accent-blue text-white sm:col-span-2"
+            pendingLabel="Adding…"
           >
             Add
-          </Button>
+          </SubmitButton>
         </form>
         <p className="mt-2 text-[11px] text-muted-foreground">
           New skill goes at the end. Click the icon column to upload light + dark variants.

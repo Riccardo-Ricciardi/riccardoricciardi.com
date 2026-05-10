@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/utils/auth/admin";
-import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 import { updateThemeAction } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
 import { ColorInput } from "@/components/admin/color-input";
@@ -18,7 +18,7 @@ interface Row {
 
 export default async function ThemeAdmin() {
   await requireAdmin();
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data } = await supabase
     .from("theme_settings")

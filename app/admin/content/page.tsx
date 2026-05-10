@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/utils/auth/admin";
-import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 import {
   createContentSlugAction,
   deleteContentSlugAction,
@@ -7,7 +7,10 @@ import {
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
 import { LangTabs } from "@/components/admin/lang-tabs";
+import { CopyableInput } from "@/components/admin/copyable-input";
+import { SubmitButton } from "@/components/admin/submit-button";
 import { CONTENT_SCHEMA, KNOWN_SLUGS, type ContentField } from "@/utils/content/schema";
+import { APP_CONFIG } from "@/utils/config/app";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +29,7 @@ interface Lang {
 
 export default async function ContentAdmin() {
   await requireAdmin();
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const [{ data: blocks }, { data: languages }] = await Promise.all([
     supabase
@@ -48,6 +51,10 @@ export default async function ContentAdmin() {
     m.set(b.language_id, b);
     bySlug.set(b.slug, m);
   }
+
+  const defaultLangId =
+    langs.find((l) => l.code === APP_CONFIG.defaultLanguage)?.id ?? null;
+  const defaultLangCode = APP_CONFIG.defaultLanguage;
 
   const customSlugs = Array.from(bySlug.keys())
     .filter((s) => !KNOWN_SLUGS.has(s))
@@ -155,25 +162,22 @@ export default async function ContentAdmin() {
                     {langs.map((l) => {
                       const block = bySlug.get(field.slug)?.get(l.id);
                       const formId = `content-${field.slug}-${l.id}`;
+                      const isDefault = l.id === defaultLangId;
+                      const defaultBlock =
+                        defaultLangId !== null
+                          ? bySlug.get(field.slug)?.get(defaultLangId)
+                          : undefined;
+                      const copyFromValue =
+                        !isDefault && defaultBlock ? defaultBlock.value : "";
                       return (
                         <td key={l.id} className="px-3 py-2 align-top">
-                          {field.multiline ? (
-                            <textarea
-                              form={formId}
-                              name="value"
-                              defaultValue={block?.value ?? ""}
-                              rows={2}
-                              className="w-full min-w-[160px] rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                            />
-                          ) : (
-                            <input
-                              form={formId}
-                              name="value"
-                              type="text"
-                              defaultValue={block?.value ?? ""}
-                              className="w-full min-w-[160px] rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                            />
-                          )}
+                          <CopyableInput
+                            formId={formId}
+                            multiline={field.multiline}
+                            initialValue={block?.value ?? ""}
+                            copyFromValue={copyFromValue}
+                            copyFromLabel={`Copy ${defaultLangCode}`}
+                          />
                         </td>
                       );
                     })}
@@ -187,6 +191,7 @@ export default async function ContentAdmin() {
                             size="sm"
                             variant="outline"
                             className="h-7 px-2 font-mono text-[10px] uppercase tracking-wider"
+                            title={`Save ${l.code}`}
                           >
                             {l.code}
                           </Button>
@@ -263,9 +268,9 @@ export default async function ContentAdmin() {
               className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-1.5 font-mono text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </label>
-          <Button type="submit" variant="outline">
+          <SubmitButton variant="outline" pendingLabel="Creating…">
             Create empty rows
-          </Button>
+          </SubmitButton>
         </form>
       </section>
     </div>

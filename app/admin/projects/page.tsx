@@ -1,7 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { requireAdmin } from "@/utils/auth/admin";
-import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 import {
   bulkUpdateProjectsAction,
   createProjectAction,
@@ -12,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DeleteButton } from "@/components/admin/delete-button";
+import { SubmitButton } from "@/components/admin/submit-button";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +26,8 @@ interface Row {
   stars: number | null;
   language: string | null;
   synced_at: string | null;
+  screenshot_url: string | null;
+  og_image: string | null;
 }
 
 interface I18nRow {
@@ -39,13 +43,15 @@ interface Lang {
 
 export default async function ProjectsAdmin() {
   await requireAdmin();
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const [{ data: rowsData }, { data: i18nData }, { data: langsData }] =
     await Promise.all([
       supabase
         .from("projects")
-        .select("id, repo, name, position, visible, stars, language, synced_at")
+        .select(
+          "id, repo, name, position, visible, stars, language, synced_at, screenshot_url, og_image"
+        )
         .order("position", { ascending: true }),
       supabase.from("projects_i18n").select("project_id, language_id"),
       supabase
@@ -78,6 +84,12 @@ export default async function ProjectsAdmin() {
     }
   }
 
+  const lastSync = rows.reduce<string | null>((acc, r) => {
+    if (!r.synced_at) return acc;
+    if (!acc) return r.synced_at;
+    return r.synced_at > acc ? r.synced_at : acc;
+  }, null);
+
   return (
     <div className="flex flex-col gap-8">
       <header className="flex items-end justify-between gap-4">
@@ -92,16 +104,21 @@ export default async function ProjectsAdmin() {
             Edit position and visibility inline. Click row title for translations
             and screenshot.
           </p>
+          {lastSync && (
+            <p className="mt-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Last GitHub sync · {formatRel(lastSync)}
+            </p>
+          )}
         </div>
         <form action={triggerSyncAction}>
-          <Button
-            type="submit"
+          <SubmitButton
             size="sm"
             variant="outline"
             className="hover:border-accent-blue hover:text-accent-blue"
+            pendingLabel="Syncing…"
           >
             Sync GitHub
-          </Button>
+          </SubmitButton>
         </form>
       </header>
 
@@ -131,6 +148,7 @@ export default async function ProjectsAdmin() {
               <thead>
                 <tr className="border-b border-dashed border-dashed-soft text-left">
                   <Th className="w-24">Order</Th>
+                  <Th className="w-16">Image</Th>
                   <Th>Repository</Th>
                   <Th>Lang · Stars</Th>
                   <Th className="w-20">Show</Th>
@@ -182,6 +200,27 @@ export default async function ProjectsAdmin() {
                     <td className="px-3 py-2">
                       <Link
                         href={`/admin/projects/${row.id}`}
+                        className="block"
+                        title="Manage project"
+                      >
+                        <span className="relative block aspect-[16/9] w-14 overflow-hidden rounded border border-dashed border-dashed-soft bg-muted/30">
+                          <Image
+                            src={
+                              row.screenshot_url ||
+                              row.og_image ||
+                              `https://opengraph.githubassets.com/1/${row.repo}`
+                            }
+                            alt={row.repo}
+                            fill
+                            sizes="56px"
+                            className="object-cover"
+                          />
+                        </span>
+                      </Link>
+                    </td>
+                    <td className="px-3 py-2">
+                      <Link
+                        href={`/admin/projects/${row.id}`}
                         className="block hover:text-accent-blue"
                       >
                         <p className="truncate font-mono text-sm font-medium">
@@ -222,9 +261,12 @@ export default async function ProjectsAdmin() {
             </table>
           </div>
 
-          <Button type="submit" className="w-full bg-accent-blue text-white">
+          <SubmitButton
+            className="w-full bg-accent-blue text-white"
+            pendingLabel="Saving…"
+          >
             Save all
-          </Button>
+          </SubmitButton>
         </form>
       )}
 
@@ -249,13 +291,13 @@ export default async function ProjectsAdmin() {
               Show on site
             </span>
           </label>
-          <Button
-            type="submit"
+          <SubmitButton
             size="sm"
             className="bg-accent-blue text-white sm:col-span-2"
+            pendingLabel="Adding…"
           >
             Add
-          </Button>
+          </SubmitButton>
         </form>
       </section>
     </div>
@@ -270,6 +312,24 @@ function Th({ children, className = "" }: { children?: React.ReactNode; classNam
       {children}
     </th>
   );
+}
+
+function formatRel(iso: string): string {
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return "—";
+  const diff = Math.max(0, Date.now() - then);
+  const sec = Math.floor(diff / 1000);
+  if (sec < 60) return `${sec}s ago`;
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  const d = Math.floor(hr / 24);
+  if (d < 30) return `${d}d ago`;
+  const mo = Math.floor(d / 30);
+  if (mo < 12) return `${mo}mo ago`;
+  const y = Math.floor(mo / 12);
+  return `${y}y ago`;
 }
 
 function Field({

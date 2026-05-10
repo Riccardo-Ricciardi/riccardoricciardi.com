@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/utils/auth/admin";
-import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import {
   bulkUpdateNavbarAction,
@@ -9,6 +9,7 @@ import {
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
 import { DeleteButton } from "@/components/admin/delete-button";
+import { SubmitButton } from "@/components/admin/submit-button";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ interface Lang {
 
 export default async function NavbarAdmin() {
   await requireAdmin();
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const [{ data: rows }, { data: languages }] = await Promise.all([
     supabase
@@ -217,9 +218,12 @@ export default async function NavbarAdmin() {
             </table>
           </div>
 
-          <Button type="submit" className="w-full bg-accent-blue text-white">
+          <SubmitButton
+            className="w-full bg-accent-blue text-white"
+            pendingLabel="Saving…"
+          >
             Save all
-          </Button>
+          </SubmitButton>
         </form>
       )}
 
@@ -258,9 +262,12 @@ export default async function NavbarAdmin() {
               </label>
             ))}
           </div>
-          <Button type="submit" className="w-full bg-accent-blue text-white">
+          <SubmitButton
+            className="w-full bg-accent-blue text-white"
+            pendingLabel="Adding…"
+          >
             Add for all languages
-          </Button>
+          </SubmitButton>
         </form>
       </section>
     </div>

@@ -1,11 +1,13 @@
 import { requireAdmin } from "@/utils/auth/admin";
-import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 import {
   cloneLanguageAction,
   deleteLanguageAction,
+  renameLanguageAction,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
 import { DeleteButton } from "@/components/admin/delete-button";
+import { SubmitButton } from "@/components/admin/submit-button";
 import { APP_CONFIG } from "@/utils/config/app";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +20,7 @@ interface Lang {
 
 export default async function LanguagesAdmin() {
   await requireAdmin();
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("languages")
     .select("id, code, name")
@@ -61,13 +63,35 @@ export default async function LanguagesAdmin() {
             <tbody>
               {langs.map((lang) => {
                 const wired = inApp.includes(lang.code);
+                const formId = `lang-${lang.id}`;
                 return (
                   <tr
                     key={lang.id}
                     className="border-b border-dashed border-dashed-soft last:border-b-0"
                   >
-                    <td className="px-3 py-2 font-mono text-sm">{lang.code}</td>
-                    <td className="px-3 py-2">{lang.name}</td>
+                    <td className="px-3 py-2">
+                      <form action={renameLanguageAction} id={formId}>
+                        <input type="hidden" name="id" value={lang.id} />
+                      </form>
+                      <input
+                        form={formId}
+                        name="code"
+                        defaultValue={lang.code}
+                        required
+                        pattern="[a-z]{2}([_-][a-z0-9]+)?"
+                        title="ISO code, e.g. en, it, pt-br"
+                        className="w-20 rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1 font-mono text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        form={formId}
+                        name="name"
+                        defaultValue={lang.name}
+                        required
+                        className="w-full rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      />
+                    </td>
                     <td className="px-3 py-2 text-xs">
                       {wired ? (
                         <span className="text-accent-blue">✓ active</span>
@@ -77,14 +101,25 @@ export default async function LanguagesAdmin() {
                         </span>
                       )}
                     </td>
-                    <td className="px-3 py-2 text-right">
-                      <DeleteButton
-                        action={deleteLanguageAction}
-                        fieldName="id"
-                        fieldValue={lang.id}
-                        label={`language "${lang.code}"`}
-                        description="Removes the language and all related translations (navbar, theme, etc)."
-                      />
+                    <td className="px-3 py-2">
+                      <div className="flex items-center justify-end gap-2">
+                        <SubmitButton
+                          form={formId}
+                          size="sm"
+                          variant="outline"
+                          className="h-7 px-2"
+                          pendingLabel="Saving…"
+                        >
+                          Save
+                        </SubmitButton>
+                        <DeleteButton
+                          action={deleteLanguageAction}
+                          fieldName="id"
+                          fieldValue={lang.id}
+                          label={`language "${lang.code}"`}
+                          description="Removes the language and all related translations (navbar, theme, content, etc)."
+                        />
+                      </div>
                     </td>
                   </tr>
                 );
@@ -144,11 +179,14 @@ export default async function LanguagesAdmin() {
               />
             </label>
           </div>
-          <Button type="submit" className="w-full bg-accent-blue text-white">
+          <SubmitButton
+            className="w-full bg-accent-blue text-white"
+            pendingLabel="Cloning…"
+          >
             Clone
-          </Button>
+          </SubmitButton>
           <p className="text-[11px] text-muted-foreground">
-            Copies all navbar/theme/not_found rows from source. Add the new code to <code className="font-mono">APP_CONFIG.languages</code> to wire it.
+            Copies navbar, theme, 404, content blocks, and project descriptions from the source locale. Add the new code to <code className="font-mono">APP_CONFIG.languages</code> to wire it.
           </p>
         </form>
       </section>
