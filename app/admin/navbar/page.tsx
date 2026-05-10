@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { SubmitButton } from "@/components/admin/submit-button";
+import { SearchBox } from "@/components/admin/search-box";
 
 export const dynamic = "force-dynamic";
 
@@ -27,8 +28,13 @@ interface Lang {
   name: string;
 }
 
-export default async function NavbarAdmin() {
+interface PageProps {
+  searchParams: Promise<{ q?: string }>;
+}
+
+export default async function NavbarAdmin({ searchParams }: PageProps) {
   await requireAdmin();
+  const { q } = await searchParams;
   const supabase = createAdminClient();
 
   const [{ data: rows }, { data: languages }] = await Promise.all([
@@ -54,7 +60,7 @@ export default async function NavbarAdmin() {
     slugMap.set(slug, m);
   }
 
-  const slugs = Array.from(slugMap.keys()).sort((a, b) => {
+  const allSlugs = Array.from(slugMap.keys()).sort((a, b) => {
     const posA = Math.min(
       ...Array.from(slugMap.get(a)!.values()).map((r) => r.position ?? 0)
     );
@@ -63,10 +69,21 @@ export default async function NavbarAdmin() {
     );
     return posA - posB;
   });
+  const query = (q ?? "").toLowerCase().trim();
+  const slugs = query
+    ? allSlugs.filter((s) => {
+        if (s.toLowerCase().includes(query)) return true;
+        const byLang = slugMap.get(s)!;
+        for (const row of byLang.values()) {
+          if ((row.value ?? "").toLowerCase().includes(query)) return true;
+        }
+        return false;
+      })
+    : allSlugs;
 
-  // Detect missing translations
+  // Detect missing translations (across all slugs, not filtered)
   const missing: { slug: string; missing: string[] }[] = [];
-  for (const slug of slugs) {
+  for (const slug of allSlugs) {
     const byLang = slugMap.get(slug)!;
     const missingCodes = langs
       .filter((l) => !byLang.has(l.id))
@@ -78,15 +95,24 @@ export default async function NavbarAdmin() {
 
   return (
     <div className="flex flex-col gap-8">
-      <header>
-        <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-          Content
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Navbar</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          One row per slug, columns per language. Empty cells = missing
-          translation. Click Save to apply all changes at once.
-        </p>
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+            Translations
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight">Navbar</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            One row per slug, columns per language. Empty cells = missing
+            translation. Click Save to apply all changes at once.
+            {query && (
+              <span className="ml-1 font-mono text-xs">
+                — {slugs.length}/{allSlugs.length} matching{" "}
+                <span className="text-accent-blue">&quot;{query}&quot;</span>
+              </span>
+            )}
+          </p>
+        </div>
+        <SearchBox placeholder="Search slug or label…" />
       </header>
 
       {missing.length > 0 && (

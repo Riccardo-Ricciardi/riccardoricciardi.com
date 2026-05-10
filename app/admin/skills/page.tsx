@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { SubmitButton } from "@/components/admin/submit-button";
+import { SearchBox } from "@/components/admin/search-box";
 
 export const dynamic = "force-dynamic";
 
@@ -29,25 +30,47 @@ interface Row {
   icon_dark_url: string | null;
 }
 
-export default async function SkillsAdmin() {
+interface PageProps {
+  searchParams: Promise<{ q?: string }>;
+}
+
+export default async function SkillsAdmin({ searchParams }: PageProps) {
   await requireAdmin();
+  const { q } = await searchParams;
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("skills")
     .select("id, name, position, percentage, dark, category, icon_url, icon_dark_url")
     .order("position", { ascending: true });
-  const rows = ((data ?? []) as Row[]) ?? [];
+  const allRows = ((data ?? []) as Row[]) ?? [];
+  const query = (q ?? "").toLowerCase().trim();
+  const rows = query
+    ? allRows.filter(
+        (r) =>
+          r.name.toLowerCase().includes(query) ||
+          (r.category ?? "").toLowerCase().includes(query)
+      )
+    : allRows;
 
   return (
     <div className="flex flex-col gap-8">
-      <header>
-        <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-          Content
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Skills</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Use the arrows to reorder. Edit other fields and click Save all.
-        </p>
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+            Catalog
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight">Skills</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Use the arrows to reorder. Edit other fields and click Save all.
+            {query && (
+              <span className="ml-1 font-mono text-xs">
+                — {rows.length}/{allRows.length} matching{" "}
+                <span className="text-accent-blue">&quot;{query}&quot;</span>
+              </span>
+            )}
+          </p>
+        </div>
+        <SearchBox placeholder="Search skills…" />
       </header>
 
       {rows.length > 0 && (

@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { SubmitButton } from "@/components/admin/submit-button";
+import { SearchBox } from "@/components/admin/search-box";
 
 export const dynamic = "force-dynamic";
 
@@ -41,8 +42,13 @@ interface Lang {
   name: string;
 }
 
-export default async function ProjectsAdmin() {
+interface PageProps {
+  searchParams: Promise<{ q?: string }>;
+}
+
+export default async function ProjectsAdmin({ searchParams }: PageProps) {
   await requireAdmin();
+  const { q } = await searchParams;
   const supabase = createAdminClient();
 
   const [{ data: rowsData }, { data: i18nData }, { data: langsData }] =
@@ -60,7 +66,16 @@ export default async function ProjectsAdmin() {
         .order("id", { ascending: true }),
     ]);
 
-  const rows = ((rowsData ?? []) as Row[]) ?? [];
+  const allRows = ((rowsData ?? []) as Row[]) ?? [];
+  const query = (q ?? "").toLowerCase().trim();
+  const rows = query
+    ? allRows.filter(
+        (r) =>
+          r.repo.toLowerCase().includes(query) ||
+          (r.name ?? "").toLowerCase().includes(query) ||
+          (r.language ?? "").toLowerCase().includes(query)
+      )
+    : allRows;
   const i18nRows = ((i18nData ?? []) as I18nRow[]) ?? [];
   const langs = (langsData ?? []) as Lang[];
 
@@ -72,9 +87,9 @@ export default async function ProjectsAdmin() {
     i18nByProject.set(row.project_id, set);
   }
 
-  // Compute missing translations
+  // Compute missing translations (across all rows, not filtered)
   const missing: { repo: string; missing: string[]; id: string }[] = [];
-  for (const r of rows) {
+  for (const r of allRows) {
     const have = i18nByProject.get(r.id) ?? new Set();
     const missingLangs = langs
       .filter((l) => !have.has(l.id))
@@ -84,7 +99,7 @@ export default async function ProjectsAdmin() {
     }
   }
 
-  const lastSync = rows.reduce<string | null>((acc, r) => {
+  const lastSync = allRows.reduce<string | null>((acc, r) => {
     if (!r.synced_at) return acc;
     if (!acc) return r.synced_at;
     return r.synced_at > acc ? r.synced_at : acc;
@@ -103,6 +118,12 @@ export default async function ProjectsAdmin() {
           <p className="mt-2 text-sm text-muted-foreground">
             Edit position and visibility inline. Click row title for translations
             and screenshot.
+            {query && (
+              <span className="ml-1 font-mono text-xs">
+                — {rows.length}/{allRows.length} matching{" "}
+                <span className="text-accent-blue">&quot;{query}&quot;</span>
+              </span>
+            )}
           </p>
           {lastSync && (
             <p className="mt-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
@@ -110,16 +131,19 @@ export default async function ProjectsAdmin() {
             </p>
           )}
         </div>
-        <form action={triggerSyncAction}>
-          <SubmitButton
-            size="sm"
-            variant="outline"
-            className="hover:border-accent-blue hover:text-accent-blue"
-            pendingLabel="Syncing…"
-          >
-            Sync GitHub
-          </SubmitButton>
-        </form>
+        <div className="flex items-center gap-2">
+          <SearchBox placeholder="Search projects…" />
+          <form action={triggerSyncAction}>
+            <SubmitButton
+              size="sm"
+              variant="outline"
+              className="hover:border-accent-blue hover:text-accent-blue"
+              pendingLabel="Syncing…"
+            >
+              Sync GitHub
+            </SubmitButton>
+          </form>
+        </div>
       </header>
 
       {missing.length > 0 && (
