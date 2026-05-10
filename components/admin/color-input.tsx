@@ -7,6 +7,7 @@ interface ColorInputProps {
   defaultValue: string;
   required?: boolean;
   placeholder?: string;
+  form?: string;
 }
 
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
@@ -16,6 +17,7 @@ export function ColorInput({
   defaultValue,
   required,
   placeholder,
+  form,
 }: ColorInputProps) {
   const [value, setValue] = useState(defaultValue);
   const isHex = HEX_RE.test(value);
@@ -42,6 +44,7 @@ export function ColorInput({
       <input
         type="text"
         name={name}
+        form={form}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         required={required}

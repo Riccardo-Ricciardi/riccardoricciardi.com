@@ -47,7 +47,7 @@ export default async function ThemeAdmin({ searchParams }: PageProps) {
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">Theme</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Edit colors, dimensions and visual tokens. Each row has independent Save.
+          Design tokens. Light + dark per row. Save independently.
         </p>
       </header>
 
@@ -62,44 +62,68 @@ export default async function ThemeAdmin({ searchParams }: PageProps) {
 
       {Array.from(grouped.entries()).map(([group, items]) => (
         <section key={group}>
-          <h2 className="mb-3 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
             {group}
           </h2>
-          <div className="grid gap-3 lg:grid-cols-2">
-            {items.map((row) => (
-              <form
-                key={row.key}
-                action={updateThemeAction}
-                className="flex flex-col gap-3 rounded-lg border border-dashed border-dashed-soft p-4"
-              >
-                <input type="hidden" name="key" value={row.key} />
-                <header>
-                  <p className="font-mono text-sm">{row.key}</p>
-                  {row.description && (
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">
-                      {row.description}
-                    </p>
-                  )}
-                </header>
-                <ValueField
-                  label="Light"
-                  name="value_light"
-                  type={row.type}
-                  defaultValue={row.value_light}
-                  required
-                />
-                <ValueField
-                  label="Dark"
-                  name="value_dark"
-                  type={row.type}
-                  defaultValue={row.value_dark ?? ""}
-                  placeholder="(falls back to light)"
-                />
-                <Button type="submit" size="sm" variant="outline" className="self-end">
-                  Save
-                </Button>
-              </form>
-            ))}
+          <div className="overflow-x-auto rounded-lg border border-dashed border-dashed-soft">
+            <table className="w-full min-w-[720px] text-sm">
+              <thead>
+                <tr className="border-b border-dashed border-dashed-soft text-left">
+                  <Th>Token</Th>
+                  <Th>Light</Th>
+                  <Th>Dark</Th>
+                  <Th className="w-16" />
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((row) => (
+                  <tr
+                    key={row.key}
+                    className="border-b border-dashed border-dashed-soft last:border-b-0"
+                  >
+                    <td className="px-3 py-2 align-top">
+                      <form action={updateThemeAction} id={`theme-${row.key}`}>
+                        <input type="hidden" name="key" value={row.key} />
+                      </form>
+                      <p className="font-mono text-xs">{row.key}</p>
+                      {row.description && (
+                        <p className="mt-0.5 text-[11px] text-muted-foreground">
+                          {row.description}
+                        </p>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 align-top">
+                      <ValueField
+                        form={`theme-${row.key}`}
+                        name="value_light"
+                        type={row.type}
+                        defaultValue={row.value_light}
+                        required
+                      />
+                    </td>
+                    <td className="px-3 py-2 align-top">
+                      <ValueField
+                        form={`theme-${row.key}`}
+                        name="value_dark"
+                        type={row.type}
+                        defaultValue={row.value_dark ?? ""}
+                        placeholder="falls back to light"
+                      />
+                    </td>
+                    <td className="px-3 py-2 align-top text-right">
+                      <Button
+                        type="submit"
+                        form={`theme-${row.key}`}
+                        size="sm"
+                        variant="outline"
+                      >
+                        Save
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
       ))}
@@ -107,43 +131,51 @@ export default async function ThemeAdmin({ searchParams }: PageProps) {
   );
 }
 
+function Th({ children, className = "" }: { children?: React.ReactNode; className?: string }) {
+  return (
+    <th
+      className={`px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground ${className}`}
+    >
+      {children}
+    </th>
+  );
+}
+
 function ValueField({
-  label,
+  form,
   name,
   type,
   defaultValue,
   required,
   placeholder,
 }: {
-  label: string;
+  form: string;
   name: string;
   type: "color" | "length" | "text" | "number";
   defaultValue: string;
   required?: boolean;
   placeholder?: string;
 }) {
+  if (type === "color") {
+    return (
+      <ColorInput
+        form={form}
+        name={name}
+        defaultValue={defaultValue}
+        required={required}
+        placeholder={placeholder}
+      />
+    );
+  }
   return (
-    <label className="flex flex-col gap-1">
-      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-        {label}
-      </span>
-      {type === "color" ? (
-        <ColorInput
-          name={name}
-          defaultValue={defaultValue}
-          required={required}
-          placeholder={placeholder}
-        />
-      ) : (
-        <input
-          name={name}
-          type="text"
-          defaultValue={defaultValue}
-          required={required}
-          placeholder={placeholder}
-          className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-1.5 font-mono text-xs focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        />
-      )}
-    </label>
+    <input
+      form={form}
+      name={name}
+      type="text"
+      defaultValue={defaultValue}
+      required={required}
+      placeholder={placeholder}
+      className="w-full rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 font-mono text-xs focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    />
   );
 }

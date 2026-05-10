@@ -122,35 +122,104 @@ export default async function ContentAdmin({ searchParams }: PageProps) {
         </div>
       )}
 
+      {/* Stable forms per cell — referenced by id from inputs/buttons in the table */}
+      {CONTENT_SCHEMA.flatMap((section) =>
+        section.fields.flatMap((field) =>
+          langs.map((l) => (
+            <form
+              key={`form-${field.slug}-${l.id}`}
+              action={updateContentAction}
+              id={`content-${field.slug}-${l.id}`}
+              className="hidden"
+            >
+              <input type="hidden" name="slug" value={field.slug} />
+              <input type="hidden" name="language_id" value={l.id} />
+            </form>
+          ))
+        )
+      )}
+
       {CONTENT_SCHEMA.map((section) => (
-        <section key={section.key} className="flex flex-col gap-4">
+        <section key={section.key} className="flex flex-col gap-3">
           <header>
-            <h2 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+            <h2 className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
               {section.title}
             </h2>
             {section.description && (
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-0.5 text-[11px] text-muted-foreground">
                 {section.description}
               </p>
             )}
           </header>
-
-          <ul className="grid list-none gap-3 p-0 lg:grid-cols-2">
-            {section.fields.map((field) => (
-              <li
-                key={field.slug}
-                className={`rounded-xl border border-dashed border-dashed-soft p-4 ${
-                  field.multiline ? "lg:col-span-2" : ""
-                }`}
-              >
-                <FieldEditor
-                  field={field}
-                  langs={langs}
-                  blocksForSlug={bySlug.get(field.slug)}
-                />
-              </li>
-            ))}
-          </ul>
+          <div className="overflow-x-auto rounded-lg border border-dashed border-dashed-soft">
+            <table className="w-full min-w-[640px] text-sm">
+              <thead>
+                <tr className="border-b border-dashed border-dashed-soft text-left">
+                  <Th className="w-44">Field</Th>
+                  {langs.map((l) => (
+                    <Th key={l.id}>{l.code}</Th>
+                  ))}
+                  <Th className="w-20" />
+                </tr>
+              </thead>
+              <tbody>
+                {section.fields.map((field) => (
+                  <tr
+                    key={field.slug}
+                    className="border-b border-dashed border-dashed-soft last:border-b-0"
+                  >
+                    <td className="px-3 py-2 align-top">
+                      <p className="text-sm font-medium">{field.label}</p>
+                      <p className="font-mono text-[10px] text-muted-foreground">
+                        {field.slug}
+                      </p>
+                    </td>
+                    {langs.map((l) => {
+                      const block = bySlug.get(field.slug)?.get(l.id);
+                      const formId = `content-${field.slug}-${l.id}`;
+                      return (
+                        <td key={l.id} className="px-3 py-2 align-top">
+                          {field.multiline ? (
+                            <textarea
+                              form={formId}
+                              name="value"
+                              defaultValue={block?.value ?? ""}
+                              rows={2}
+                              className="w-full min-w-[160px] rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            />
+                          ) : (
+                            <input
+                              form={formId}
+                              name="value"
+                              type="text"
+                              defaultValue={block?.value ?? ""}
+                              className="w-full min-w-[160px] rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            />
+                          )}
+                        </td>
+                      );
+                    })}
+                    <td className="px-3 py-2 align-top">
+                      <div className="flex flex-col gap-1">
+                        {langs.map((l) => (
+                          <Button
+                            key={l.id}
+                            type="submit"
+                            form={`content-${field.slug}-${l.id}`}
+                            size="sm"
+                            variant="outline"
+                            className="h-7 px-2 font-mono text-[10px] uppercase tracking-wider"
+                          >
+                            {l.code}
+                          </Button>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       ))}
 
@@ -222,6 +291,16 @@ export default async function ContentAdmin({ searchParams }: PageProps) {
         </form>
       </section>
     </div>
+  );
+}
+
+function Th({ children, className = "" }: { children?: React.ReactNode; className?: string }) {
+  return (
+    <th
+      className={`px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground ${className}`}
+    >
+      {children}
+    </th>
   );
 }
 
