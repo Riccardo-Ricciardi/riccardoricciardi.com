@@ -173,11 +173,9 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
             </table>
           </div>
 
-          <div className="flex justify-end">
-            <Button type="submit" className="bg-accent-blue text-white">
-              Save all
-            </Button>
-          </div>
+          <Button type="submit" className="w-full bg-accent-blue text-white">
+            Save all
+          </Button>
         </form>
       )}
 

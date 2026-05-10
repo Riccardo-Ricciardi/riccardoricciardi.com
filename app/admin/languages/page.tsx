@@ -86,11 +86,9 @@ export default async function LanguagesAdmin({ searchParams }: PageProps) {
             required
             placeholder="Français"
           />
-          <div className="self-end">
-            <Button type="submit" className="bg-accent-blue text-white">
-              Clone
-            </Button>
-          </div>
+          <Button type="submit" className="w-full bg-accent-blue text-white">
+            Clone
+          </Button>
         </form>
         <p className="mt-2 text-xs text-muted-foreground">
           Clones all navbar/theme/not_found rows from source. After cloning, add

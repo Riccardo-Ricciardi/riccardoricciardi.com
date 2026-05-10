@@ -63,7 +63,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
           <Button
             type="submit"
             size="lg"
-            className="mt-2 bg-accent-blue text-white hover:bg-[var(--accent-blue-hover)]"
+            className="mt-2 w-full bg-accent-blue text-white hover:bg-[var(--accent-blue-hover)]"
           >
             Sign in
           </Button>
