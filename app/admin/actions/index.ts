@@ -6,3 +6,4 @@ export * from "./navbar";
 export * from "./content";
 export * from "./theme";
 export * from "./languages";
+export * from "./not-found";
