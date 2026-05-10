@@ -22,14 +22,23 @@ export function ColorInput({
 
   return (
     <div className="flex items-center gap-2">
-      <input
-        type="color"
-        aria-label={`${name} color picker`}
-        value={isHex ? value : "#000000"}
-        onChange={(e) => setValue(e.target.value)}
-        disabled={!isHex}
-        className="h-9 w-9 shrink-0 rounded-md border border-dashed border-dashed-soft bg-background disabled:opacity-50"
+      {/* Always-on swatch preview — works for any CSS color (hex, oklch, rgb, etc.) */}
+      <span
+        aria-hidden="true"
+        title="Preview"
+        className="h-9 w-9 shrink-0 rounded-md border border-dashed border-dashed-soft"
+        style={{ backgroundColor: value }}
       />
+      {/* Hex picker — only enabled when value is a 6-digit hex */}
+      {isHex && (
+        <input
+          type="color"
+          aria-label={`${name} color picker`}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          className="h-9 w-9 shrink-0 rounded-md border border-dashed border-dashed-soft bg-background"
+        />
+      )}
       <input
         type="text"
         name={name}

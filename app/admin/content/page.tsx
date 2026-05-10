@@ -108,7 +108,7 @@ export default async function ContentAdmin({ searchParams }: PageProps) {
       )}
 
       {missing.length > 0 && (
-        <div className="rounded-md border border-dashed border-amber-500/40 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+        <div className="rounded-md border border-dashed border-amber-500/40 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-200">
           <p className="font-medium">Missing translations</p>
           <ul className="mt-1 list-disc pl-4">
             {missing.map((m) => (

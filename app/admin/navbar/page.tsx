@@ -1,11 +1,14 @@
 import { requireAdmin } from "@/utils/auth/admin";
 import { createClient } from "@/utils/supabase/server";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import {
   bulkUpdateNavbarAction,
   createNavbarAction,
   deleteNavbarSlugAction,
+  moveNavbarSlugAction,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
+import { DeleteButton } from "@/components/admin/delete-button";
 
 export const dynamic = "force-dynamic";
 
@@ -108,7 +111,7 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
       )}
 
       {missing.length > 0 && (
-        <div className="rounded-md border border-dashed border-amber-500/40 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+        <div className="rounded-md border border-dashed border-amber-500/40 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-200">
           <p className="font-medium">Missing translations</p>
           <ul className="mt-1 list-disc pl-4">
             {missing.map((m) => (
@@ -131,6 +134,9 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
             <table className="w-full min-w-[640px] text-sm">
               <thead>
                 <tr className="border-b border-dashed border-dashed-soft text-left">
+                  <th className="w-24 px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                    Order
+                  </th>
                   <th className="px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                     Slug
                   </th>
@@ -142,14 +148,11 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
                       {l.code} label
                     </th>
                   ))}
-                  <th className="w-16 px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                    Pos
-                  </th>
                   <th className="w-20 px-3 py-2" />
                 </tr>
               </thead>
               <tbody>
-                {slugs.map((slug) => {
+                {slugs.map((slug, index) => {
                   const byLang = slugMap.get(slug)!;
                   const firstRow = Array.from(byLang.values())[0];
                   const position = firstRow?.position ?? 0;
@@ -160,10 +163,46 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
                     >
                       <td className="px-3 py-2">
                         <input
+                          type="hidden"
+                          name={`nav[${slug}][position]`}
+                          value={position}
+                        />
+                        <div className="flex items-center gap-1">
+                          <span className="w-5 font-mono text-xs tabular-nums text-muted-foreground">
+                            {index + 1}
+                          </span>
+                          <button
+                            type="submit"
+                            formAction={moveNavbarSlugAction}
+                            formNoValidate
+                            disabled={index === 0}
+                            name={`move:${slug}:up`}
+                            value="1"
+                            aria-label="Move up"
+                            className="rounded p-0.5 text-muted-foreground hover:text-accent-blue disabled:opacity-30 disabled:hover:text-muted-foreground"
+                          >
+                            <ChevronUp className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="submit"
+                            formAction={moveNavbarSlugAction}
+                            formNoValidate
+                            disabled={index === slugs.length - 1}
+                            name={`move:${slug}:down`}
+                            value="1"
+                            aria-label="Move down"
+                            className="rounded p-0.5 text-muted-foreground hover:text-accent-blue disabled:opacity-30 disabled:hover:text-muted-foreground"
+                          >
+                            <ChevronDown className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2">
+                        <input
                           name={`nav[${slug}][slug]`}
                           defaultValue={slug}
                           placeholder="(home)"
-                          className="w-full rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1 font-mono text-xs focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="w-full rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 font-mono text-xs focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         />
                       </td>
                       {langs.map((l) => {
@@ -175,7 +214,7 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
                               name={`nav[${slug}][value][${l.id}]`}
                               defaultValue={row?.value ?? ""}
                               placeholder={isMissing ? "(missing)" : ""}
-                              className={`w-full rounded-md border border-dashed bg-background px-2 py-1 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                              className={`w-full rounded-md border border-dashed bg-background px-2 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                                 isMissing
                                   ? "border-amber-500/40 placeholder:text-amber-600/70"
                                   : "border-dashed-soft"
@@ -184,25 +223,14 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
                           </td>
                         );
                       })}
-                      <td className="px-3 py-2">
-                        <input
-                          name={`nav[${slug}][position]`}
-                          type="number"
-                          defaultValue={position}
-                          className="w-14 rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        />
-                      </td>
                       <td className="px-3 py-2 text-right">
-                        <button
-                          type="submit"
-                          formAction={deleteNavbarSlugAction}
-                          formNoValidate
-                          name="slug"
-                          value={slug}
-                          className="font-mono text-[10px] uppercase tracking-wider text-red-600 hover:underline"
-                        >
-                          Delete
-                        </button>
+                        <DeleteButton
+                          action={deleteNavbarSlugAction}
+                          fieldName="delete"
+                          fieldValue={slug}
+                          label={`navbar item "${slug || "(home)"}"`}
+                          description="Removes the entry across all languages. This cannot be undone."
+                        />
                       </td>
                     </tr>
                   );

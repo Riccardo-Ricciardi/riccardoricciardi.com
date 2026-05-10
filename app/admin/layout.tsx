@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getAdminUser } from "@/utils/auth/admin";
 import { logoutAction } from "@/app/admin/actions";
 import { AdminNav, type NavGroup } from "@/components/admin/admin-nav";
+import { Toaster } from "@/components/ui/sonner";
+import { AdminToastListener } from "@/components/admin/toast-listener";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -70,6 +72,8 @@ export default async function AdminLayout({
       <main className="flex-1">
         <div className="container-page py-8">{children}</div>
       </main>
+      <Toaster position="bottom-right" richColors />
+      <AdminToastListener />
     </div>
   );
 }

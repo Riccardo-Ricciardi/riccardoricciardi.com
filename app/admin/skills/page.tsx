@@ -1,16 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import { requireAdmin } from "@/utils/auth/admin";
 import { createClient } from "@/utils/supabase/server";
 import {
   bulkUpdateSkillsAction,
   createSkillAction,
   deleteSkillAction,
+  moveSkillAction,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
-import { Toggle } from "@/components/admin/toggle";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DeleteButton } from "@/components/admin/delete-button";
 
 export const dynamic = "force-dynamic";
+
+const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL ?? "";
 
 interface Row {
   id: number;
@@ -45,7 +50,7 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">Skills</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Edit any cell. Save all applies all changes at once.
+          Use the arrows to reorder. Edit other fields and click Save all.
         </p>
       </header>
 
@@ -69,113 +74,134 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
       {rows.length > 0 && (
         <form action={bulkUpdateSkillsAction} className="flex flex-col gap-3">
           <div className="overflow-x-auto rounded-lg border border-dashed border-dashed-soft">
-            <table className="w-full min-w-[720px] text-sm">
+            <table className="w-full min-w-[760px] text-sm">
               <thead>
                 <tr className="border-b border-dashed border-dashed-soft text-left">
-                  <Th>Icon</Th>
-                  <Th>Name</Th>
                   <Th className="w-20">Order</Th>
+                  <Th className="w-12">Icon</Th>
+                  <Th>Name</Th>
                   <Th className="w-24">Level</Th>
                   <Th>Category</Th>
-                  <Th className="w-20">Dark icon</Th>
+                  <Th className="w-24">Dark icon</Th>
                   <Th className="w-20" />
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="border-b border-dashed border-dashed-soft last:border-b-0"
-                  >
-                    <td className="px-3 py-2">
-                      <input
-                        type="hidden"
-                        name={`skill[${row.id}][__row]`}
-                        value="1"
-                      />
-                      <Link
-                        href={`/admin/skills/${row.id}`}
-                        className="block"
-                        title="Manage icons"
-                      >
-                        {row.icon_url ? (
-                          <span className="relative inline-block h-7 w-7 rounded border border-dashed border-dashed-soft bg-background">
-                            <Image
-                              src={row.icon_url}
-                              alt=""
-                              fill
-                              sizes="28px"
-                              className="object-contain p-0.5"
-                            />
-                          </span>
-                        ) : (
-                          <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-accent-blue">
-                            upload
-                          </span>
-                        )}
-                      </Link>
-                    </td>
-                    <td className="px-3 py-2">
-                      <input
-                        name={`skill[${row.id}][name]`}
-                        defaultValue={row.name}
-                        required
-                        className="w-full rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      />
-                    </td>
-                    <td className="px-3 py-2">
-                      <input
-                        name={`skill[${row.id}][position]`}
-                        type="number"
-                        defaultValue={(row.position ?? 0).toString()}
-                        aria-label="Display order"
-                        className="w-16 rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm tabular-nums focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      />
-                    </td>
-                    <td className="px-3 py-2">
-                      <div className="relative w-20">
+                {rows.map((row, index) => {
+                  const iconSrc = row.icon_url ?? `${BASE_URL}/${row.name}.png`;
+                  return (
+                    <tr
+                      key={row.id}
+                      className="border-b border-dashed border-dashed-soft last:border-b-0"
+                    >
+                      <td className="px-3 py-2">
                         <input
-                          name={`skill[${row.id}][percentage]`}
-                          type="number"
-                          min={0}
-                          max={100}
-                          defaultValue={(row.percentage ?? 0).toString()}
-                          aria-label="Proficiency level 0-100"
-                          className="w-full rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 pr-6 text-sm tabular-nums focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          type="hidden"
+                          name={`skill[${row.id}][__row]`}
+                          value="1"
                         />
-                        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 font-mono text-[10px] text-muted-foreground">
-                          %
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-3 py-2">
-                      <input
-                        name={`skill[${row.id}][category]`}
-                        defaultValue={row.category ?? ""}
-                        className="w-full rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      />
-                    </td>
-                    <td className="px-3 py-2">
-                      <Toggle
-                        name={`skill[${row.id}][dark]`}
-                        defaultChecked={row.dark ?? false}
-                        ariaLabel="Has dark mode icon variant"
-                      />
-                    </td>
-                    <td className="px-3 py-2 text-right">
-                      <button
-                        type="submit"
-                        formAction={deleteSkillAction}
-                        formNoValidate
-                        name="id"
-                        value={row.id}
-                        className="font-mono text-[10px] uppercase tracking-wider text-red-600 hover:underline"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                        <div className="flex items-center gap-1">
+                          <span className="w-5 font-mono text-xs tabular-nums text-muted-foreground">
+                            {index + 1}
+                          </span>
+                          <button
+                            type="submit"
+                            formAction={moveSkillAction}
+                            formNoValidate
+                            disabled={index === 0}
+                            name={`move:${row.id}:up`}
+                            value="1"
+                            aria-label="Move up"
+                            className="rounded p-0.5 text-muted-foreground hover:text-accent-blue disabled:opacity-30 disabled:hover:text-muted-foreground"
+                          >
+                            <ChevronUp className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="submit"
+                            formAction={moveSkillAction}
+                            formNoValidate
+                            disabled={index === rows.length - 1}
+                            name={`move:${row.id}:down`}
+                            value="1"
+                            aria-label="Move down"
+                            className="rounded p-0.5 text-muted-foreground hover:text-accent-blue disabled:opacity-30 disabled:hover:text-muted-foreground"
+                          >
+                            <ChevronDown className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2">
+                        <Link
+                          href={`/admin/skills/${row.id}`}
+                          className="block"
+                          title="Manage icons"
+                        >
+                          {iconSrc ? (
+                            <span className="relative inline-block h-8 w-8 rounded border border-dashed border-dashed-soft bg-background">
+                              <Image
+                                src={iconSrc}
+                                alt=""
+                                fill
+                                sizes="32px"
+                                className="object-contain p-0.5"
+                              />
+                            </span>
+                          ) : (
+                            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-accent-blue">
+                              upload
+                            </span>
+                          )}
+                        </Link>
+                      </td>
+                      <td className="px-3 py-2">
+                        <input
+                          name={`skill[${row.id}][name]`}
+                          defaultValue={row.name}
+                          required
+                          className="w-full rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="relative w-20">
+                          <input
+                            name={`skill[${row.id}][percentage]`}
+                            type="number"
+                            min={0}
+                            max={100}
+                            defaultValue={(row.percentage ?? 0).toString()}
+                            aria-label="Proficiency level 0-100"
+                            className="w-full rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 pr-6 text-sm tabular-nums focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          />
+                          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 font-mono text-[10px] text-muted-foreground">
+                            %
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2">
+                        <input
+                          name={`skill[${row.id}][category]`}
+                          defaultValue={row.category ?? ""}
+                          className="w-full rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <Checkbox
+                          name={`skill[${row.id}][dark]`}
+                          defaultChecked={row.dark ?? false}
+                          aria-label="Has dark icon variant"
+                        />
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        <DeleteButton
+                          action={deleteSkillAction}
+                          fieldName="delete"
+                          fieldValue={row.id}
+                          label={`skill "${row.name}"`}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -194,14 +220,7 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
           action={createSkillAction}
           className="grid grid-cols-2 items-end gap-2 rounded-lg border border-dashed border-dashed-soft p-3 sm:grid-cols-12"
         >
-          <Field label="Name" name="name" required className="sm:col-span-3" />
-          <Field
-            label="Order"
-            name="position"
-            type="number"
-            defaultValue={rows.length.toString()}
-            className="sm:col-span-1"
-          />
+          <Field label="Name" name="name" required className="sm:col-span-4" />
           <Field
             label="Level (0-100)"
             name="percentage"
@@ -213,11 +232,16 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
           />
           <Field label="Category" name="category" className="sm:col-span-2" />
           <label className="flex items-center gap-2 self-end pb-2 sm:col-span-2">
-            <Toggle name="dark" ariaLabel="Has dark mode icon" />
+            <Checkbox name="dark" aria-label="Has dark icon" />
             <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
               Dark icon
             </span>
           </label>
+          <input
+            type="hidden"
+            name="position"
+            value={rows.length}
+          />
           <Button
             type="submit"
             size="sm"
@@ -227,7 +251,7 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
           </Button>
         </form>
         <p className="mt-2 text-[11px] text-muted-foreground">
-          After adding, click the icon column in the table to upload light + dark variants.
+          New skill goes at the end. Click the icon column to upload light + dark variants.
         </p>
       </section>
     </div>

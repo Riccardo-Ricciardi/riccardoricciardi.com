@@ -224,11 +224,154 @@ export async function updateSkillAction(formData: FormData) {
 
 export async function deleteSkillAction(formData: FormData) {
   await requireAdmin();
-  const id = Number(formData.get("id"));
+  const raw = formData.get("delete") ?? formData.get("id") ?? "";
+  const id = Number(raw);
+  if (!id) redirect("/admin/skills");
   const supabase = createAdminClient();
   await supabase.from("skills").delete().eq("id", id);
   revalidatePath("/", "layout");
   redirect("/admin/skills");
+}
+
+async function swapPositions<T extends { id: number | string; position: number | null }>(
+  table: "skills" | "projects",
+  rows: T[],
+  currentId: T["id"],
+  direction: "up" | "down"
+) {
+  const supabase = createAdminClient();
+  // Normalize: ensure positions are 0..N-1 sequential
+  const sorted = [...rows].sort(
+    (a, b) => (a.position ?? 0) - (b.position ?? 0)
+  );
+  const idx = sorted.findIndex((r) => r.id === currentId);
+  if (idx === -1) return;
+  const targetIdx = direction === "up" ? idx - 1 : idx + 1;
+  if (targetIdx < 0 || targetIdx >= sorted.length) return;
+  const a = sorted[idx];
+  const b = sorted[targetIdx];
+  await supabase.from(table).update({ position: targetIdx }).eq("id", a.id);
+  await supabase.from(table).update({ position: idx }).eq("id", b.id);
+  // Renumber other rows to keep sequential
+  for (let i = 0; i < sorted.length; i++) {
+    if (i === idx || i === targetIdx) continue;
+    if ((sorted[i].position ?? 0) !== i) {
+      await supabase.from(table).update({ position: i }).eq("id", sorted[i].id);
+    }
+  }
+}
+
+function parseMove(formData: FormData): { id: string; direction: "up" | "down" } | null {
+  const move = String(formData.get("move") ?? "");
+  if (move) {
+    const colon = move.lastIndexOf(":");
+    if (colon > 0) {
+      const id = move.slice(0, colon);
+      const dir = move.slice(colon + 1);
+      if (dir === "up" || dir === "down") return { id, direction: dir };
+    }
+  }
+  for (const k of formData.keys()) {
+    const m = k.match(/^move:(.+):(up|down)$/);
+    if (m) return { id: m[1], direction: m[2] as "up" | "down" };
+  }
+  const id = formData.get("id");
+  const dir = formData.get("direction");
+  if (id && (dir === "up" || dir === "down")) {
+    return { id: String(id), direction: dir };
+  }
+  return null;
+}
+
+export async function moveSkillAction(formData: FormData) {
+  await requireAdmin();
+  const parsed = parseMove(formData);
+  if (!parsed) redirect("/admin/skills");
+  const id = Number(parsed.id);
+  const direction = parsed.direction;
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("skills")
+    .select("id, position")
+    .order("position", { ascending: true });
+  await swapPositions(
+    "skills",
+    (data ?? []) as Array<{ id: number; position: number | null }>,
+    id,
+    direction
+  );
+  revalidatePath("/", "layout");
+  redirect("/admin/skills");
+}
+
+export async function moveProjectAction(formData: FormData) {
+  await requireAdmin();
+  const parsed = parseMove(formData);
+  if (!parsed) redirect("/admin/projects");
+  const id = parsed.id;
+  const direction = parsed.direction;
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("projects")
+    .select("id, position")
+    .order("position", { ascending: true });
+  await swapPositions(
+    "projects",
+    (data ?? []) as Array<{ id: string; position: number | null }>,
+    id,
+    direction
+  );
+  revalidatePath("/", "layout");
+  redirect("/admin/projects");
+}
+
+export async function moveNavbarSlugAction(formData: FormData) {
+  await requireAdmin();
+  const parsed = parseMove(formData);
+  if (!parsed) redirect("/admin/navbar");
+  const slug = parsed.id;
+  const direction = parsed.direction;
+  const supabase = createAdminClient();
+
+  // Get all rows ordered by position, group by slug
+  const { data } = await supabase
+    .from("navbar")
+    .select("id, slug, position")
+    .order("position", { ascending: true });
+
+  type Row = { id: number; slug: string | null; position: number | null };
+  const rows = (data ?? []) as Row[];
+
+  // Build ordered list of unique slugs
+  const seen = new Set<string>();
+  const slugOrder: string[] = [];
+  for (const r of rows) {
+    const s = r.slug ?? "";
+    if (!seen.has(s)) {
+      seen.add(s);
+      slugOrder.push(s);
+    }
+  }
+
+  const idx = slugOrder.indexOf(slug);
+  if (idx === -1) return;
+  const targetIdx = direction === "up" ? idx - 1 : idx + 1;
+  if (targetIdx < 0 || targetIdx >= slugOrder.length) return;
+  // Swap slugs in array
+  [slugOrder[idx], slugOrder[targetIdx]] = [
+    slugOrder[targetIdx],
+    slugOrder[idx],
+  ];
+  // Renumber: for each slug in new order, set all its rows to that index
+  for (let i = 0; i < slugOrder.length; i++) {
+    await supabase
+      .from("navbar")
+      .update({ position: i })
+      .eq("slug", slugOrder[i]);
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/admin/navbar");
 }
 
 export async function bulkUpdateSkillsAction(formData: FormData) {
@@ -382,7 +525,9 @@ export async function upsertProjectI18nAction(formData: FormData) {
 
 export async function deleteProjectAction(formData: FormData) {
   await requireAdmin();
-  const id = String(formData.get("id"));
+  const raw = formData.get("delete") ?? formData.get("id") ?? "";
+  const id = String(raw);
+  if (!id) redirect("/admin/projects");
   const supabase = createAdminClient();
   await supabase.from("projects").delete().eq("id", id);
   revalidatePath("/", "layout");
@@ -444,7 +589,8 @@ export async function deleteNavbarAction(formData: FormData) {
 
 export async function deleteNavbarSlugAction(formData: FormData) {
   await requireAdmin();
-  const slug = String(formData.get("slug") ?? "");
+  const raw = formData.get("delete") ?? formData.get("slug") ?? "";
+  const slug = String(raw);
   const supabase = createAdminClient();
   await supabase.from("navbar").delete().eq("slug", slug);
   revalidatePath("/", "layout");

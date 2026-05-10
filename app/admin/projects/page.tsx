@@ -1,14 +1,17 @@
 import Link from "next/link";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import { requireAdmin } from "@/utils/auth/admin";
 import { createClient } from "@/utils/supabase/server";
 import {
   bulkUpdateProjectsAction,
   createProjectAction,
   deleteProjectAction,
+  moveProjectAction,
   triggerSyncAction,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
-import { Toggle } from "@/components/admin/toggle";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DeleteButton } from "@/components/admin/delete-button";
 
 export const dynamic = "force-dynamic";
 
@@ -125,7 +128,7 @@ export default async function ProjectsAdmin({ searchParams }: PageProps) {
       )}
 
       {missing.length > 0 && (
-        <div className="rounded-md border border-dashed border-amber-500/40 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+        <div className="rounded-md border border-dashed border-amber-500/40 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-200">
           <p className="font-medium">Missing translations</p>
           <ul className="mt-1 list-disc pl-4">
             {missing.map((m) => (
@@ -149,15 +152,15 @@ export default async function ProjectsAdmin({ searchParams }: PageProps) {
             <table className="w-full min-w-[640px] text-sm">
               <thead>
                 <tr className="border-b border-dashed border-dashed-soft text-left">
+                  <Th className="w-24">Order</Th>
                   <Th>Repository</Th>
                   <Th>Lang · Stars</Th>
-                  <Th className="w-20">Order</Th>
                   <Th className="w-20">Show</Th>
                   <Th className="w-32" />
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row) => (
+                {rows.map((row, index) => (
                   <tr
                     key={row.id}
                     className="border-b border-dashed border-dashed-soft last:border-b-0"
@@ -168,6 +171,37 @@ export default async function ProjectsAdmin({ searchParams }: PageProps) {
                         name={`project[${row.id}][__row]`}
                         value="1"
                       />
+                      <div className="flex items-center gap-1">
+                        <span className="w-5 font-mono text-xs tabular-nums text-muted-foreground">
+                          {index + 1}
+                        </span>
+                        <button
+                          type="submit"
+                          formAction={moveProjectAction}
+                          formNoValidate
+                          disabled={index === 0}
+                          name={`move:${row.id}:up`}
+                          value="1"
+                          aria-label="Move up"
+                          className="rounded p-0.5 text-muted-foreground hover:text-accent-blue disabled:opacity-30 disabled:hover:text-muted-foreground"
+                        >
+                          <ChevronUp className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="submit"
+                          formAction={moveProjectAction}
+                          formNoValidate
+                          disabled={index === rows.length - 1}
+                          name={`move:${row.id}:down`}
+                          value="1"
+                          aria-label="Move down"
+                          className="rounded p-0.5 text-muted-foreground hover:text-accent-blue disabled:opacity-30 disabled:hover:text-muted-foreground"
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2">
                       <Link
                         href={`/admin/projects/${row.id}`}
                         className="block hover:text-accent-blue"
@@ -184,19 +218,10 @@ export default async function ProjectsAdmin({ searchParams }: PageProps) {
                       {row.language ?? "—"} · ★{row.stars ?? 0}
                     </td>
                     <td className="px-3 py-2">
-                      <input
-                        name={`project[${row.id}][position]`}
-                        type="number"
-                        defaultValue={(row.position ?? 0).toString()}
-                        aria-label="Display order"
-                        className="w-16 rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm tabular-nums focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      />
-                    </td>
-                    <td className="px-3 py-2">
-                      <Toggle
+                      <Checkbox
                         name={`project[${row.id}][visible]`}
                         defaultChecked={row.visible ?? false}
-                        ariaLabel="Show project"
+                        aria-label="Show project on site"
                       />
                     </td>
                     <td className="px-3 py-2 text-right">
@@ -206,16 +231,12 @@ export default async function ProjectsAdmin({ searchParams }: PageProps) {
                       >
                         Edit
                       </Link>
-                      <button
-                        type="submit"
-                        formAction={deleteProjectAction}
-                        formNoValidate
-                        name="id"
-                        value={row.id}
-                        className="font-mono text-[10px] uppercase tracking-wider text-red-600 hover:underline"
-                      >
-                        Delete
-                      </button>
+                      <DeleteButton
+                        action={deleteProjectAction}
+                        fieldName="delete"
+                        fieldValue={row.id}
+                        label={`project "${row.repo}"`}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -244,17 +265,11 @@ export default async function ProjectsAdmin({ searchParams }: PageProps) {
             placeholder="Riccardo-Ricciardi/repo-name"
             className="sm:col-span-7"
           />
-          <Field
-            label="Order"
-            name="position"
-            type="number"
-            defaultValue={rows.length.toString()}
-            className="sm:col-span-1"
-          />
-          <label className="flex items-center gap-2 self-end pb-2 sm:col-span-2">
-            <Toggle name="visible" defaultChecked ariaLabel="Show on site" />
+          <input type="hidden" name="position" value={rows.length} />
+          <label className="flex items-center gap-2 self-end pb-2 sm:col-span-3">
+            <Checkbox name="visible" defaultChecked aria-label="Show on site" />
             <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              Show
+              Show on site
             </span>
           </label>
           <Button
