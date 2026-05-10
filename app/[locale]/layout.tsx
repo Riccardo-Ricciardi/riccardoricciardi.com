@@ -1,31 +1,16 @@
-import "@/app/globals.css";
-import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Providers } from "@/components/providers";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { SkipLink } from "@/components/skip-link";
 import { JsonLd } from "@/components/json-ld";
+import { HtmlLangUpdater } from "@/components/html-lang-updater";
 import {
   APP_CONFIG,
   isSupportedLanguage,
   type SupportedLanguage,
 } from "@/utils/config/app";
 import { getDictionary } from "@/utils/i18n/dictionary";
-
-const geistSans = Geist({ subsets: ["latin"], variable: "--font-sans" });
-const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
-
-export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
-  ],
-  colorScheme: "light dark",
-  width: "device-width",
-  initialScale: 1,
-};
 
 export function generateStaticParams() {
   return APP_CONFIG.languages.map((locale) => ({ locale }));
@@ -124,29 +109,19 @@ export default async function LocaleLayout({
         };
 
   return (
-    <html
-      lang={locale}
-      suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable}`}
-    >
-      <body
-        suppressHydrationWarning
-        className="flex min-h-screen flex-col"
-      >
-        <Providers>
-          <SkipLink label={ariaLabels.skip} />
-          <Navbar
-            locale={locale as SupportedLanguage}
-            dictionary={dictionary}
-            ariaLabels={ariaLabels}
-          />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <Footer locale={locale} />
-          <JsonLd locale={locale as SupportedLanguage} />
-        </Providers>
-      </body>
-    </html>
+    <>
+      <HtmlLangUpdater lang={locale} />
+      <SkipLink label={ariaLabels.skip} />
+      <Navbar
+        locale={locale as SupportedLanguage}
+        dictionary={dictionary}
+        ariaLabels={ariaLabels}
+      />
+      <main id="main" className="flex-1">
+        {children}
+      </main>
+      <Footer locale={locale} />
+      <JsonLd locale={locale as SupportedLanguage} />
+    </>
   );
 }
