@@ -16,13 +16,8 @@ interface Row {
   position: number;
 }
 
-interface PageProps {
-  searchParams: Promise<{ error?: string; ok?: string }>;
-}
-
-export default async function ThemeAdmin({ searchParams }: PageProps) {
+export default async function ThemeAdmin() {
   await requireAdmin();
-  const { error } = await searchParams;
   const supabase = await createClient();
 
   const { data } = await supabase
@@ -50,15 +45,6 @@ export default async function ThemeAdmin({ searchParams }: PageProps) {
           Design tokens. Light + dark per row. Save independently.
         </p>
       </header>
-
-      {error && (
-        <p
-          role="alert"
-          className="rounded-md border border-dashed border-red-500/40 bg-red-500/5 px-3 py-2 text-xs text-red-600"
-        >
-          {error}
-        </p>
-      )}
 
       {Array.from(grouped.entries()).map(([group, items]) => (
         <section key={group}>

@@ -28,13 +28,8 @@ interface Row {
   icon_dark_url: string | null;
 }
 
-interface PageProps {
-  searchParams: Promise<{ error?: string; ok?: string }>;
-}
-
-export default async function SkillsAdmin({ searchParams }: PageProps) {
+export default async function SkillsAdmin() {
   await requireAdmin();
-  const { error, ok } = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase
     .from("skills")
@@ -53,23 +48,6 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
           Use the arrows to reorder. Edit other fields and click Save all.
         </p>
       </header>
-
-      {error && (
-        <p
-          role="alert"
-          className="rounded-md border border-dashed border-red-500/40 bg-red-500/5 px-3 py-2 text-xs text-red-600"
-        >
-          {error}
-        </p>
-      )}
-      {ok && (
-        <p
-          role="status"
-          className="rounded-md border border-dashed border-accent-blue bg-accent-blue-soft px-3 py-2 text-xs text-accent-blue"
-        >
-          Changes saved
-        </p>
-      )}
 
       {rows.length > 0 && (
         <form action={bulkUpdateSkillsAction} className="flex flex-col gap-3">

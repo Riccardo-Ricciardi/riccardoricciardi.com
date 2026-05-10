@@ -18,7 +18,13 @@ export function AdminToastListener() {
     lastKey.current = key;
 
     if (ok) {
-      toast.success(ok === "saved" ? "Saved" : ok);
+      const messages: Record<string, string> = {
+        saved: "Saved",
+        created: "Created",
+        deleted: "Deleted",
+        updated: "Updated",
+      };
+      toast.success(messages[ok] ?? ok);
     } else if (error) {
       toast.error(decodeURIComponent(error));
     }

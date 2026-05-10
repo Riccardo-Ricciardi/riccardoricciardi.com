@@ -26,13 +26,8 @@ interface Lang {
   name: string;
 }
 
-interface PageProps {
-  searchParams: Promise<{ error?: string; ok?: string }>;
-}
-
-export default async function NavbarAdmin({ searchParams }: PageProps) {
+export default async function NavbarAdmin() {
   await requireAdmin();
-  const { error, ok } = await searchParams;
   const supabase = await createClient();
 
   const [{ data: rows }, { data: languages }] = await Promise.all([
@@ -92,23 +87,6 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
           translation. Click Save to apply all changes at once.
         </p>
       </header>
-
-      {error && (
-        <p
-          role="alert"
-          className="rounded-md border border-dashed border-red-500/40 bg-red-500/5 px-3 py-2 text-xs text-red-600"
-        >
-          {error}
-        </p>
-      )}
-      {ok && (
-        <p
-          role="status"
-          className="rounded-md border border-dashed border-accent-blue bg-accent-blue-soft px-3 py-2 text-xs text-accent-blue"
-        >
-          Changes saved
-        </p>
-      )}
 
       {missing.length > 0 && (
         <div className="rounded-md border border-dashed border-amber-500/40 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-200">
