@@ -17,7 +17,7 @@ interface Row {
 }
 
 interface PageProps {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; ok?: string }>;
 }
 
 export default async function ThemeAdmin({ searchParams }: PageProps) {
@@ -40,14 +40,14 @@ export default async function ThemeAdmin({ searchParams }: PageProps) {
   }
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-8">
       <header>
         <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
           Design system
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">Theme</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Live tokens — overrides global CSS variables. Save to apply across the site.
+          Edit colors, dimensions and visual tokens. Each row has independent Save.
         </p>
       </header>
 
@@ -62,57 +62,45 @@ export default async function ThemeAdmin({ searchParams }: PageProps) {
 
       {Array.from(grouped.entries()).map(([group, items]) => (
         <section key={group}>
-          <h2 className="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+          <h2 className="mb-3 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
             {group}
           </h2>
-          <ul className="flex flex-col gap-2 list-none p-0">
+          <div className="grid gap-3 lg:grid-cols-2">
             {items.map((row) => (
-              <li
+              <form
                 key={row.key}
-                className="rounded-xl border border-dashed border-dashed-soft p-4"
+                action={updateThemeAction}
+                className="flex flex-col gap-3 rounded-lg border border-dashed border-dashed-soft p-4"
               >
-                <form
-                  action={updateThemeAction}
-                  className="grid grid-cols-1 gap-3 sm:grid-cols-7"
-                >
-                  <input type="hidden" name="key" value={row.key} />
-
-                  <div className="sm:col-span-2">
-                    <p className="font-mono text-sm">{row.key}</p>
-                    {row.description && (
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {row.description}
-                      </p>
-                    )}
-                    <p className="mt-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                      {row.type}
+                <input type="hidden" name="key" value={row.key} />
+                <header>
+                  <p className="font-mono text-sm">{row.key}</p>
+                  {row.description && (
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
+                      {row.description}
                     </p>
-                  </div>
-
-                  <ValueField
-                    label="Light"
-                    name="value_light"
-                    type={row.type}
-                    defaultValue={row.value_light}
-                    required
-                  />
-                  <ValueField
-                    label="Dark"
-                    name="value_dark"
-                    type={row.type}
-                    defaultValue={row.value_dark ?? ""}
-                    placeholder="(falls back to light)"
-                  />
-
-                  <div className="flex items-end gap-2 sm:col-span-2">
-                    <Button type="submit" size="sm" variant="outline">
-                      Save
-                    </Button>
-                  </div>
-                </form>
-              </li>
+                  )}
+                </header>
+                <ValueField
+                  label="Light"
+                  name="value_light"
+                  type={row.type}
+                  defaultValue={row.value_light}
+                  required
+                />
+                <ValueField
+                  label="Dark"
+                  name="value_dark"
+                  type={row.type}
+                  defaultValue={row.value_dark ?? ""}
+                  placeholder="(falls back to light)"
+                />
+                <Button type="submit" size="sm" variant="outline" className="self-end">
+                  Save
+                </Button>
+              </form>
             ))}
-          </ul>
+          </div>
         </section>
       ))}
     </div>
@@ -135,7 +123,7 @@ function ValueField({
   placeholder?: string;
 }) {
   return (
-    <label className="flex flex-col gap-1.5 sm:col-span-2">
+    <label className="flex flex-col gap-1">
       <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
         {label}
       </span>
@@ -153,7 +141,7 @@ function ValueField({
           defaultValue={defaultValue}
           required={required}
           placeholder={placeholder}
-          className="flex-1 rounded-md border border-dashed border-dashed-soft bg-background px-3 py-1.5 font-mono text-xs focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-1.5 font-mono text-xs focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
       )}
     </label>

@@ -596,6 +596,60 @@ export async function createNavbarAction(formData: FormData) {
   redirect("/admin/navbar");
 }
 
+export async function createNavbarMultilangAction(formData: FormData) {
+  await requireAdmin();
+  const supabase = createAdminClient();
+
+  const slug = String(formData.get("slug") ?? "").trim();
+
+  const { data: langsData } = await supabase
+    .from("languages")
+    .select("id, code")
+    .order("id", { ascending: true });
+  const langs = (langsData ?? []) as Array<{ id: number; code: string }>;
+
+  const inserts: Array<{ slug: string; value: string; language_id: number; position: number }> = [];
+
+  // Auto-position: max+1 (or reuse existing slug pos)
+  let position = 0;
+  const { data: existing } = await supabase
+    .from("navbar")
+    .select("position")
+    .eq("slug", slug)
+    .limit(1)
+    .maybeSingle();
+  const existingPos = (existing as { position: number | null } | null)?.position;
+  if (existingPos !== undefined && existingPos !== null) {
+    position = existingPos;
+  } else {
+    const { data: maxRow } = await supabase
+      .from("navbar")
+      .select("position")
+      .order("position", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const maxPos = (maxRow as { position: number | null } | null)?.position ?? -1;
+    position = maxPos + 1;
+  }
+
+  for (const lang of langs) {
+    const value = String(formData.get(`label_${lang.code}`) ?? "").trim();
+    if (value) {
+      inserts.push({ slug, value, language_id: lang.id, position });
+    }
+  }
+
+  if (inserts.length === 0) {
+    redirect("/admin/navbar?error=at_least_one_label_required");
+  }
+
+  const { error } = await supabase.from("navbar").insert(inserts);
+  if (error) redirect(`/admin/navbar?error=${encodeURIComponent(error.message)}`);
+
+  revalidatePath("/", "layout");
+  redirect("/admin/navbar?ok=saved");
+}
+
 export async function updateNavbarAction(formData: FormData) {
   await requireAdmin();
   const supabase = createAdminClient();

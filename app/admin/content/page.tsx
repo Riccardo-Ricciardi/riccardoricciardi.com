@@ -135,11 +135,13 @@ export default async function ContentAdmin({ searchParams }: PageProps) {
             )}
           </header>
 
-          <ul className="flex flex-col gap-3 list-none p-0">
+          <ul className="grid list-none gap-3 p-0 lg:grid-cols-2">
             {section.fields.map((field) => (
               <li
                 key={field.slug}
-                className="rounded-xl border border-dashed border-dashed-soft p-4"
+                className={`rounded-xl border border-dashed border-dashed-soft p-4 ${
+                  field.multiline ? "lg:col-span-2" : ""
+                }`}
               >
                 <FieldEditor
                   field={field}

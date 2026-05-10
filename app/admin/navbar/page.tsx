@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import {
   bulkUpdateNavbarAction,
-  createNavbarAction,
+  createNavbarMultilangAction,
   deleteNavbarSlugAction,
   moveNavbarSlugAction,
 } from "@/app/admin/actions";
@@ -245,65 +245,45 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
         </form>
       )}
 
-      {/* Add new */}
+      {/* Add new — single form with one label per language */}
       <section>
         <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          Add slug (creates one empty row per language to fill in)
+          Add new item (fill all languages at once)
         </h2>
         <form
-          action={createNavbarAction}
-          className="grid grid-cols-2 items-end gap-2 rounded-lg border border-dashed border-dashed-soft p-3 sm:grid-cols-12"
+          action={createNavbarMultilangAction}
+          className="flex flex-col gap-3 rounded-lg border border-dashed border-dashed-soft p-4"
         >
-          <label className="flex flex-col gap-1 sm:col-span-2">
+          <label className="flex flex-col gap-1">
             <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              Lang
-            </span>
-            <select
-              name="language_id"
-              required
-              className="rounded-md border border-dashed border-dashed-soft bg-background px-2.5 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              {langs.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.code}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="flex flex-col gap-1 sm:col-span-3">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              Slug
+              Slug (empty for home)
             </span>
             <input
               name="slug"
               type="text"
               placeholder="about"
-              className="rounded-md border border-dashed border-dashed-soft bg-background px-2.5 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-2 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </label>
-          <label className="flex flex-col gap-1 sm:col-span-4">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              Label
-            </span>
-            <input
-              name="value"
-              type="text"
-              required
-              className="rounded-md border border-dashed border-dashed-soft bg-background px-2.5 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </label>
-          <Button
-            type="submit"
-            size="sm"
-            className="bg-accent-blue text-white sm:col-span-3"
-          >
-            Add
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {langs.map((l) => (
+              <label key={l.id} className="flex flex-col gap-1">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                  {l.code} label
+                </span>
+                <input
+                  name={`label_${l.code}`}
+                  type="text"
+                  placeholder={`Label in ${l.name}`}
+                  className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-2 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </label>
+            ))}
+          </div>
+          <Button type="submit" className="w-full bg-accent-blue text-white">
+            Add for all languages
           </Button>
         </form>
-        <p className="mt-2 text-[11px] text-muted-foreground">
-          Tip: add the same slug for one language, then fill the empty cells in
-          the table for the other languages and Save.
-        </p>
       </section>
     </div>
   );
