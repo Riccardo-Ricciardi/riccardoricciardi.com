@@ -140,6 +140,9 @@
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 4rem;
+    /* Reserve scrollbar gutter so Radix popovers/dropdowns locking scroll
+       don't cause a layout shift (page widening + navbar growing). */
+    scrollbar-gutter: stable;
   }
   body {
     @apply bg-background text-foreground antialiased;
