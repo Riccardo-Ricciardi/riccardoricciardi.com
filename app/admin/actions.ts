@@ -231,6 +231,89 @@ export async function deleteSkillAction(formData: FormData) {
   redirect("/admin/skills");
 }
 
+export async function bulkUpdateSkillsAction(formData: FormData) {
+  await requireAdmin();
+  const supabase = createAdminClient();
+
+  type Update = {
+    name?: string;
+    position?: number;
+    percentage?: number;
+    category?: string | null;
+    dark?: boolean;
+  };
+  const updates = new Map<number, Update>();
+
+  for (const [key, raw] of formData.entries()) {
+    const value = typeof raw === "string" ? raw : "";
+    const m = key.match(/^skill\[(\d+)\]\[(\w+)\]$/);
+    if (!m) continue;
+    const id = Number(m[1]);
+    const field = m[2];
+    const u = updates.get(id) ?? {};
+    if (field === "name") u.name = value.trim();
+    else if (field === "position") u.position = Number(value) || 0;
+    else if (field === "percentage") u.percentage = Number(value) || 0;
+    else if (field === "category") u.category = value.trim() || null;
+    else if (field === "dark") u.dark = value === "on" || value === "true";
+    updates.set(id, u);
+  }
+
+  // Track which skill IDs have a `dark` checkbox in the form. Unchecked
+  // checkboxes are NOT submitted, so we need a hidden marker per row.
+  const rowIds = new Set<number>();
+  for (const k of formData.keys()) {
+    const m = k.match(/^skill\[(\d+)\]\[__row\]$/);
+    if (m) rowIds.add(Number(m[1]));
+  }
+
+  for (const id of rowIds) {
+    const u = updates.get(id) ?? {};
+    if (!("dark" in u)) u.dark = false;
+    if (Object.keys(u).length === 0) continue;
+    await supabase.from("skills").update(u).eq("id", id);
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/admin/skills?ok=saved");
+}
+
+export async function bulkUpdateProjectsAction(formData: FormData) {
+  await requireAdmin();
+  const supabase = createAdminClient();
+
+  type Update = { position?: number; visible?: boolean };
+  const updates = new Map<string, Update>();
+
+  for (const [key, raw] of formData.entries()) {
+    const value = typeof raw === "string" ? raw : "";
+    const m = key.match(/^project\[([^\]]+)\]\[(\w+)\]$/);
+    if (!m) continue;
+    const id = m[1];
+    const field = m[2];
+    const u = updates.get(id) ?? {};
+    if (field === "position") u.position = Number(value) || 0;
+    else if (field === "visible") u.visible = value === "on" || value === "true";
+    updates.set(id, u);
+  }
+
+  const rowIds = new Set<string>();
+  for (const k of formData.keys()) {
+    const m = k.match(/^project\[([^\]]+)\]\[__row\]$/);
+    if (m) rowIds.add(m[1]);
+  }
+
+  for (const id of rowIds) {
+    const u = updates.get(id) ?? {};
+    if (!("visible" in u)) u.visible = false;
+    if (Object.keys(u).length === 0) continue;
+    await supabase.from("projects").update(u).eq("id", id);
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/admin/projects?ok=saved");
+}
+
 // ---------------- PROJECTS ----------------
 
 export async function createProjectAction(formData: FormData) {
@@ -357,6 +440,88 @@ export async function deleteNavbarAction(formData: FormData) {
   await supabase.from("navbar").delete().eq("id", id);
   revalidatePath("/", "layout");
   redirect("/admin/navbar");
+}
+
+export async function deleteNavbarSlugAction(formData: FormData) {
+  await requireAdmin();
+  const slug = String(formData.get("slug") ?? "");
+  const supabase = createAdminClient();
+  await supabase.from("navbar").delete().eq("slug", slug);
+  revalidatePath("/", "layout");
+  redirect("/admin/navbar");
+}
+
+export async function bulkUpdateNavbarAction(formData: FormData) {
+  await requireAdmin();
+  const supabase = createAdminClient();
+
+  type Group = {
+    slug: string;
+    position: number;
+    values: Map<number, string>;
+  };
+  const groups = new Map<string, Group>();
+
+  for (const [key, raw] of formData.entries()) {
+    const value = typeof raw === "string" ? raw : "";
+    const m = key.match(/^nav\[(.+?)\]\[(\w+)\](?:\[(\d+)\])?$/);
+    if (!m) continue;
+    const oldSlug = m[1];
+    const field = m[2];
+    const langId = m[3];
+
+    const g = groups.get(oldSlug) ?? {
+      slug: oldSlug,
+      position: 0,
+      values: new Map<number, string>(),
+    };
+    if (field === "slug") g.slug = value.trim();
+    else if (field === "position") g.position = Number(value) || 0;
+    else if (field === "value" && langId) g.values.set(Number(langId), value);
+    groups.set(oldSlug, g);
+  }
+
+  for (const [oldSlug, g] of groups) {
+    const { data: existing } = await supabase
+      .from("navbar")
+      .select("id, language_id")
+      .eq("slug", oldSlug);
+
+    const existingByLang = new Map(
+      ((existing ?? []) as Array<{ id: number; language_id: number }>).map(
+        (r) => [r.language_id, r.id]
+      )
+    );
+
+    for (const [langId, raw] of g.values) {
+      const trimmed = raw.trim();
+      const existingId = existingByLang.get(langId);
+      if (trimmed) {
+        if (existingId !== undefined) {
+          await supabase
+            .from("navbar")
+            .update({
+              slug: g.slug,
+              value: trimmed,
+              position: g.position,
+            })
+            .eq("id", existingId);
+        } else {
+          await supabase.from("navbar").insert({
+            slug: g.slug,
+            value: trimmed,
+            language_id: langId,
+            position: g.position,
+          });
+        }
+      } else if (existingId !== undefined) {
+        await supabase.from("navbar").delete().eq("id", existingId);
+      }
+    }
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/admin/navbar?ok=saved");
 }
 
 // ---------------- LANGUAGES ----------------

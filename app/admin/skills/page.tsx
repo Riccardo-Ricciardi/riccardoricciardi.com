@@ -1,15 +1,13 @@
+import Image from "next/image";
+import Link from "next/link";
 import { requireAdmin } from "@/utils/auth/admin";
 import { createClient } from "@/utils/supabase/server";
 import {
-  clearSkillIconAction,
+  bulkUpdateSkillsAction,
   createSkillAction,
   deleteSkillAction,
-  updateSkillAction,
-  uploadSkillIconAction,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
-import { FormField, FormToggle } from "@/components/admin/form-field";
-import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
@@ -25,12 +23,12 @@ interface Row {
 }
 
 interface PageProps {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; ok?: string }>;
 }
 
 export default async function SkillsAdmin({ searchParams }: PageProps) {
   await requireAdmin();
-  const { error } = await searchParams;
+  const { error, ok } = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase
     .from("skills")
@@ -45,6 +43,9 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
           Content
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">Skills</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Edit any cell. Save all applies all changes at once.
+        </p>
       </header>
 
       {error && (
@@ -55,24 +56,148 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
           {error}
         </p>
       )}
+      {ok && (
+        <p
+          role="status"
+          className="rounded-md border border-dashed border-accent-blue bg-accent-blue-soft px-3 py-2 text-xs text-accent-blue"
+        >
+          Changes saved
+        </p>
+      )}
+
+      {rows.length > 0 && (
+        <form action={bulkUpdateSkillsAction} className="flex flex-col gap-3">
+          <div className="overflow-x-auto rounded-lg border border-dashed border-dashed-soft">
+            <table className="w-full min-w-[720px] text-sm">
+              <thead>
+                <tr className="border-b border-dashed border-dashed-soft text-left">
+                  <Th>Icon</Th>
+                  <Th>Name</Th>
+                  <Th className="w-16">Pos</Th>
+                  <Th className="w-16">%</Th>
+                  <Th>Category</Th>
+                  <Th className="w-16">Dark</Th>
+                  <Th className="w-20" />
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="border-b border-dashed border-dashed-soft last:border-b-0"
+                  >
+                    <td className="px-3 py-2">
+                      <input
+                        type="hidden"
+                        name={`skill[${row.id}][__row]`}
+                        value="1"
+                      />
+                      <Link
+                        href={`/admin/skills/${row.id}`}
+                        className="block"
+                        title="Manage icons"
+                      >
+                        {row.icon_url ? (
+                          <span className="relative inline-block h-7 w-7 rounded border border-dashed border-dashed-soft bg-background">
+                            <Image
+                              src={row.icon_url}
+                              alt=""
+                              fill
+                              sizes="28px"
+                              className="object-contain p-0.5"
+                            />
+                          </span>
+                        ) : (
+                          <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-accent-blue">
+                            upload
+                          </span>
+                        )}
+                      </Link>
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        name={`skill[${row.id}][name]`}
+                        defaultValue={row.name}
+                        required
+                        className="w-full rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        name={`skill[${row.id}][position]`}
+                        type="number"
+                        defaultValue={(row.position ?? 0).toString()}
+                        className="w-14 rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        name={`skill[${row.id}][percentage]`}
+                        type="number"
+                        min={0}
+                        max={100}
+                        defaultValue={(row.percentage ?? 0).toString()}
+                        className="w-14 rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        name={`skill[${row.id}][category]`}
+                        defaultValue={row.category ?? ""}
+                        className="w-full rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        name={`skill[${row.id}][dark]`}
+                        type="checkbox"
+                        defaultChecked={row.dark ?? false}
+                        className="h-4 w-4"
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <button
+                        type="submit"
+                        formAction={deleteSkillAction}
+                        formNoValidate
+                        name="id"
+                        value={row.id}
+                        className="font-mono text-[10px] uppercase tracking-wider text-red-600 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex justify-end">
+            <Button type="submit" className="bg-accent-blue text-white">
+              Save all
+            </Button>
+          </div>
+        </form>
+      )}
 
       <section>
         <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          Add new
+          Add new skill
         </h2>
         <form
           action={createSkillAction}
           className="grid grid-cols-2 items-end gap-2 rounded-lg border border-dashed border-dashed-soft p-3 sm:grid-cols-12"
         >
-          <FormField label="Name" name="name" required className="sm:col-span-3" />
-          <FormField
+          <Field label="Name" name="name" required className="sm:col-span-3" />
+          <Field
             label="Pos"
             name="position"
             type="number"
             defaultValue={rows.length.toString()}
             className="sm:col-span-1"
           />
-          <FormField
+          <Field
             label="%"
             name="percentage"
             type="number"
@@ -81,174 +206,72 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
             defaultValue="80"
             className="sm:col-span-1"
           />
-          <FormField label="Category" name="category" className="sm:col-span-3" />
-          <FormToggle label="Dark" name="dark" className="sm:col-span-2" />
-          <Button type="submit" size="sm" className="bg-accent-blue text-white sm:col-span-2">
+          <Field label="Category" name="category" className="sm:col-span-3" />
+          <label className="flex items-center gap-2 self-end pb-1.5 sm:col-span-2">
+            <input type="checkbox" name="dark" className="h-4 w-4" />
+            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Dark
+            </span>
+          </label>
+          <Button
+            type="submit"
+            size="sm"
+            className="bg-accent-blue text-white sm:col-span-2"
+          >
             Add
           </Button>
         </form>
-      </section>
-
-      <section>
-        <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          {rows.length} item{rows.length === 1 ? "" : "s"}
-        </h2>
-        <ul className="flex flex-col gap-2 list-none p-0">
-          {rows.map((row) => (
-            <li
-              key={row.id}
-              className="rounded-lg border border-dashed border-dashed-soft p-3"
-            >
-              <form
-                action={updateSkillAction}
-                className="grid grid-cols-2 items-end gap-2 sm:grid-cols-12"
-              >
-                <input type="hidden" name="id" value={row.id} />
-                <div className="flex items-center gap-2 sm:col-span-3">
-                  {row.icon_url && (
-                    <span className="relative h-7 w-7 shrink-0 rounded border border-dashed border-dashed-soft bg-background">
-                      <Image
-                        src={row.icon_url}
-                        alt=""
-                        fill
-                        sizes="28px"
-                        className="object-contain p-0.5"
-                      />
-                    </span>
-                  )}
-                  <FormField label="Name" name="name" defaultValue={row.name} required className="flex-1" />
-                </div>
-                <FormField
-                  label="Pos"
-                  name="position"
-                  type="number"
-                  defaultValue={(row.position ?? 0).toString()}
-                  className="sm:col-span-1"
-                />
-                <FormField
-                  label="%"
-                  name="percentage"
-                  type="number"
-                  min={0}
-                  max={100}
-                  defaultValue={(row.percentage ?? 0).toString()}
-                  className="sm:col-span-1"
-                />
-                <FormField
-                  label="Category"
-                  name="category"
-                  defaultValue={row.category ?? ""}
-                  className="sm:col-span-3"
-                />
-                <FormToggle
-                  label="Dark"
-                  name="dark"
-                  defaultChecked={row.dark ?? false}
-                  className="sm:col-span-2"
-                />
-                <Button type="submit" size="sm" variant="outline" className="sm:col-span-2">
-                  Save
-                </Button>
-              </form>
-
-              <details className="mt-2">
-                <summary className="cursor-pointer font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground">
-                  Icons + delete
-                </summary>
-                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <IconSlot rowId={row.id} variant="light" url={row.icon_url} fallbackName={row.name} />
-                  <IconSlot rowId={row.id} variant="dark" url={row.icon_dark_url} fallbackName={row.name} />
-                </div>
-              </details>
-
-              <form action={deleteSkillAction} className="mt-3 flex justify-end">
-                <input type="hidden" name="id" value={row.id} />
-                <Button
-                  type="submit"
-                  size="sm"
-                  variant="outline"
-                  className="border-red-500/40 text-red-600 hover:bg-red-500/5 hover:text-red-700"
-                >
-                  Delete
-                </Button>
-              </form>
-            </li>
-          ))}
-        </ul>
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          After adding, click the icon column in the table to upload light + dark variants.
+        </p>
       </section>
     </div>
   );
 }
 
-function IconSlot({
-  rowId,
-  variant,
-  url,
-  fallbackName,
+function Th({ children, className = "" }: { children?: React.ReactNode; className?: string }) {
+  return (
+    <th
+      className={`px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground ${className}`}
+    >
+      {children}
+    </th>
+  );
+}
+
+function Field({
+  label,
+  name,
+  type = "text",
+  defaultValue,
+  required,
+  min,
+  max,
+  className = "",
 }: {
-  rowId: number;
-  variant: "light" | "dark";
-  url: string | null;
-  fallbackName: string;
+  label: string;
+  name: string;
+  type?: string;
+  defaultValue?: string;
+  required?: boolean;
+  min?: number;
+  max?: number;
+  className?: string;
 }) {
   return (
-    <div className="rounded-md border border-dashed border-dashed-soft p-2.5">
-      <div className="mb-2 flex items-center justify-between">
-        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          Icon — {variant}
-        </span>
-        {url && (
-          <form action={clearSkillIconAction}>
-            <input type="hidden" name="id" value={rowId} />
-            <input type="hidden" name="variant" value={variant} />
-            <button
-              type="submit"
-              className="font-mono text-[10px] uppercase tracking-wider text-red-600 hover:underline"
-            >
-              Remove
-            </button>
-          </form>
-        )}
-      </div>
-      <div className="flex items-center gap-2">
-        <div
-          className={`relative h-9 w-9 shrink-0 rounded-md border border-dashed border-dashed-soft ${
-            variant === "dark" ? "bg-foreground/90" : "bg-background"
-          }`}
-        >
-          {url ? (
-            <Image
-              src={url}
-              alt={`${fallbackName} ${variant}`}
-              fill
-              sizes="36px"
-              className="object-contain p-0.5"
-            />
-          ) : (
-            <span className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
-              ?
-            </span>
-          )}
-        </div>
-        <form
-          action={uploadSkillIconAction}
-          encType="multipart/form-data"
-          className="flex flex-1 items-center gap-2"
-        >
-          <input type="hidden" name="id" value={rowId} />
-          <input type="hidden" name="variant" value={variant} />
-          <input
-            type="file"
-            name="file"
-            accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml,image/gif"
-            required
-            className="flex-1 text-xs file:mr-2 file:rounded file:border file:border-dashed file:border-dashed-soft file:bg-background file:px-2 file:py-0.5 file:text-[10px] hover:file:border-accent-blue"
-          />
-          <Button type="submit" size="sm" variant="outline">
-            Upload
-          </Button>
-        </form>
-      </div>
-    </div>
+    <label className={`flex flex-col gap-1 ${className}`}>
+      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
+      <input
+        name={name}
+        type={type}
+        defaultValue={defaultValue}
+        required={required}
+        min={min}
+        max={max}
+        className="rounded-md border border-dashed border-dashed-soft bg-background px-2.5 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      />
+    </label>
   );
 }

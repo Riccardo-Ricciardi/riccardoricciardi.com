@@ -2,13 +2,12 @@ import Link from "next/link";
 import { requireAdmin } from "@/utils/auth/admin";
 import { createClient } from "@/utils/supabase/server";
 import {
+  bulkUpdateProjectsAction,
   createProjectAction,
   deleteProjectAction,
   triggerSyncAction,
-  updateProjectAction,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
-import { FormField, FormToggle } from "@/components/admin/form-field";
 
 export const dynamic = "force-dynamic";
 
@@ -23,19 +22,62 @@ interface Row {
   synced_at: string | null;
 }
 
+interface I18nRow {
+  project_id: string;
+  language_id: number;
+}
+
+interface Lang {
+  id: number;
+  code: string;
+  name: string;
+}
+
 interface PageProps {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; ok?: string }>;
 }
 
 export default async function ProjectsAdmin({ searchParams }: PageProps) {
   await requireAdmin();
-  const { error } = await searchParams;
+  const { error, ok } = await searchParams;
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("projects")
-    .select("id, repo, name, position, visible, stars, language, synced_at")
-    .order("position", { ascending: true });
-  const rows = ((data ?? []) as Row[]) ?? [];
+
+  const [{ data: rowsData }, { data: i18nData }, { data: langsData }] =
+    await Promise.all([
+      supabase
+        .from("projects")
+        .select("id, repo, name, position, visible, stars, language, synced_at")
+        .order("position", { ascending: true }),
+      supabase.from("projects_i18n").select("project_id, language_id"),
+      supabase
+        .from("languages")
+        .select("id, code, name")
+        .order("id", { ascending: true }),
+    ]);
+
+  const rows = ((rowsData ?? []) as Row[]) ?? [];
+  const i18nRows = ((i18nData ?? []) as I18nRow[]) ?? [];
+  const langs = (langsData ?? []) as Lang[];
+
+  // Build map: project_id -> Set<language_id>
+  const i18nByProject = new Map<string, Set<number>>();
+  for (const row of i18nRows) {
+    const set = i18nByProject.get(row.project_id) ?? new Set<number>();
+    set.add(row.language_id);
+    i18nByProject.set(row.project_id, set);
+  }
+
+  // Compute missing translations
+  const missing: { repo: string; missing: string[]; id: string }[] = [];
+  for (const r of rows) {
+    const have = i18nByProject.get(r.id) ?? new Set();
+    const missingLangs = langs
+      .filter((l) => !have.has(l.id))
+      .map((l) => l.code);
+    if (missingLangs.length > 0) {
+      missing.push({ id: r.id, repo: r.repo, missing: missingLangs });
+    }
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -47,6 +89,10 @@ export default async function ProjectsAdmin({ searchParams }: PageProps) {
           <h1 className="mt-2 text-3xl font-semibold tracking-tight">
             Projects
           </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Edit position and visibility inline. Click row title for translations
+            and screenshot.
+          </p>
         </div>
         <form action={triggerSyncAction}>
           <Button
@@ -68,110 +114,203 @@ export default async function ProjectsAdmin({ searchParams }: PageProps) {
           {error}
         </p>
       )}
+      {ok && (
+        <p
+          role="status"
+          className="rounded-md border border-dashed border-accent-blue bg-accent-blue-soft px-3 py-2 text-xs text-accent-blue"
+        >
+          Changes saved
+        </p>
+      )}
+
+      {missing.length > 0 && (
+        <div className="rounded-md border border-dashed border-amber-500/40 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+          <p className="font-medium">Missing translations</p>
+          <ul className="mt-1 list-disc pl-4">
+            {missing.map((m) => (
+              <li key={m.id}>
+                <Link
+                  href={`/admin/projects/${m.id}`}
+                  className="font-mono hover:underline"
+                >
+                  {m.repo}
+                </Link>{" "}
+                → missing description in {m.missing.join(", ")}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {rows.length > 0 && (
+        <form action={bulkUpdateProjectsAction} className="flex flex-col gap-3">
+          <div className="overflow-x-auto rounded-lg border border-dashed border-dashed-soft">
+            <table className="w-full min-w-[640px] text-sm">
+              <thead>
+                <tr className="border-b border-dashed border-dashed-soft text-left">
+                  <Th>Repo</Th>
+                  <Th>Stats</Th>
+                  <Th className="w-16">Pos</Th>
+                  <Th className="w-20">Visible</Th>
+                  <Th className="w-32" />
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="border-b border-dashed border-dashed-soft last:border-b-0"
+                  >
+                    <td className="px-3 py-2">
+                      <input
+                        type="hidden"
+                        name={`project[${row.id}][__row]`}
+                        value="1"
+                      />
+                      <Link
+                        href={`/admin/projects/${row.id}`}
+                        className="block hover:text-accent-blue"
+                      >
+                        <p className="truncate font-mono text-sm font-medium">
+                          {row.repo}
+                        </p>
+                        <p className="truncate text-[11px] text-muted-foreground">
+                          {row.name ?? "—"}
+                        </p>
+                      </Link>
+                    </td>
+                    <td className="px-3 py-2 text-[11px] text-muted-foreground">
+                      {row.language ?? "—"} · ★{row.stars ?? 0}
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        name={`project[${row.id}][position]`}
+                        type="number"
+                        defaultValue={(row.position ?? 0).toString()}
+                        className="w-14 rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        name={`project[${row.id}][visible]`}
+                        type="checkbox"
+                        defaultChecked={row.visible ?? false}
+                        className="h-4 w-4"
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <Link
+                        href={`/admin/projects/${row.id}`}
+                        className="mr-3 font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-accent-blue"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        type="submit"
+                        formAction={deleteProjectAction}
+                        formNoValidate
+                        name="id"
+                        value={row.id}
+                        className="font-mono text-[10px] uppercase tracking-wider text-red-600 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex justify-end">
+            <Button type="submit" className="bg-accent-blue text-white">
+              Save all
+            </Button>
+          </div>
+        </form>
+      )}
 
       <section>
         <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          Add new
+          Add new project
         </h2>
         <form
           action={createProjectAction}
           className="grid grid-cols-2 items-end gap-2 rounded-lg border border-dashed border-dashed-soft p-3 sm:grid-cols-12"
         >
-          <FormField
+          <Field
             label="Repo (owner/name)"
             name="repo"
             required
             placeholder="Riccardo-Ricciardi/repo-name"
             className="sm:col-span-7"
           />
-          <FormField
+          <Field
             label="Pos"
             name="position"
             type="number"
             defaultValue={rows.length.toString()}
             className="sm:col-span-1"
           />
-          <FormToggle label="Visible" name="visible" defaultChecked className="sm:col-span-2" />
-          <Button type="submit" size="sm" className="bg-accent-blue text-white sm:col-span-2">
+          <label className="flex items-center gap-2 self-end pb-1.5 sm:col-span-2">
+            <input type="checkbox" name="visible" defaultChecked className="h-4 w-4" />
+            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Visible
+            </span>
+          </label>
+          <Button
+            type="submit"
+            size="sm"
+            className="bg-accent-blue text-white sm:col-span-2"
+          >
             Add
           </Button>
         </form>
       </section>
-
-      <section>
-        <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          {rows.length} item{rows.length === 1 ? "" : "s"}
-        </h2>
-        <ul className="flex flex-col gap-2 list-none p-0">
-          {rows.map((row) => (
-            <li
-              key={row.id}
-              className="rounded-lg border border-dashed border-dashed-soft p-3"
-            >
-              <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="truncate font-mono text-sm font-medium">
-                    {row.repo}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground">
-                    {row.name ?? "—"} · {row.language ?? "—"} · ★{row.stars ?? 0}
-                  </p>
-                </div>
-                <Link
-                  href={`/admin/projects/${row.id}`}
-                  className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-accent-blue"
-                >
-                  Translations →
-                </Link>
-              </div>
-              <div className="grid grid-cols-2 items-end gap-2 sm:grid-cols-12">
-                <form
-                  action={updateProjectAction}
-                  className="contents"
-                  id={`update-${row.id}`}
-                >
-                  <input type="hidden" name="id" value={row.id} />
-                  <FormField
-                    label="Pos"
-                    name="position"
-                    type="number"
-                    defaultValue={(row.position ?? 0).toString()}
-                    className="sm:col-span-2"
-                  />
-                  <FormToggle
-                    label="Visible"
-                    name="visible"
-                    defaultChecked={row.visible ?? false}
-                    className="sm:col-span-2"
-                  />
-                  <Button
-                    type="submit"
-                    size="sm"
-                    variant="outline"
-                    className="sm:col-span-2"
-                  >
-                    Save
-                  </Button>
-                </form>
-                <form
-                  action={deleteProjectAction}
-                  className="sm:col-span-2"
-                >
-                  <input type="hidden" name="id" value={row.id} />
-                  <Button
-                    type="submit"
-                    size="sm"
-                    variant="outline"
-                    className="w-full border-red-500/40 text-red-600 hover:bg-red-500/5 hover:text-red-700"
-                  >
-                    Delete
-                  </Button>
-                </form>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
     </div>
+  );
+}
+
+function Th({ children, className = "" }: { children?: React.ReactNode; className?: string }) {
+  return (
+    <th
+      className={`px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground ${className}`}
+    >
+      {children}
+    </th>
+  );
+}
+
+function Field({
+  label,
+  name,
+  type = "text",
+  defaultValue,
+  required,
+  placeholder,
+  className = "",
+}: {
+  label: string;
+  name: string;
+  type?: string;
+  defaultValue?: string;
+  required?: boolean;
+  placeholder?: string;
+  className?: string;
+}) {
+  return (
+    <label className={`flex flex-col gap-1 ${className}`}>
+      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
+      <input
+        name={name}
+        type={type}
+        defaultValue={defaultValue}
+        required={required}
+        placeholder={placeholder}
+        className="rounded-md border border-dashed border-dashed-soft bg-background px-2.5 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      />
+    </label>
   );
 }

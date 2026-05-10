@@ -58,6 +58,24 @@ export default async function ContentAdmin({ searchParams }: PageProps) {
     .filter((s) => !KNOWN_SLUGS.has(s))
     .sort();
 
+  // Detect missing translations for known schema fields
+  const missing: { slug: string; label: string; missing: string[] }[] = [];
+  for (const section of CONTENT_SCHEMA) {
+    for (const field of section.fields) {
+      const present = bySlug.get(field.slug);
+      const missingCodes = langs
+        .filter((l) => !(present?.has(l.id) && present.get(l.id)?.value))
+        .map((l) => l.code);
+      if (missingCodes.length > 0) {
+        missing.push({
+          slug: field.slug,
+          label: `${section.title} — ${field.label}`,
+          missing: missingCodes,
+        });
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col gap-12">
       <header>
@@ -87,6 +105,21 @@ export default async function ContentAdmin({ searchParams }: PageProps) {
         >
           Saved {ok}
         </p>
+      )}
+
+      {missing.length > 0 && (
+        <div className="rounded-md border border-dashed border-amber-500/40 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+          <p className="font-medium">Missing translations</p>
+          <ul className="mt-1 list-disc pl-4">
+            {missing.map((m) => (
+              <li key={m.slug}>
+                {m.label}{" "}
+                <span className="font-mono text-[10px]">({m.slug})</span> →{" "}
+                missing in {m.missing.join(", ")}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {CONTENT_SCHEMA.map((section) => (
