@@ -15,8 +15,8 @@ interface Row {
   id: string;
   repo: string;
   name: string | null;
-  position: number;
-  visible: boolean;
+  position: number | null;
+  visible: boolean | null;
   stars: number | null;
   language: string | null;
   synced_at: string | null;
@@ -139,13 +139,13 @@ export default async function ProjectsAdmin({ searchParams }: PageProps) {
                   label="Position"
                   name="position"
                   type="number"
-                  defaultValue={row.position.toString()}
+                  defaultValue={(row.position ?? 0).toString()}
                 />
                 <label className="flex items-center gap-2 self-end pb-2">
                   <input
                     type="checkbox"
                     name="visible"
-                    defaultChecked={row.visible}
+                    defaultChecked={row.visible ?? false}
                   />
                   <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
                     Visible

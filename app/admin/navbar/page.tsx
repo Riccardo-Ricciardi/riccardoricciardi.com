@@ -14,7 +14,7 @@ interface NavRow {
   slug: string | null;
   value: string;
   language_id: number;
-  position: number;
+  position: number | null;
 }
 
 interface Lang {
@@ -145,7 +145,7 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
                     label="Position"
                     name="position"
                     type="number"
-                    defaultValue={row.position.toString()}
+                    defaultValue={(row.position ?? 0).toString()}
                   />
                   <div className="flex items-end gap-2">
                     <Button type="submit" size="sm" variant="outline">

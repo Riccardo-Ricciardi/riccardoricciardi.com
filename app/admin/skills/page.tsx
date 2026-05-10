@@ -12,9 +12,9 @@ export const dynamic = "force-dynamic";
 interface Row {
   id: number;
   name: string;
-  position: number;
-  percentage: number;
-  dark: boolean;
+  position: number | null;
+  percentage: number | null;
+  dark: boolean | null;
   category: string | null;
 }
 
@@ -108,7 +108,7 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
                   label="Position"
                   name="position"
                   type="number"
-                  defaultValue={row.position.toString()}
+                  defaultValue={(row.position ?? 0).toString()}
                 />
                 <Field
                   label="%"
@@ -116,7 +116,7 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
                   type="number"
                   min={0}
                   max={100}
-                  defaultValue={row.percentage.toString()}
+                  defaultValue={(row.percentage ?? 0).toString()}
                 />
                 <Field
                   label="Category"
@@ -124,7 +124,7 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
                   defaultValue={row.category ?? ""}
                 />
                 <label className="flex items-center gap-2 self-end pb-2">
-                  <input type="checkbox" name="dark" defaultChecked={row.dark} />
+                  <input type="checkbox" name="dark" defaultChecked={row.dark ?? false} />
                   <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
                     Dark
                   </span>
