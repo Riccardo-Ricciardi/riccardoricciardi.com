@@ -23,7 +23,7 @@ export function ThemePicker({ labels, ariaLabel }: ThemePickerProps) {
     labels.length === THEMES.length ? labels : ["Light", "Dark", "System"];
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" aria-label={ariaLabel}>
           <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />

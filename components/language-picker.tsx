@@ -54,7 +54,7 @@ export function LanguagePicker({ locale, ariaLabel }: LanguagePickerProps) {
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       {isPending && <GlobalLoader fullscreen />}
       <DropdownMenuTrigger asChild>
         <Button
