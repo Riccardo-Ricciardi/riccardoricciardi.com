@@ -2,141 +2,185 @@
 
 ## Last session — 2026-05-10
 
-Single branch `main`. Vercel auto-deploy on push.
+Branch unico: `main`. Deploy via `npx vercel --prod` (Vercel webhook GitHub rotto — fix CLI usato).
 
-### Stack
+## Stack
 
-Next 16 (Turbopack), React 19, Tailwind 4, shadcn (button, card, dropdown-menu), Supabase SSR + static client, next-themes, ldrs (Bouncy), Geist + Geist Mono, Vercel Speed Insights, lucide-react.
+Next 16 (Turbopack), React 19, Tailwind 4, **shadcn** (button, card, dropdown-menu, switch, checkbox, alert-dialog, tabs, input, label, table, badge, tooltip, sonner, separator), Supabase SSR + static + admin (service-role) client, next-themes, ldrs, Geist + Geist Mono, lucide-react.
 
-### Architecture (now)
+## Architettura
 
 ```
 app/
+├── layout.tsx                # root (html/body, fonts, Providers, DynamicThemeVars, icons)
+├── not-found.tsx             # global 404 (cookie/Accept-Language locale)
 ├── [locale]/
-│   ├── layout.tsx        # flex-col min-h-screen, Footer mounted
-│   ├── page.tsx          # Hero + Skills + Projects (force-static, 1h ISR)
+│   ├── layout.tsx            # inner (Navbar, Footer, JsonLd, HtmlLangUpdater)
+│   ├── page.tsx              # Hero + Skills + Projects (force-static, 1h ISR)
 │   ├── loading.tsx
-│   ├── not-found.tsx     # red 404 (per user pref)
+│   ├── not-found.tsx
 │   └── opengraph-image.tsx
-└── api/cron/sync-github/route.ts   # Vercel cron entrypoint, Bearer auth
+├── api/cron/sync-github/     # Vercel cron endpoint
+└── admin/                    # In-app CMS
+    ├── layout.tsx            # AdminNav + Toaster + AdminToastListener
+    ├── login/page.tsx
+    ├── page.tsx              # Dashboard (3 groups: Design/Data/Settings)
+    ├── theme/page.tsx        # Table per group, color swatch+picker
+    ├── content/page.tsx      # Table per schema section, multi-lang cols
+    ├── skills/page.tsx       # Table (Order/Icon/Name/Level/Dark/Delete)
+    ├── skills/[id]/page.tsx  # Icon upload light+dark
+    ├── projects/page.tsx     # Table + missing-translations banner
+    ├── projects/[id]/page.tsx# i18n descrizioni + screenshot upload
+    ├── navbar/page.tsx       # Table grouped per slug + multi-lang Add
+    ├── languages/page.tsx    # Table
+    └── actions.ts            # All server actions
 
 components/
-├── hero.tsx              # shadcn-style: pill + 7xl tracking-tight + CTA pair + bg-dot mask
-├── skills.tsx            # rounded-xl, mono labels, hover bg-accent/40
-├── skill-meter.tsx       # role=meter, foreground/muted segments
-├── projects.tsx          # grid 1/2/3 cols
-├── project-card.tsx      # og_image hero, mono name, topic chips, ★/forks/lang
-├── footer.tsx            # border-t, GitHub/LinkedIn/email lucide icons
-├── navbar.tsx            # sticky h-14, blur, border-b
-├── language-picker.tsx   # client URL-based
-├── theme-picker.tsx      # client prop-based
-├── navbar-mobile.tsx
-├── providers.tsx
-├── global-loader.tsx
-├── skip-link.tsx
-└── json-ld.tsx
+├── hero.tsx (Sparkles + dot-mask + glow + MouseParticles)
+├── skills.tsx, skill-meter.tsx
+├── projects.tsx, project-card.tsx
+├── navbar.tsx (uses ScrolledHeader fixed+transparent at top)
+├── footer.tsx (border-t single line, GitHub + email icons)
+├── mouse-particles.tsx (canvas, accent-blue, prefers-reduced-motion)
+├── scrolled-header.tsx (data-scrolled attribute)
+├── dynamic-theme-vars.tsx (<style> injection)
+├── global-loader.tsx (Bouncy ldrs)
+├── html-lang-updater.tsx
+├── language-picker.tsx, theme-picker.tsx, navbar-mobile.tsx
+├── providers.tsx, json-ld.tsx, skip-link.tsx
+├── admin/
+│   ├── admin-nav.tsx         # Desktop horizontal grouped, mobile drawer
+│   ├── color-input.tsx       # Swatch always visible + hex picker
+│   ├── delete-button.tsx     # AlertDialog confirm
+│   ├── toast-listener.tsx    # ?ok=/?error= -> sonner toast
+│   └── lang-tabs.tsx         # Wraps shadcn Tabs primitives
+└── ui/                       # shadcn components
 
 utils/
-├── config/app.ts                # APP_CONFIG (single source)
-├── i18n/{dictionary,types}.ts   # cached server fetch
-├── skills/fetch.ts              # cached
-├── projects/fetch.ts            # cached + i18n description override
-├── supabase/{client,server,static,middleware}.ts
+├── config/app.ts             # APP_CONFIG (languages, defaultLanguage, translationTables)
+├── auth/admin.ts             # requireAdmin, getAdminUser, ADMIN_EMAILS allowlist
+├── i18n/{dictionary,types}.ts
+├── content/{fetch,schema}.ts # getContentBlocks + schema for /admin/content
+├── theme/fetch.ts            # getThemeSettings + buildThemeCss
+├── skills/fetch.ts
+├── projects/fetch.ts
+├── storage/upload.ts         # uploadImage/deleteImage (Supabase Storage bucket 'image')
+├── supabase/
+│   ├── client.ts             # browser
+│   ├── server.ts             # cookies (auth)
+│   ├── static.ts             # no cookies (public reads, SSG)
+│   ├── admin.ts              # service-role (bypasses RLS, server-only mutations)
+│   └── middleware.ts
 └── logger.ts
 
 supabase/
-├── functions/sync-github/index.ts   # Deno: GitHub API → projects table
+├── functions/sync-github/    # Deno edge fn (Bearer CRON_SECRET)
 └── migrations/
     ├── 0001_navbar_slug.sql
     ├── 0002_projects_table.sql
-    └── 0003_supabase_reorg.sql      # rename not-found→not_found, indexes, helpers
+    ├── 0003_supabase_reorg.sql       # rename not-found->not_found, indexes, helpers
+    ├── 0004_image_columns.sql        # icon_url, icon_dark_url, screenshot_url
+    └── 0005_theme_and_content.sql    # theme_settings + content_blocks tables
 ```
 
-### Supabase schema (current)
+## DB schema (Supabase project `yfzqurdmbllthonjdzpb`)
 
-| Table | Purpose | Notes |
-|---|---|---|
-| `languages` | Supported languages | id (int), code, name |
-| `navbar` | Per-locale menu | slug, value, language_id, position |
-| `theme` | Theme picker labels | per-locale |
-| `not_found` | 404 strings | per-locale (renamed from `not-found`) |
-| `skills` | Tech skills | + nullable `category` for grouping |
-| `projects` | GitHub repos | synced metadata (stars/forks/lang/topics/og_image) |
-| `projects_i18n` | Per-locale description | override for projects |
+All RLS public-SELECT. Mutations bypass via service_role.
 
-RLS: public-SELECT on all (visible=true for projects).
+| Table | Columns |
+|---|---|
+| `languages` | id, code, name |
+| `navbar` | id, slug, value, language_id, position |
+| `theme` | id, slug, value, language_id, position |
+| `not_found` | id, slug, value, language_id, position |
+| `skills` | id, name, position, percentage, dark, category, icon_url, icon_dark_url |
+| `projects` | id (uuid), repo, name, description, url, homepage, stars, forks, language, topics[], og_image, screenshot_url, pushed_at, synced_at, position, visible |
+| `projects_i18n` | project_id, language_id, description |
+| `theme_settings` | key, value_light, value_dark, type, group_name, description, position |
+| `content_blocks` | id, slug, value, language_id, updated_at |
 
-### Helpers (Supabase Studio → SQL Editor)
+SQL helpers: `clone_language(src, tgt, name)`, `upsert_navbar_item(lang, slug, value, pos)`.
 
-```sql
--- Bootstrap a new language
-select clone_language('en', 'fr', 'Français');
+## Admin (`/admin/login`)
 
--- Add a navbar entry (run for each language)
-select upsert_navbar_item('en', 'blog', 'Blog', 4);
-select upsert_navbar_item('it', 'blog', 'Blog', 4);
-```
+- Auth: Supabase email/password, allowlist via `ADMIN_EMAILS` env (default `admin@riccardoricciardi.com`)
+- Service-role client used for mutations (bypass RLS)
+- AlertDialog confirms every delete
+- Sonner toasts on save/error via `?ok=`/`?error=` query params
+- Tabs (shadcn) for per-language editing
+- Move buttons (↑ ↓) for position; `swapPositions()` normalizes 0..N-1
+- Auto-position on create (MAX+1)
+- Color swatch always visible (works for oklch/rgb/hex)
+- Multi-lang navbar Add: one form, one row per language
 
-### GitHub Projects sync
+### Adding stuff cheat sheet
 
-1. Insert row in `projects` table (only `repo` + `position` + `visible=true` needed)
-2. Optional: insert into `projects_i18n` for translated description
-3. Cron `0 */6 * * *` hits `/api/cron/sync-github` → proxies to Supabase Edge Function `sync-github`
-4. Edge fn fetches GitHub API, fills `name/description/url/homepage/stars/forks/language/topics/og_image/pushed_at`
+- **Skill**: `/admin/skills` → Add new → name+level+dark, auto-position
+- **Project**: `/admin/projects` → Add new → repo URL only, click "Sync GitHub" to pull metadata
+- **Project i18n**: `/admin/projects/{id}` → tabs per lang
+- **Navbar item**: `/admin/navbar` → Add → slug + label per lang at once
+- **Content string**: edit `utils/content/schema.ts` to declare slug, then edit values in `/admin/content`
+- **Theme token**: edit value in `/admin/theme` (existing tokens) or add via SQL + map in `utils/theme/fetch.ts` `KEY_TO_VAR`
+- **Language**: `/admin/languages` → Clone (then add code to `APP_CONFIG.languages` array)
 
-### Manual steps (one-time setup)
+## Visual system
 
-**Vercel env (Production + Preview):**
-- `CRON_SECRET` = random 32+ char string
-- `GITHUB_TOKEN` = PAT classic, scope `public_repo`
-- `NEXT_PUBLIC_SITE_URL` = `https://riccardoricciardi.com`
+- OKLCH neutral tokens (shadcn `new-york`)
+- Accent: Tailwind `blue-600` light / `blue-500` dark (override-able via DB)
+- Dashed grid borders (`var(--border-dashed)`) across cards/dividers/container sides
+- Container max-width `1400px` (overridable via theme token)
+- Smooth scroll, font-feature-settings, ::selection accent
+- Hero: dot pattern + accent-blue glow + MouseParticles (network of dots that flee cursor)
+- Navbar: fixed transparent at top → blur+border on scroll
+- Heading `letter-spacing: -0.025em`
 
-**Deploy edge function:**
-```bash
-npx supabase functions deploy sync-github --project-ref yfzqurdmbllthonjdzpb
-npx supabase secrets set CRON_SECRET=<same> GITHUB_TOKEN=<same> --project-ref yfzqurdmbllthonjdzpb
-```
+## Required Vercel env vars (Production)
 
-**First sync:**
-```bash
-curl -X GET https://riccardoricciardi.com/api/cron/sync-github \
-  -H "Authorization: Bearer <CRON_SECRET>"
-```
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_SUPABASE_IMAGE_URL`
+- `NEXT_PUBLIC_SITE_URL=https://riccardoricciardi.com`
+- `SUPABASE_SERVICE_ROLE_KEY` (Sensitive)
+- `ADMIN_EMAILS=admin@riccardoricciardi.com`
+- `CRON_SECRET` (Sensitive, 32+ chars)
+- `GITHUB_TOKEN` (Sensitive, PAT public_repo)
 
-### Visual system
+## Cron
 
-- OKLCH neutral tokens (shadcn `new-york` default)
-- `--accent-blue` light `#087EA4` / dark `#149ECA` (react.dev) — used in selection + reserved for links
-- Container `max-w-1400px` + responsive padding
-- Section rhythm `py-16 md:py-24 lg:py-28`
-- `.bg-dot` + `.bg-dot-mask` + `.bg-grid` + `.text-balance` utilities
-- Smooth scroll (respects reduced-motion)
-- Heading `letter-spacing: -0.025em` automatic
-- `font-feature-settings: rlig 1, calt 1` for better Geist rendering
+`vercel.json` schedules `/api/cron/sync-github` daily at 06:00 UTC (Hobby plan limit). The route validates `Authorization: Bearer <CRON_SECRET>` then proxies to Supabase Edge Function `sync-github` which fetches GitHub API per row in `projects` and updates metadata.
 
-### Adding stuff (cheat sheet)
+## Open items
 
-**New skill:** Insert row in `skills` table (`name`, `position`, `percentage`, `dark`, optional `category`).
-**New navbar item:** `select upsert_navbar_item('<lang>', '<slug>', '<label>', <pos>);` per language.
-**New language:** `select clone_language('en', '<code>', '<name>');` then update `APP_CONFIG.languages` array.
-**New project:** Insert row in `projects` (repo, position, visible). Cron auto-syncs metadata.
-**Override project description per locale:** Insert row in `projects_i18n`.
+- Tighten Theme description column wrap (border_dashed row has weird swatch — browser-specific dashed rendering, low priority)
+- Skills/Projects mobile table overflow OK (`overflow-x-auto`) but could test on actual phone
+- Image preview before submit (drag-drop) — nice to have
+- Drag-to-reorder (dnd-kit) — alternative to chevron buttons
+- Soft delete + undo
+- Search box for tables (skills/projects/navbar) when content grows
+- Translate admin UI to IT (currently EN only)
 
-### Next backlog
-
-- [ ] Seed projects rows (repo + position) and run first cron
-- [ ] Add `NEXT_PUBLIC_SITE_URL`, `CRON_SECRET`, `GITHUB_TOKEN` to Vercel
-- [ ] Deploy `sync-github` edge function
-- [ ] Add About section (probably DB-backed `about` translation table)
-- [ ] CV download link
-- [ ] Lighthouse pass + bundle analyzer
-- [ ] CSP tighten (remove unsafe-inline/unsafe-eval, use nonce)
-- [ ] Submit sitemap to Google Search Console
-
-### Useful commands
+## Useful commands
 
 ```bash
 npm run dev
 npm run build
 npm run typecheck
+npx vercel --prod --yes   # manual deploy when webhook is broken
 ```
+
+## Recent deploys
+
+Latest: `a37dc11` (Languages table + drop Skills Category column).
+
+Stack of features shipped today:
+- Shadcn checkbox + switch components
+- Move buttons for position (skills/projects/navbar) — auto-unique
+- Skill icon fallback to convention URL
+- Multi-lang navbar add (one form, all langs)
+- Dense table layouts (theme/content/languages)
+- AlertDialog delete confirmation
+- Sonner toasts
+- Auto-position on create
+- Roomier admin nav with group separators
+- Favicon on all routes
+- Color swatch preview works for oklch
