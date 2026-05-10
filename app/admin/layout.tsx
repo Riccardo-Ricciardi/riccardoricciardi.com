@@ -16,25 +16,26 @@ const NAV_GROUPS: NavGroup[] = [
     items: [{ href: "/admin", label: "Dashboard" }],
   },
   {
-    label: "Design",
+    label: "Translations",
     items: [
-      { href: "/admin/theme", label: "Theme" },
       { href: "/admin/content", label: "Content" },
+      { href: "/admin/navbar", label: "Navbar" },
     ],
   },
   {
-    label: "Data",
+    label: "Catalog",
     items: [
       { href: "/admin/skills", label: "Skills" },
       { href: "/admin/projects", label: "Projects" },
     ],
   },
   {
-    label: "Settings",
-    items: [
-      { href: "/admin/navbar", label: "Navbar" },
-      { href: "/admin/languages", label: "Languages" },
-    ],
+    label: "Design",
+    items: [{ href: "/admin/theme", label: "Theme" }],
+  },
+  {
+    label: "System",
+    items: [{ href: "/admin/languages", label: "Languages" }],
   },
 ];
 

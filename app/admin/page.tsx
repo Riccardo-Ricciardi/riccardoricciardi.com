@@ -72,7 +72,7 @@ interface ActivityItem {
 }
 
 interface SurfaceCardData {
-  group: "Design" | "Data" | "Settings";
+  group: "Translations" | "Catalog" | "Design" | "System";
   href: string;
   title: string;
   desc: string;
@@ -293,15 +293,7 @@ export default async function AdminDashboard() {
 
   const surfaces: SurfaceCardData[] = [
     {
-      group: "Design",
-      href: "/admin/theme",
-      title: "Theme",
-      desc: "Design tokens — colors, dimensions",
-      total: themeRows.length,
-      lastEdit: themeLastEdit,
-    },
-    {
-      group: "Design",
+      group: "Translations",
       href: "/admin/content",
       title: "Content",
       desc: "Hero, headings, CTAs per locale",
@@ -309,7 +301,15 @@ export default async function AdminDashboard() {
       lastEdit: contentLastEdit,
     },
     {
-      group: "Data",
+      group: "Translations",
+      href: "/admin/navbar",
+      title: "Navbar",
+      desc: "Menu items per language",
+      total: navbarSlugCount,
+      addHref: "/admin/navbar#add",
+    },
+    {
+      group: "Catalog",
       href: "/admin/skills",
       title: "Skills",
       desc: "Tech stack with proficiency + icons",
@@ -317,7 +317,7 @@ export default async function AdminDashboard() {
       addHref: "/admin/skills#add",
     },
     {
-      group: "Data",
+      group: "Catalog",
       href: "/admin/projects",
       title: "Projects",
       desc: "GitHub repos + i18n + screenshots",
@@ -332,15 +332,15 @@ export default async function AdminDashboard() {
       addHref: "/admin/projects#add",
     },
     {
-      group: "Settings",
-      href: "/admin/navbar",
-      title: "Navbar",
-      desc: "Menu items per language",
-      total: navbarSlugCount,
-      addHref: "/admin/navbar#add",
+      group: "Design",
+      href: "/admin/theme",
+      title: "Theme",
+      desc: "Design tokens — colors, dimensions",
+      total: themeRows.length,
+      lastEdit: themeLastEdit,
     },
     {
-      group: "Settings",
+      group: "System",
       href: "/admin/languages",
       title: "Languages",
       desc: "Add or remove locales",
@@ -349,10 +349,11 @@ export default async function AdminDashboard() {
     },
   ];
 
-  const groups: Array<"Design" | "Data" | "Settings"> = [
+  const groups: Array<"Translations" | "Catalog" | "Design" | "System"> = [
+    "Translations",
+    "Catalog",
     "Design",
-    "Data",
-    "Settings",
+    "System",
   ];
 
   return (
