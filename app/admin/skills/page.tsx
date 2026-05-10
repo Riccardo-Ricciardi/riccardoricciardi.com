@@ -77,11 +77,10 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
             <table className="w-full min-w-[760px] text-sm">
               <thead>
                 <tr className="border-b border-dashed border-dashed-soft text-left">
-                  <Th className="w-20">Order</Th>
+                  <Th className="w-24">Order</Th>
                   <Th className="w-12">Icon</Th>
                   <Th>Name</Th>
                   <Th className="w-24">Level</Th>
-                  <Th>Category</Th>
                   <Th className="w-24">Dark icon</Th>
                   <Th className="w-20" />
                 </tr>
@@ -179,12 +178,10 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
                       </td>
                       <td className="px-3 py-2">
                         <input
+                          type="hidden"
                           name={`skill[${row.id}][category]`}
                           defaultValue={row.category ?? ""}
-                          className="w-full rounded-md border border-dashed border-dashed-soft bg-background px-2 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         />
-                      </td>
-                      <td className="px-3 py-2">
                         <Checkbox
                           name={`skill[${row.id}][dark]`}
                           defaultChecked={row.dark ?? false}
