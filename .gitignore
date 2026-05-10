@@ -46,3 +46,6 @@ et --hard 973d537
 
 # graphify
 /graphify-out/
+
+# claude code local state
+.claude/

@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { Providers } from "@/components/providers";
 import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
 import { SkipLink } from "@/components/skip-link";
 import { JsonLd } from "@/components/json-ld";
 import {
@@ -128,7 +129,10 @@ export default async function LocaleLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
-      <body suppressHydrationWarning>
+      <body
+        suppressHydrationWarning
+        className="flex min-h-screen flex-col"
+      >
         <Providers>
           <SkipLink label={ariaLabels.skip} />
           <Navbar
@@ -136,7 +140,10 @@ export default async function LocaleLayout({
             dictionary={dictionary}
             ariaLabels={ariaLabels}
           />
-          <main id="main">{children}</main>
+          <main id="main" className="flex-1">
+            {children}
+          </main>
+          <Footer locale={locale} />
           <JsonLd locale={locale as SupportedLanguage} />
         </Providers>
       </body>

@@ -2,7 +2,7 @@ export const APP_CONFIG = {
   languages: ["en", "it"] as const,
   defaultLanguage: "en" as const,
   mobileBreakpointPx: 900,
-  translationTables: ["navbar", "theme", "not-found"] as const,
+  translationTables: ["navbar", "theme", "not_found"] as const,
   siteName: "Riccardo Ricciardi",
   siteUrl:
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://riccardoricciardi.com",

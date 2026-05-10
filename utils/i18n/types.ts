@@ -9,5 +9,5 @@ export type NavbarItem = {
 export type Dictionary = {
   navbar: NavbarItem[];
   theme: string[];
-  "not-found": string[];
+  not_found: string[];
 } & Record<TranslationTable, NavbarItem[] | string[]>;

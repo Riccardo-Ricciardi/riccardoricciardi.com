@@ -13,16 +13,17 @@ export async function Skills({ heading }: SkillsProps) {
 
   return (
     <section
+      id="skills"
       aria-labelledby="skills-heading"
-      className="container-page py-12 md:py-16"
+      className="container-page py-16 md:py-24 lg:py-28"
     >
-      <header className="mb-8 md:mb-10">
-        <h1
+      <header className="mb-10 md:mb-14">
+        <h2
           id="skills-heading"
-          className="text-3xl md:text-4xl font-bold tracking-tight text-foreground"
+          className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground"
         >
           {heading}
-        </h1>
+        </h2>
       </header>
 
       {skills.length === 0 ? (
@@ -37,7 +38,7 @@ export async function Skills({ heading }: SkillsProps) {
             return (
               <li
                 key={id}
-                className="group relative flex flex-col items-center justify-between rounded-lg border border-border bg-card p-3 text-center transition-all duration-200 hover:border-foreground/30 hover:shadow-sm hover:-translate-y-0.5"
+                className="group relative flex flex-col items-center justify-between rounded-xl border border-border bg-card p-4 text-center transition-colors duration-200 hover:bg-accent/40 hover:border-foreground/20"
               >
                 <div className="relative w-full pt-[75%]">
                   <Image
@@ -65,7 +66,7 @@ export async function Skills({ heading }: SkillsProps) {
                   )}
                 </div>
 
-                <p className="mt-3 mb-2 text-xs font-medium text-foreground">
+                <p className="mt-3 mb-2 font-mono text-xs font-medium tracking-tight text-foreground">
                   {name}
                 </p>
 

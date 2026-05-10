@@ -7,7 +7,7 @@ import { APP_CONFIG } from "@/utils/config/app";
 export default async function LocaleNotFound() {
   const locale = APP_CONFIG.defaultLanguage;
   const dict = await getDictionary(locale);
-  const messages = dict["not-found"] as string[];
+  const messages = dict.not_found as string[];
   const message = messages?.[0] ?? "Page not found";
   const cta = messages?.[1] ?? "Back to home";
 

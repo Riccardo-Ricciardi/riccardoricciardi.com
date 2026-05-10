@@ -12,7 +12,7 @@ import { logger } from "@/utils/logger";
 const FALLBACK: Dictionary = {
   navbar: [],
   theme: ["Light", "Dark", "System"],
-  "not-found": ["Page not found", "Back to home"],
+  not_found: ["Page not found", "Back to home"],
 };
 
 type RawRow = { value: string; position: number; slug?: string | null };

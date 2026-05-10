@@ -1,195 +1,142 @@
 # HANDOFF — riccardoricciardi.com
 
-## Sessione 2026-05-09
+## Last session — 2026-05-10
 
-### Stato attuale
+Single branch `main`. Vercel auto-deploy on push.
 
-Branch unico: `main`. Tutto pushato e deployato via Vercel.
+### Stack
 
-**Stack confermato:** Next 16 (Turbopack), React 19, Tailwind 4, shadcn (button, card, dropdown-menu), Supabase SSR + static read-only client, next-themes, ldrs (Bouncy loader), Geist font, Vercel Speed Insights.
+Next 16 (Turbopack), React 19, Tailwind 4, shadcn (button, card, dropdown-menu), Supabase SSR + static client, next-themes, ldrs (Bouncy), Geist + Geist Mono, Vercel Speed Insights, lucide-react.
 
-### Cosa è stato fatto
-
-#### Architettura
-- `app/` → `app/[locale]/` con root layout dinamico (`<html lang>`)
-- URL strategy: prefix sempre (`/en`, `/it`)
-- Server Components + `React.cache` per dictionary e skills fetch
-- Static Supabase client (no cookies) → SSG abilitato per `/en` e `/it`
-- ISR 1h via `revalidate: 3600` + `force-static`
-- Suspense + `loading.tsx` (rimosso loadingManager zustand)
-- Slug-based routing per navbar (colonna `slug` su Supabase)
-- Proxy locale-aware con detect cookie + Accept-Language
-
-#### Componenti
-- Server: `Navbar`, `Skills`, `JsonLd`
-- Client: `LanguagePicker` (URL-based), `ThemePicker` (props), `NavbarMobile`, `Providers`, `GlobalLoader`
-- A11y: `SkipLink`, `SkillMeter` (`role="meter"`, sempre visibile), aria-labels, focus-visible
-
-#### SEO
-- `generateMetadata` per locale (OG, Twitter, hreflang, canonical)
-- `app/sitemap.ts`, `app/robots.ts`, `app/manifest.ts`
-- JSON-LD `Person` + `WebSite`
-- `app/[locale]/opengraph-image.tsx` dinamica
-- `metadataBase` da `NEXT_PUBLIC_SITE_URL`
-
-#### Sicurezza
-- `next.config.ts` headers: HSTS, CSP (Supabase + Vercel allowlist), X-Frame-Options DENY, X-Content-Type-Options, Referrer-Policy, Permissions-Policy
-- `poweredByHeader: false`
-- Supabase RLS verificato: SELECT public-only su tutte le 5 tabelle
-
-#### DB
-- Migration `0001_navbar_slug.sql` applicata via Supabase MCP
-- Unique index `navbar_slug_per_language_idx` su `(language_id, slug)`
-
-#### Loader + Design
-- `GlobalLoader` Bouncy spinner ldrs (fullscreen + inline modes)
-- Trigger: route loading, Suspense fallback, language transition
-- Card skill: hover lift, border accent, ombra leggera
-- Container responsive padding
-
-### Decisioni chiave
-
-- **No content section yet** — utente lo aggiungerà dopo
-- **Single branch `main`** — backup/codex/vercel branch tutti cancellati
-- **Vercel auto-deploy** su push main
-- **No tests for now** — Playwright rimosso
-- **Design direction**: shadcn + react.dev (semplice, monochrome, clean)
-
-### Next steps (da fare prossima sessione)
-
-#### Design rifinitura → shadcn / react.dev feel
-
-1. **Hero strip** sopra skills:
-   - Nome grande (`text-5xl md:text-7xl font-bold tracking-tight`)
-   - Role/tagline mutato sotto (`text-xl text-muted-foreground`)
-   - Eventuale eyebrow text in mono font (`font-mono text-sm`)
-   - Background sottile dot pattern o gradient radial (shadcn-style)
-
-2. **Accent color blue** (alla react.dev):
-   - Aggiungi `--accent-blue: oklch(0.65 0.18 250)` in globals.css
-   - Usa per link, focus ring, skill meter filled, hover states
-
-3. **Typography pairing**:
-   - `Geist` per UI (già attivo)
-   - `Geist Mono` per labels tecniche skill (già importato, non usato)
-   - Applica `font-mono` su nome skill nel card
-
-4. **Section dividers** sottili tra sezioni:
-   - `border-b border-border` con padding generoso
-   - Eventuale dot pattern background per hero (shadcn pattern)
-
-5. **Footer minimale**:
-   - `© Riccardo Ricciardi {year}`
-   - Link GitHub / LinkedIn / email (icone lucide)
-   - Border-top, padding generoso
-
-6. **Skill card refinement**:
-   - Considerare layout bento (alcune card più grandi)
-   - O mantenere grid uniforme stile shadcn registry
-
-7. **Scrollbar styling**: già fatto, verifica look
-
-#### Performance ulteriore
-
-- [ ] Lazy-load `country-flag-icons` (componenti SVG inline)
-- [ ] Verifica bundle size con `npm run build` + `next-bundle-analyzer`
-- [ ] Considera `next/dynamic` per `LanguagePicker` + `ThemePicker` (interazioni rare)
-- [ ] Preload critical font weight in layout
-- [ ] Audit `tw-animate-css` + `tailwindcss-animate` — rimuovi se inutilizzati
-
-#### Contenuto (quando pronto)
-
-- [ ] Hero (nome + headline + foto/avatar)
-- [ ] About section
-- [ ] Projects (cards con stack, link, screenshot)
-- [ ] Experience timeline
-- [ ] Contact form (server action) o link mailto + social
-- [ ] CV download link
-
-#### SEO + analytics
-
-- [ ] Aggiungi `NEXT_PUBLIC_SITE_URL` su Vercel env (Production)
-- [ ] Verifica Real Experience Score Vercel post-deploy
-- [ ] Submit sitemap a Google Search Console
-- [ ] Aggiungi Plausible o Vercel Analytics (oltre Speed Insights)
-- [ ] Verifica OG image renderizza correttamente (debug `/en/opengraph-image`)
-
-#### A11y
-
-- [ ] Run axe-core o Lighthouse a11y audit
-- [ ] Verifica contrast ratio tutti i testi (specie hover states)
-- [ ] Test screen reader (NVDA/VoiceOver) navigazione completa
-
-#### Sicurezza
-
-- [ ] Tighten CSP: rimuovi `'unsafe-inline'` + `'unsafe-eval'` da `script-src` (richiede nonce)
-- [ ] Audit Supabase: verifica `anon_key` non sia mai usato lato server con privilegi extra
-- [ ] Considera rate-limit (Upstash + middleware) se aggiungi form
-
-### File chiave per orientarsi
+### Architecture (now)
 
 ```
-app/[locale]/
-├── layout.tsx           # root + metadata + SEO
-├── page.tsx             # home (force-static)
-├── loading.tsx          # GlobalLoader
-├── not-found.tsx        # 404
-└── opengraph-image.tsx  # dynamic OG
+app/
+├── [locale]/
+│   ├── layout.tsx        # flex-col min-h-screen, Footer mounted
+│   ├── page.tsx          # Hero + Skills + Projects (force-static, 1h ISR)
+│   ├── loading.tsx
+│   ├── not-found.tsx     # red 404 (per user pref)
+│   └── opengraph-image.tsx
+└── api/cron/sync-github/route.ts   # Vercel cron entrypoint, Bearer auth
 
 components/
-├── navbar.tsx           # server
-├── skills.tsx           # server, fetch + render
-├── skill-meter.tsx      # role=meter, always visible
-├── language-picker.tsx  # client, URL-based
-├── theme-picker.tsx     # client, prop-based
-├── navbar-mobile.tsx    # client dropdown
-├── providers.tsx        # ThemeProvider + SpeedInsights
-├── global-loader.tsx    # Bouncy fullscreen
+├── hero.tsx              # shadcn-style: pill + 7xl tracking-tight + CTA pair + bg-dot mask
+├── skills.tsx            # rounded-xl, mono labels, hover bg-accent/40
+├── skill-meter.tsx       # role=meter, foreground/muted segments
+├── projects.tsx          # grid 1/2/3 cols
+├── project-card.tsx      # og_image hero, mono name, topic chips, ★/forks/lang
+├── footer.tsx            # border-t, GitHub/LinkedIn/email lucide icons
+├── navbar.tsx            # sticky h-14, blur, border-b
+├── language-picker.tsx   # client URL-based
+├── theme-picker.tsx      # client prop-based
+├── navbar-mobile.tsx
+├── providers.tsx
+├── global-loader.tsx
 ├── skip-link.tsx
-└── json-ld.tsx          # Person + WebSite schema
+└── json-ld.tsx
 
 utils/
-├── config/app.ts        # APP_CONFIG (single source of truth)
-├── i18n/
-│   ├── dictionary.ts    # cached server fetch
-│   └── types.ts
-├── skills/fetch.ts      # cached server fetch
-├── supabase/
-│   ├── client.ts        # browser
-│   ├── server.ts        # cookies-based (auth, future)
-│   ├── static.ts        # NO cookies (read-only public, SSG-safe)
-│   └── middleware.ts
-└── logger.ts            # replaces console.error
+├── config/app.ts                # APP_CONFIG (single source)
+├── i18n/{dictionary,types}.ts   # cached server fetch
+├── skills/fetch.ts              # cached
+├── projects/fetch.ts            # cached + i18n description override
+├── supabase/{client,server,static,middleware}.ts
+└── logger.ts
+
+supabase/
+├── functions/sync-github/index.ts   # Deno: GitHub API → projects table
+└── migrations/
+    ├── 0001_navbar_slug.sql
+    ├── 0002_projects_table.sql
+    └── 0003_supabase_reorg.sql      # rename not-found→not_found, indexes, helpers
 ```
 
-### Comandi utili
+### Supabase schema (current)
+
+| Table | Purpose | Notes |
+|---|---|---|
+| `languages` | Supported languages | id (int), code, name |
+| `navbar` | Per-locale menu | slug, value, language_id, position |
+| `theme` | Theme picker labels | per-locale |
+| `not_found` | 404 strings | per-locale (renamed from `not-found`) |
+| `skills` | Tech skills | + nullable `category` for grouping |
+| `projects` | GitHub repos | synced metadata (stars/forks/lang/topics/og_image) |
+| `projects_i18n` | Per-locale description | override for projects |
+
+RLS: public-SELECT on all (visible=true for projects).
+
+### Helpers (Supabase Studio → SQL Editor)
+
+```sql
+-- Bootstrap a new language
+select clone_language('en', 'fr', 'Français');
+
+-- Add a navbar entry (run for each language)
+select upsert_navbar_item('en', 'blog', 'Blog', 4);
+select upsert_navbar_item('it', 'blog', 'Blog', 4);
+```
+
+### GitHub Projects sync
+
+1. Insert row in `projects` table (only `repo` + `position` + `visible=true` needed)
+2. Optional: insert into `projects_i18n` for translated description
+3. Cron `0 */6 * * *` hits `/api/cron/sync-github` → proxies to Supabase Edge Function `sync-github`
+4. Edge fn fetches GitHub API, fills `name/description/url/homepage/stars/forks/language/topics/og_image/pushed_at`
+
+### Manual steps (one-time setup)
+
+**Vercel env (Production + Preview):**
+- `CRON_SECRET` = random 32+ char string
+- `GITHUB_TOKEN` = PAT classic, scope `public_repo`
+- `NEXT_PUBLIC_SITE_URL` = `https://riccardoricciardi.com`
+
+**Deploy edge function:**
+```bash
+npx supabase functions deploy sync-github --project-ref yfzqurdmbllthonjdzpb
+npx supabase secrets set CRON_SECRET=<same> GITHUB_TOKEN=<same> --project-ref yfzqurdmbllthonjdzpb
+```
+
+**First sync:**
+```bash
+curl -X GET https://riccardoricciardi.com/api/cron/sync-github \
+  -H "Authorization: Bearer <CRON_SECRET>"
+```
+
+### Visual system
+
+- OKLCH neutral tokens (shadcn `new-york` default)
+- `--accent-blue` light `#087EA4` / dark `#149ECA` (react.dev) — used in selection + reserved for links
+- Container `max-w-1400px` + responsive padding
+- Section rhythm `py-16 md:py-24 lg:py-28`
+- `.bg-dot` + `.bg-dot-mask` + `.bg-grid` + `.text-balance` utilities
+- Smooth scroll (respects reduced-motion)
+- Heading `letter-spacing: -0.025em` automatic
+- `font-feature-settings: rlig 1, calt 1` for better Geist rendering
+
+### Adding stuff (cheat sheet)
+
+**New skill:** Insert row in `skills` table (`name`, `position`, `percentage`, `dark`, optional `category`).
+**New navbar item:** `select upsert_navbar_item('<lang>', '<slug>', '<label>', <pos>);` per language.
+**New language:** `select clone_language('en', '<code>', '<name>');` then update `APP_CONFIG.languages` array.
+**New project:** Insert row in `projects` (repo, position, visible). Cron auto-syncs metadata.
+**Override project description per locale:** Insert row in `projects_i18n`.
+
+### Next backlog
+
+- [ ] Seed projects rows (repo + position) and run first cron
+- [ ] Add `NEXT_PUBLIC_SITE_URL`, `CRON_SECRET`, `GITHUB_TOKEN` to Vercel
+- [ ] Deploy `sync-github` edge function
+- [ ] Add About section (probably DB-backed `about` translation table)
+- [ ] CV download link
+- [ ] Lighthouse pass + bundle analyzer
+- [ ] CSP tighten (remove unsafe-inline/unsafe-eval, use nonce)
+- [ ] Submit sitemap to Google Search Console
+
+### Useful commands
 
 ```bash
-npm run dev          # turbopack dev
-npm run build        # production build
-npm run typecheck    # tsc --noEmit
+npm run dev
+npm run build
+npm run typecheck
 ```
-
-### Env richieste (Vercel + .env.local)
-
-```
-NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-NEXT_PUBLIC_SUPABASE_IMAGE_URL=...
-NEXT_PUBLIC_SITE_URL=https://riccardoricciardi.com
-```
-
-### Riferimenti design
-
-- shadcn/ui: https://ui.shadcn.com (lookup hero, registry layout)
-- react.dev: https://react.dev (lookup typography, accent blue, sticky nav)
-- Geist font specimens: https://vercel.com/font
-
-### Memoria sessione
-
-User vuole:
-- Design semplice stile shadcn + react.dev
-- Caveman mode attivo nelle risposte
-- Niente test per ora
-- Tutto via Vercel (auto-deploy)
-- Single branch main
