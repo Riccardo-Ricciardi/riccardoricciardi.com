@@ -108,7 +108,7 @@ export default async function LanguagesAdmin({ searchParams }: PageProps) {
         </div>
       </section>
 
-      <section>
+      <section id="add" className="scroll-mt-24">
         <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
           Clone a language
         </h2>

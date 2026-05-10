@@ -209,7 +209,7 @@ export default async function SkillsAdmin({ searchParams }: PageProps) {
         </form>
       )}
 
-      <section>
+      <section id="add" className="scroll-mt-24">
         <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
           Add new skill
         </h2>

@@ -246,7 +246,7 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
       )}
 
       {/* Add new — single form with one label per language */}
-      <section>
+      <section id="add" className="scroll-mt-24">
         <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
           Add new item (fill all languages at once)
         </h2>
