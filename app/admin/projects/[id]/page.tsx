@@ -8,6 +8,7 @@ import {
   uploadProjectScreenshotAction,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
+import { LangTabs } from "@/components/admin/lang-tabs";
 
 export const dynamic = "force-dynamic";
 
@@ -154,32 +155,34 @@ export default async function ProjectI18nAdmin({ params }: PageProps) {
         </div>
       </section>
 
-      <section className="flex flex-col gap-4">
-        {langs.map((lang) => (
-          <form
-            key={lang.id}
-            action={upsertProjectI18nAction}
-            className="flex flex-col gap-2 rounded-xl border border-dashed border-dashed-soft p-4"
-          >
-            <input type="hidden" name="project_id" value={p.id} />
-            <input type="hidden" name="language_id" value={lang.id} />
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
-                {lang.code} — {lang.name}
-              </span>
-              <Button type="submit" size="sm" variant="outline">
+      <section>
+        <h2 className="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+          Description per language
+        </h2>
+        <LangTabs
+          storageKey="admin.lang"
+          langs={langs}
+          panels={langs.map((lang) => (
+            <form
+              key={lang.id}
+              action={upsertProjectI18nAction}
+              className="flex flex-col gap-2"
+            >
+              <input type="hidden" name="project_id" value={p.id} />
+              <input type="hidden" name="language_id" value={lang.id} />
+              <textarea
+                name="description"
+                defaultValue={overrides.get(lang.id) ?? ""}
+                rows={4}
+                placeholder={`Localized description for ${lang.code} (leave empty to use default)`}
+                className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-2 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+              <Button type="submit" size="sm" variant="outline" className="self-start">
                 Save
               </Button>
-            </div>
-            <textarea
-              name="description"
-              defaultValue={overrides.get(lang.id) ?? ""}
-              rows={3}
-              placeholder={`Localized description for ${lang.code} (leave empty to use default)`}
-              className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-2 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </form>
-        ))}
+            </form>
+          ))}
+        />
       </section>
     </div>
   );

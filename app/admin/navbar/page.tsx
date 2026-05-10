@@ -6,6 +6,7 @@ import {
   updateNavbarAction,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
+import { LangTabs } from "@/components/admin/lang-tabs";
 
 export const dynamic = "force-dynamic";
 
@@ -113,62 +114,77 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
         </p>
       </section>
 
-      {langs.map((lang) => (
-        <section key={lang.id}>
-          <h2 className="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
-            {lang.code} — {lang.name}
-          </h2>
-          <ul className="flex flex-col gap-2 list-none p-0">
-            {(grouped.get(lang.id) ?? []).map((row) => (
-              <li
-                key={row.id}
-                className="rounded-xl border border-dashed border-dashed-soft p-4"
-              >
-                <form
-                  action={updateNavbarAction}
-                  className="grid grid-cols-1 gap-3 sm:grid-cols-5"
+      <section>
+        <h2 className="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+          Items per language
+        </h2>
+        <LangTabs
+          storageKey="admin.lang"
+          langs={langs}
+          panels={langs.map((lang) => (
+            <ul
+              key={lang.id}
+              className="flex flex-col gap-2 list-none p-0"
+            >
+              {(grouped.get(lang.id) ?? []).length === 0 && (
+                <li className="text-sm text-muted-foreground">
+                  No items for this language yet.
+                </li>
+              )}
+              {(grouped.get(lang.id) ?? []).map((row) => (
+                <li
+                  key={row.id}
+                  className="rounded-xl border border-dashed border-dashed-soft p-4"
                 >
-                  <input type="hidden" name="id" value={row.id} />
-                  <Field
-                    label="Slug"
-                    name="slug"
-                    defaultValue={row.slug ?? ""}
-                  />
-                  <Field
-                    label="Label"
-                    name="value"
-                    defaultValue={row.value}
-                    required
-                    className="sm:col-span-2"
-                  />
-                  <Field
-                    label="Position"
-                    name="position"
-                    type="number"
-                    defaultValue={(row.position ?? 0).toString()}
-                  />
-                  <div className="flex items-end gap-2">
-                    <Button type="submit" size="sm" variant="outline">
-                      Save
-                    </Button>
-                  </div>
-                </form>
-                <form action={deleteNavbarAction} className="mt-3 flex justify-end">
-                  <input type="hidden" name="id" value={row.id} />
-                  <Button
-                    type="submit"
-                    size="sm"
-                    variant="outline"
-                    className="border-red-500/40 text-red-600 hover:bg-red-500/5 hover:text-red-700"
+                  <form
+                    action={updateNavbarAction}
+                    className="grid grid-cols-1 gap-3 sm:grid-cols-5"
                   >
-                    Delete
-                  </Button>
-                </form>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+                    <input type="hidden" name="id" value={row.id} />
+                    <Field
+                      label="Slug"
+                      name="slug"
+                      defaultValue={row.slug ?? ""}
+                    />
+                    <Field
+                      label="Label"
+                      name="value"
+                      defaultValue={row.value}
+                      required
+                      className="sm:col-span-2"
+                    />
+                    <Field
+                      label="Position"
+                      name="position"
+                      type="number"
+                      defaultValue={(row.position ?? 0).toString()}
+                    />
+                    <div className="flex items-end gap-2">
+                      <Button type="submit" size="sm" variant="outline">
+                        Save
+                      </Button>
+                    </div>
+                  </form>
+                  <form
+                    action={deleteNavbarAction}
+                    className="mt-3 flex justify-end"
+                  >
+                    <input type="hidden" name="id" value={row.id} />
+                    <Button
+                      type="submit"
+                      size="sm"
+                      variant="outline"
+                      className="border-red-500/40 text-red-600 hover:bg-red-500/5 hover:text-red-700"
+                    >
+                      Delete
+                    </Button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          ))}
+        />
+      </section>
     </div>
   );
 }

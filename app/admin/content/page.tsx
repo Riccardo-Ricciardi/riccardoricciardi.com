@@ -6,6 +6,7 @@ import {
   updateContentAction,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
+import { LangTabs } from "@/components/admin/lang-tabs";
 
 export const dynamic = "force-dynamic";
 
@@ -121,25 +122,19 @@ export default async function ContentAdmin({ searchParams }: PageProps) {
                 </button>
               </form>
             </header>
-            <div className="flex flex-col gap-3">
-              {langs.map((lang) => {
+            <LangTabs
+              storageKey="admin.lang"
+              langs={langs}
+              panels={langs.map((lang) => {
                 const block = bySlug.get(slug)?.get(lang.id);
                 return (
                   <form
                     key={lang.id}
                     action={updateContentAction}
-                    className="flex flex-col gap-1.5"
+                    className="flex flex-col gap-2"
                   >
                     <input type="hidden" name="slug" value={slug} />
                     <input type="hidden" name="language_id" value={lang.id} />
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                        {lang.code}
-                      </span>
-                      <Button type="submit" size="sm" variant="outline">
-                        Save
-                      </Button>
-                    </div>
                     <textarea
                       name="value"
                       defaultValue={block?.value ?? ""}
@@ -147,10 +142,13 @@ export default async function ContentAdmin({ searchParams }: PageProps) {
                       placeholder={`Value for ${lang.code}`}
                       className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-2 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     />
+                    <Button type="submit" size="sm" variant="outline" className="self-start">
+                      Save
+                    </Button>
                   </form>
                 );
               })}
-            </div>
+            />
           </article>
         ))}
       </section>
