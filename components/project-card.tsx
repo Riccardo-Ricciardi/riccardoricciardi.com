@@ -14,7 +14,7 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
     `https://opengraph.githubassets.com/1/${project.repo}`;
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all duration-200 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft)]">
+    <article className="group flex flex-col overflow-hidden rounded-xl border border-dashed border-dashed-soft bg-card transition-all duration-200 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft)]">
       <a
         href={href}
         target="_blank"
@@ -22,7 +22,7 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
         className="flex flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         aria-label={`${project.name ?? project.repo} — open project`}
       >
-        <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-border bg-muted/30">
+        <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-dashed border-dashed-soft bg-muted/30">
           <Image
             src={ogImage}
             alt=""
@@ -55,7 +55,7 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
               {project.topics.slice(0, 4).map((topic) => (
                 <li
                   key={topic}
-                  className="rounded-full border border-border bg-background px-2 py-0.5 font-mono text-[10px] font-medium text-muted-foreground"
+                  className="rounded-full border border-dashed border-dashed-soft bg-background px-2 py-0.5 font-mono text-[10px] font-medium text-muted-foreground"
                 >
                   {topic}
                 </li>

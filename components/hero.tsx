@@ -42,7 +42,7 @@ export function Hero({
           {eyebrow && (
             <Link
               href={`/${locale}`}
-              className="group mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1 text-xs font-medium text-foreground/80 backdrop-blur transition-colors hover:border-accent-blue hover:text-foreground"
+              className="group mb-6 inline-flex items-center gap-2 rounded-full border border-dashed border-dashed-soft bg-background/80 px-3 py-1 text-xs font-medium text-foreground/80 backdrop-blur transition-colors hover:border-accent-blue hover:text-foreground"
             >
               <Sparkles
                 className="h-3 w-3 text-accent-blue"

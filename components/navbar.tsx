@@ -3,6 +3,7 @@ import Image from "next/image";
 import { LanguagePicker } from "@/components/language-picker";
 import { ThemePicker } from "@/components/theme-picker";
 import { NavbarMobile } from "@/components/navbar-mobile";
+import { ScrolledHeader } from "@/components/scrolled-header";
 import type { Dictionary } from "@/utils/i18n/types";
 import type { SupportedLanguage } from "@/utils/config/app";
 
@@ -26,9 +27,9 @@ export function Navbar({ locale, dictionary, ariaLabels }: NavbarProps) {
   const items = dictionary.navbar;
 
   return (
-    <header
-      className="border-grid sticky top-0 z-50 w-full border-b bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/85"
-      aria-label={ariaLabels.nav}
+    <ScrolledHeader
+      ariaLabel={ariaLabels.nav}
+      className="navbar-shell sticky top-0 z-50 w-full transition-colors duration-200"
     >
       <div className="container-page flex h-14 items-center justify-between">
         <Link
@@ -73,6 +74,6 @@ export function Navbar({ locale, dictionary, ariaLabels }: NavbarProps) {
           />
         </div>
       </div>
-    </header>
+    </ScrolledHeader>
   );
 }

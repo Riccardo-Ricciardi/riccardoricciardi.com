@@ -38,7 +38,7 @@ export async function Skills({ heading }: SkillsProps) {
             return (
               <li
                 key={id}
-                className="group relative flex flex-col items-stretch justify-between rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft)]"
+                className="group relative flex flex-col items-stretch justify-between rounded-xl border border-dashed border-dashed-soft bg-card p-4 transition-all duration-200 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft)]"
               >
                 <div className="relative mx-auto h-12 w-12 sm:h-14 sm:w-14">
                   <Image

@@ -169,8 +169,20 @@
     max-width: 1400px;
     margin-inline: auto;
     padding-inline: 1rem;
-    border-left: 1px dashed var(--border-dashed);
-    border-right: 1px dashed var(--border-dashed);
+    background-image:
+      linear-gradient(
+        to bottom,
+        var(--border-dashed) 0 6px,
+        transparent 6px 12px
+      ),
+      linear-gradient(
+        to bottom,
+        var(--border-dashed) 0 6px,
+        transparent 6px 12px
+      );
+    background-size: 1px 12px, 1px 12px;
+    background-position: left top, right top;
+    background-repeat: repeat-y, repeat-y;
   }
   @media (min-width: 640px) {
     .container-page {
@@ -187,13 +199,73 @@
     border-color: var(--border);
   }
   .section-divider-b {
-    border-bottom: 1px dashed var(--border-dashed);
+    background-image: linear-gradient(
+      to right,
+      var(--border-dashed) 0 6px,
+      transparent 6px 12px
+    );
+    background-size: 12px 1px;
+    background-position: left bottom;
+    background-repeat: repeat-x;
   }
   .section-divider-t {
-    border-top: 1px dashed var(--border-dashed);
+    background-image: linear-gradient(
+      to right,
+      var(--border-dashed) 0 6px,
+      transparent 6px 12px
+    );
+    background-size: 12px 1px;
+    background-position: left top;
+    background-repeat: repeat-x;
   }
   .border-dashed-soft {
     border-color: var(--border-dashed);
+  }
+  .card-dashed {
+    background-image:
+      linear-gradient(
+        to right,
+        var(--border-dashed) 0 6px,
+        transparent 6px 12px
+      ),
+      linear-gradient(
+        to right,
+        var(--border-dashed) 0 6px,
+        transparent 6px 12px
+      ),
+      linear-gradient(
+        to bottom,
+        var(--border-dashed) 0 6px,
+        transparent 6px 12px
+      ),
+      linear-gradient(
+        to bottom,
+        var(--border-dashed) 0 6px,
+        transparent 6px 12px
+      );
+    background-size: 12px 1px, 12px 1px, 1px 12px, 1px 12px;
+    background-position: left top, left bottom, left top, right top;
+    background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  }
+  .navbar-shell {
+    background-color: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    transition: background-color 200ms ease, backdrop-filter 200ms ease,
+      -webkit-backdrop-filter 200ms ease;
+  }
+  .navbar-shell[data-scrolled="true"] {
+    background-color: color-mix(in oklab, var(--background) 80%, transparent);
+    -webkit-backdrop-filter: blur(12px) saturate(120%);
+    backdrop-filter: blur(12px) saturate(120%);
+    background-image: linear-gradient(
+      to right,
+      var(--border-dashed) 0 6px,
+      transparent 6px 12px
+    );
+    background-size: 12px 1px;
+    background-position: left bottom;
+    background-repeat: repeat-x;
   }
   .bg-dot {
     background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
