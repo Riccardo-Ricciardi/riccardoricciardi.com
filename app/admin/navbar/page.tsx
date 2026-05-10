@@ -253,48 +253,59 @@ export default async function NavbarAdmin({ searchParams }: PageProps) {
         </form>
       )}
 
-      {/* Add new — single form with one label per language */}
+      {/* Add new — compact single-row form with slug + one label per language */}
       <section id="add" className="scroll-mt-24">
         <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          Add new item (fill all languages at once)
+          Add new item
         </h2>
         <form
           action={createNavbarMultilangAction}
-          className="flex flex-col gap-3 rounded-lg border border-dashed border-dashed-soft p-4"
+          className="grid grid-cols-1 items-end gap-2 rounded-lg border border-dashed border-dashed-soft p-3 sm:grid-cols-12"
         >
-          <label className="flex flex-col gap-1">
+          <label className="flex flex-col gap-1 sm:col-span-3">
             <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              Slug (empty for home)
+              Slug (empty = home)
             </span>
             <input
               name="slug"
               type="text"
+              pattern="[a-z0-9_-]*"
               placeholder="about"
-              className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-2 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded-md border border-dashed border-dashed-soft bg-background px-2.5 py-1.5 font-mono text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </label>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {langs.map((l) => (
-              <label key={l.id} className="flex flex-col gap-1">
+          {langs.map((l) => {
+            const span =
+              langs.length === 1
+                ? "sm:col-span-7"
+                : langs.length === 2
+                  ? "sm:col-span-3"
+                  : "sm:col-span-2";
+            return (
+              <label key={l.id} className={`flex flex-col gap-1 ${span}`}>
                 <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                   {l.code} label
                 </span>
                 <input
                   name={`label_${l.code}`}
                   type="text"
-                  placeholder={`Label in ${l.name}`}
-                  className="rounded-md border border-dashed border-dashed-soft bg-background px-3 py-2 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  placeholder={l.name}
+                  className="rounded-md border border-dashed border-dashed-soft bg-background px-2.5 py-1.5 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
               </label>
-            ))}
-          </div>
+            );
+          })}
           <SubmitButton
-            className="w-full bg-accent-blue text-white"
+            size="sm"
+            className="bg-accent-blue text-white sm:col-span-2"
             pendingLabel="Adding…"
           >
-            Add for all languages
+            Add
           </SubmitButton>
         </form>
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          Fill at least one locale. Empty slug creates the home link.
+        </p>
       </section>
     </div>
   );
