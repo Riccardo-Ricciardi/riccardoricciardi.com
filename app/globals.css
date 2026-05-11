@@ -215,14 +215,14 @@
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
 
-  /* typography — names distinct from Tailwind defaults */
-  --text-display: var(--text-display);
-  --text-h1: var(--text-h1);
-  --text-h2: var(--text-h2);
-  --text-h3: var(--text-h3);
-  --text-h4: var(--text-h4);
-  --text-body-lg: var(--text-body-lg);
-  --text-eyebrow: var(--text-eyebrow);
+  /* typography — concrete values keep Tailwind from skipping these on self-reference */
+  --text-display: clamp(3rem, 5.5vw + 1rem, 5rem);
+  --text-h1: clamp(2rem, 2.5vw + 1rem, 3rem);
+  --text-h2: clamp(1.5rem, 1.5vw + 0.9rem, 2rem);
+  --text-h3: clamp(1.25rem, 0.5vw + 1.1rem, 1.5rem);
+  --text-h4: clamp(1rem, 0.2vw + 0.95rem, 1.125rem);
+  --text-body-lg: 1.125rem;
+  --text-eyebrow: 0.6875rem;
 
   /* spacing — additive, no override on built-in scale */
   --spacing-section-y: var(--section-y);
@@ -238,13 +238,13 @@
   --spacing-sp-3xl: var(--sp-3xl);
   --spacing-sp-4xl: var(--sp-4xl);
 
-  /* radius — semantic names */
-  --radius-chip: var(--radius-chip);
-  --radius-control: var(--radius-control);
-  --radius-card: var(--radius-card);
-  --radius-surface: var(--radius-surface);
-  --radius-hero: var(--radius-hero);
-  --radius-pill: var(--radius-pill);
+  /* radius — concrete values keep Tailwind from skipping these on self-reference */
+  --radius-chip: 0.375rem;
+  --radius-control: 0.5rem;
+  --radius-card: 0.75rem;
+  --radius-surface: 1rem;
+  --radius-hero: 1.25rem;
+  --radius-pill: 9999px;
 }
 
 @layer base {
