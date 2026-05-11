@@ -3,6 +3,7 @@ import { getAboutSections } from "@/utils/about/fetch";
 import { getSiteIdentity } from "@/utils/identity/fetch";
 import type { SupportedLanguage } from "@/utils/config/app";
 import { SectionHeading } from "@/components/site/atoms/section-heading";
+import { Eyebrow } from "@/components/site/atoms/eyebrow";
 
 interface AboutProps {
   heading: string;
@@ -20,7 +21,7 @@ export async function About({ heading, eyebrow, subtitle, locale }: AboutProps) 
   return (
     <section
       aria-labelledby="about-heading"
-      className="container-page section-divider-b py-16 md:py-24 lg:py-28"
+      className="container-page section-divider-b section-y"
     >
       <SectionHeading
         eyebrow={eyebrow}
@@ -54,14 +55,12 @@ export async function About({ heading, eyebrow, subtitle, locale }: AboutProps) 
               </span>
             </div>
           )}
-          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-            {identity.name}
-          </p>
+          <Eyebrow className="mt-4">{identity.name}</Eyebrow>
         </aside>
 
         <div className="flex flex-col gap-10">
           {sections.length === 0 ? (
-            <p className="text-base leading-relaxed text-muted-foreground">
+            <p className="text-body-lg text-muted-foreground">
               {locale === "it"
                 ? "Sto ancora scrivendo questa pagina."
                 : "Still writing this page."}
@@ -70,16 +69,14 @@ export async function About({ heading, eyebrow, subtitle, locale }: AboutProps) 
             sections.map((section, i) => (
               <article key={section.id} className="flex flex-col gap-3">
                 <div className="flex items-baseline gap-3">
-                  <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
+                  <Eyebrow as="span" className="tabular-nums">
                     {String(i + 1).padStart(2, "0")}
-                  </span>
+                  </Eyebrow>
                   {section.heading && (
-                    <h3 className="text-xl font-semibold tracking-tight md:text-2xl">
-                      {section.heading}
-                    </h3>
+                    <h3 className="text-h3">{section.heading}</h3>
                   )}
                 </div>
-                <div className="ml-9 whitespace-pre-line text-base leading-relaxed text-foreground/85 md:text-lg">
+                <div className="text-body-lg ml-9 whitespace-pre-line text-foreground/85">
                   {section.body}
                 </div>
               </article>
