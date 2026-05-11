@@ -26,6 +26,22 @@ export const CONTENT_SCHEMA: ContentSection[] = [
     ],
   },
   {
+    key: "services",
+    title: "Services section (home)",
+    description: "Three-card services block under the home hero",
+    fields: [
+      { slug: "services_eyebrow", label: "Eyebrow" },
+      { slug: "services_heading", label: "Heading" },
+      { slug: "services_subtitle", label: "Subtitle", multiline: true },
+      { slug: "service_1_title", label: "Card 1 — title" },
+      { slug: "service_1_body", label: "Card 1 — body", multiline: true },
+      { slug: "service_2_title", label: "Card 2 — title" },
+      { slug: "service_2_body", label: "Card 2 — body", multiline: true },
+      { slug: "service_3_title", label: "Card 3 — title" },
+      { slug: "service_3_body", label: "Card 3 — body", multiline: true },
+    ],
+  },
+  {
     key: "skills",
     title: "Skills section",
     fields: [

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { Hero } from "@/components/site/hero";
+import { Services, SERVICE_ICONS } from "@/components/site/services/section";
 import { Skills } from "@/components/site/skills/section";
 import { Projects } from "@/components/site/projects/section";
 import { GlobalLoader } from "@/components/global-loader";
@@ -57,6 +58,47 @@ export default async function Page({ params }: PageProps) {
   );
   const allLabel = content(blocks, "common_all", "All");
 
+  const servicesEyebrow = content(blocks, "services_eyebrow", "Services");
+  const servicesHeading = content(
+    blocks,
+    "services_heading",
+    "How I can help"
+  );
+  const servicesSubtitle = content(
+    blocks,
+    "services_subtitle",
+    "Three engagement formats. Pick what fits, or write to me with something different."
+  );
+  const serviceItems = [
+    {
+      title: content(blocks, "service_1_title", "Full-stack web app"),
+      body: content(
+        blocks,
+        "service_1_body",
+        "From idea to deploy: design, frontend, API, database, hosting."
+      ),
+      icon: SERVICE_ICONS[0],
+    },
+    {
+      title: content(blocks, "service_2_title", "Refactor & migrations"),
+      body: content(
+        blocks,
+        "service_2_body",
+        "Pick up an existing codebase, untangle the parts that hurt, ship the upgrade."
+      ),
+      icon: SERVICE_ICONS[1],
+    },
+    {
+      title: content(blocks, "service_3_title", "Integrations"),
+      body: content(
+        blocks,
+        "service_3_body",
+        "Auth, payments, storage, third-party APIs. Wire them into your stack."
+      ),
+      icon: SERVICE_ICONS[2],
+    },
+  ].filter((s) => s.title || s.body);
+
   return (
     <>
       <Hero
@@ -72,6 +114,12 @@ export default async function Page({ params }: PageProps) {
           href: "#projects",
         }}
         locale={locale}
+      />
+      <Services
+        eyebrow={servicesEyebrow}
+        heading={servicesHeading}
+        subtitle={servicesSubtitle}
+        items={serviceItems}
       />
       <Suspense fallback={<GlobalLoader />}>
         <Skills
