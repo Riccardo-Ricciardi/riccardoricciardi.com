@@ -33,7 +33,7 @@ export async function Projects({
     <section
       id="projects"
       aria-labelledby="projects-heading"
-      className="container-page section-divider-b py-16 md:py-24 lg:py-28"
+      className="container-page section-divider-b section-y"
     >
       <SectionHeading
         eyebrow={eyebrow}

@@ -1,9 +1,11 @@
 import { cn } from "@/lib/utils";
 
+type EyebrowTag = "p" | "span" | "div" | "dt" | "dd" | "li" | "small";
+
 interface EyebrowProps {
   children: React.ReactNode;
   className?: string;
-  as?: "p" | "span" | "div";
+  as?: EyebrowTag;
   id?: string;
 }
 

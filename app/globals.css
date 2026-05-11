@@ -523,11 +523,14 @@
   /* card base */
   .card-base {
     background: var(--bg-elevated);
-    border: 1px dashed var(--border-dashed);
+    border: 1px solid var(--border-dashed);
     border-radius: var(--radius-card);
     padding: var(--card-padding);
     transition: border-color 160ms ease, transform 160ms ease,
       box-shadow 160ms ease;
+  }
+  .card-flush {
+    padding: 0;
   }
   .card-interactive {
     cursor: pointer;
@@ -549,7 +552,7 @@
     gap: 0.5rem;
     padding: 0.25rem 0.625rem;
     border-radius: var(--radius-pill);
-    border: 1px dashed var(--border-dashed);
+    border: 1px solid var(--border-dashed);
     background: var(--bg-elevated);
     font-size: var(--text-caption);
     line-height: 1;
@@ -601,7 +604,7 @@
     min-height: 2.75rem;
     padding: 0.625rem 0.75rem;
     border-radius: var(--radius-control);
-    border: 1px dashed var(--border-dashed);
+    border: 1px solid var(--border-dashed);
     background: var(--bg-default);
     font-size: 0.875rem;
     color: var(--fg-default);
@@ -610,7 +613,6 @@
   .field-input:focus-visible {
     outline: none;
     border-color: var(--accent);
-    border-style: solid;
     box-shadow: 0 0 0 3px var(--accent-soft);
   }
   .field-textarea {

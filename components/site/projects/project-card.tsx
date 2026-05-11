@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ArrowUpRight, GitFork, Star } from "lucide-react";
 import type { Project } from "@/utils/projects/fetch";
 import { TechChip } from "@/components/site/atoms/tech-chip";
+import { Eyebrow } from "@/components/site/atoms/eyebrow";
 
 export interface NarrativeLabels {
   problem: string;
@@ -27,7 +28,7 @@ export function ProjectCard({ project, priority = false, labels }: ProjectCardPr
   );
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-xl border border-dashed-soft bg-card transition-all duration-300 hover:-translate-y-0.5 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft),0_8px_24px_-12px_rgb(0_0_0_/_0.18)]">
+    <article className="group card-base card-flush flex flex-col overflow-hidden hover:-translate-y-0.5 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft),0_8px_24px_-12px_rgb(0_0_0_/_0.18)]">
       <a
         href={href}
         target="_blank"
@@ -52,7 +53,7 @@ export function ProjectCard({ project, priority = false, labels }: ProjectCardPr
 
         <div className="flex flex-1 flex-col gap-3 p-5">
           <header className="flex items-start justify-between gap-3">
-            <h3 className="font-mono text-sm font-medium tracking-tight text-foreground">
+            <h3 className="text-h4 text-foreground">
               {project.name ?? project.repo}
             </h3>
             <ArrowUpRight
@@ -62,13 +63,13 @@ export function ProjectCard({ project, priority = false, labels }: ProjectCardPr
           </header>
 
           {project.description && !hasNarrative && (
-            <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+            <p className="text-body-sm line-clamp-3 text-muted-foreground">
               {project.description}
             </p>
           )}
 
           {hasNarrative && (
-            <dl className="flex flex-col gap-2.5 text-sm leading-relaxed">
+            <dl className="text-body-sm flex flex-col gap-2.5">
               {project.problem && (
                 <NarrativeRow label={labels.problem} value={project.problem} tone="muted" />
               )}
@@ -91,7 +92,7 @@ export function ProjectCard({ project, priority = false, labels }: ProjectCardPr
             </ul>
           )}
 
-          <footer className="mt-auto flex items-center gap-4 pt-2 text-xs text-muted-foreground">
+          <footer className="text-caption mt-auto flex items-center gap-4 pt-2 text-muted-foreground">
             {project.language && (
               <span className="inline-flex items-center gap-1.5">
                 <span
@@ -134,14 +135,12 @@ function NarrativeRow({ label, value, tone }: NarrativeRowProps) {
         ? "text-foreground/90"
         : "text-muted-foreground";
   const labelClass =
-    tone === "accent" ? "text-accent-blue" : "text-muted-foreground";
+    tone === "accent" ? "text-accent-blue" : undefined;
   return (
     <div className="flex flex-col gap-0.5">
-      <dt
-        className={`font-mono text-[10px] uppercase tracking-[0.18em] ${labelClass}`}
-      >
+      <Eyebrow as="dt" className={labelClass}>
         {label}
-      </dt>
+      </Eyebrow>
       <dd className={`line-clamp-2 ${valueClass}`}>{value}</dd>
     </div>
   );
