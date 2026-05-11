@@ -28,7 +28,7 @@ export function WorkTimeline({
     <ol className="relative list-none p-0">
       <span
         aria-hidden="true"
-        className="absolute left-[7px] top-2 bottom-2 w-px bg-[image:repeating-linear-gradient(to_bottom,var(--border-dashed)_0_4px,transparent_4px_8px)]"
+        className="absolute left-[7px] top-2 bottom-2 w-px bg-[var(--border-dashed)]"
       />
       {items.map((item) => (
         <li key={item.id} className="relative pl-8 pb-10 last:pb-0">

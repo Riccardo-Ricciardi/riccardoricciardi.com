@@ -172,8 +172,8 @@
     max-width: var(--container-max-width, 1400px);
     margin-inline: auto;
     padding-inline: 1rem;
-    border-left: 1px dashed var(--border-dashed);
-    border-right: 1px dashed var(--border-dashed);
+    border-left: 1px solid var(--border-dashed);
+    border-right: 1px solid var(--border-dashed);
   }
   @media (min-width: 640px) {
     .container-page {
@@ -190,10 +190,10 @@
     border-color: var(--border);
   }
   .section-divider-b {
-    border-bottom: 1px dashed var(--border-dashed);
+    border-bottom: 1px solid var(--border-dashed);
   }
   .section-divider-t {
-    border-top: 1px dashed var(--border-dashed);
+    border-top: 1px solid var(--border-dashed);
   }
   .border-dashed-soft {
     border-color: var(--border-dashed);
@@ -208,7 +208,7 @@
   }
   .navbar-shell[data-scrolled="true"] {
     background-color: color-mix(in oklab, var(--background) 80%, transparent);
-    border-bottom: 1px dashed var(--border-dashed);
+    border-bottom: 1px solid var(--border-dashed);
     -webkit-backdrop-filter: blur(12px) saturate(120%);
     backdrop-filter: blur(12px) saturate(120%);
   }

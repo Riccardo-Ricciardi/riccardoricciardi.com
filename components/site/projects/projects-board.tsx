@@ -2,15 +2,16 @@
 
 import { useMemo, useState } from "react";
 import type { Project } from "@/utils/projects/fetch";
-import { ProjectCard } from "@/components/site/projects/project-card";
+import { ProjectCard, type NarrativeLabels } from "@/components/site/projects/project-card";
 import { cn } from "@/lib/utils";
 
 interface ProjectsBoardProps {
   projects: Project[];
   allLabel: string;
+  narrativeLabels: NarrativeLabels;
 }
 
-export function ProjectsBoard({ projects, allLabel }: ProjectsBoardProps) {
+export function ProjectsBoard({ projects, allLabel, narrativeLabels }: ProjectsBoardProps) {
   const topics = useMemo(() => {
     const counts = new Map<string, number>();
     for (const p of projects) {
@@ -55,7 +56,7 @@ export function ProjectsBoard({ projects, allLabel }: ProjectsBoardProps) {
       <ul className="grid list-none items-start gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((project, i) => (
           <li key={project.id}>
-            <ProjectCard project={project} priority={i < 3} />
+            <ProjectCard project={project} priority={i < 3} labels={narrativeLabels} />
           </li>
         ))}
       </ul>
@@ -78,7 +79,7 @@ function FilterChip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "rounded-full border border-dashed px-3 py-1 font-mono text-[11px] uppercase tracking-wider transition-colors",
+        "rounded-full border px-3 py-1 font-mono text-[11px] uppercase tracking-wider transition-colors",
         active
           ? "border-accent-blue bg-accent-blue text-white"
           : "border-dashed-soft text-muted-foreground hover:border-accent-blue hover:text-foreground"

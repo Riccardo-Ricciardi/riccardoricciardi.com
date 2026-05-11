@@ -23,8 +23,32 @@ interface NavbarProps {
   };
 }
 
+const NAV_WHITELIST = ["", "work", "contact"] as const;
+const NAV_FALLBACK_LABELS: Record<string, { it: string; en: string }> = {
+  "": { it: "Home", en: "Home" },
+  work: { it: "Progetti", en: "Projects" },
+  contact: { it: "Contatti", en: "Contact" },
+};
+
+function buildNavItems(
+  dictionaryItems: NavbarProps["dictionary"]["navbar"],
+  locale: SupportedLanguage
+): NavbarProps["dictionary"]["navbar"] {
+  const bySlug = new Map(dictionaryItems.map((item) => [item.slug, item]));
+  return NAV_WHITELIST.map((slug, index) => {
+    const existing = bySlug.get(slug);
+    if (existing) return existing;
+    const fallback = NAV_FALLBACK_LABELS[slug];
+    return {
+      slug,
+      label: fallback ? fallback[locale === "it" ? "it" : "en"] : slug,
+      position: index,
+    };
+  });
+}
+
 export function Navbar({ locale, dictionary, ariaLabels }: NavbarProps) {
-  const items = dictionary.navbar;
+  const items = buildNavItems(dictionary.navbar, locale);
 
   return (
     <ScrolledHeader

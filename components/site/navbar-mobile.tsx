@@ -47,7 +47,7 @@ export function NavbarMobile({ items, locale, ariaLabel }: NavbarMobileProps) {
           aria-label={ariaLabel}
           className="fixed inset-0 z-[60] flex flex-col bg-background/95 backdrop-blur-xl animate-in fade-in"
         >
-          <div className="flex items-center justify-between border-b border-dashed border-dashed-soft px-4 py-3">
+          <div className="flex items-center justify-between border-b border-dashed-soft px-4 py-3">
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
               Menu
             </p>

@@ -33,7 +33,7 @@ export async function About({ heading, eyebrow, subtitle, locale }: AboutProps) 
       <div className="grid gap-10 md:grid-cols-[1fr_2fr] md:gap-14 lg:gap-20">
         <aside className="md:sticky md:top-24 md:self-start">
           {identity.profile_photo_url ? (
-            <div className="relative aspect-[4/5] w-full max-w-sm overflow-hidden rounded-2xl border border-dashed border-dashed-soft">
+            <div className="relative aspect-[4/5] w-full max-w-sm overflow-hidden rounded-2xl border border-dashed-soft">
               <Image
                 src={identity.profile_photo_url}
                 alt={identity.name}
@@ -44,7 +44,7 @@ export async function About({ heading, eyebrow, subtitle, locale }: AboutProps) 
               />
             </div>
           ) : (
-            <div className="grid aspect-[4/5] w-full max-w-sm place-items-center rounded-2xl border border-dashed border-dashed-soft bg-muted/30">
+            <div className="grid aspect-[4/5] w-full max-w-sm place-items-center rounded-2xl border border-dashed-soft bg-muted/30">
               <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
                 {identity.name
                   .split(" ")

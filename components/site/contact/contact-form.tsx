@@ -52,7 +52,7 @@ export function ContactForm({ locale, labels }: ContactFormProps) {
   }, [state, labels.successTitle, labels.successBody]);
 
   return (
-    <div className="rounded-2xl border border-dashed border-dashed-soft bg-card p-6 md:p-8">
+    <div className="rounded-2xl border border-dashed-soft bg-card p-6 md:p-8">
       <header className="mb-6">
         <h3 className="text-xl font-semibold tracking-tight md:text-2xl">
           {labels.title}
@@ -105,7 +105,7 @@ export function ContactForm({ locale, labels }: ContactFormProps) {
             rows={5}
             maxLength={2000}
             placeholder={labels.messagePlaceholder}
-            className="min-h-32 w-full resize-y rounded-lg border border-dashed border-dashed-soft bg-background px-3 py-2.5 text-sm leading-relaxed focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft"
+            className="min-h-32 w-full resize-y rounded-lg border border-dashed-soft bg-background px-3 py-2.5 text-sm leading-relaxed focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft"
           />
         </label>
 
@@ -149,7 +149,7 @@ function Field({
         autoComplete={autoComplete}
         maxLength={maxLength}
         placeholder={placeholder}
-        className="h-11 w-full rounded-lg border border-dashed border-dashed-soft bg-background px-3 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft"
+        className="h-11 w-full rounded-lg border border-dashed-soft bg-background px-3 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft"
       />
     </label>
   );

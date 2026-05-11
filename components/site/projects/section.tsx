@@ -22,6 +22,13 @@ export async function Projects({
 
   if (projects.length === 0) return null;
 
+  const isIt = locale === "it";
+  const narrativeLabels = {
+    problem: isIt ? "Problema" : "Problem",
+    solution: isIt ? "Soluzione" : "Solution",
+    outcome: isIt ? "Risultato" : "Result",
+  };
+
   return (
     <section
       id="projects"
@@ -36,7 +43,11 @@ export async function Projects({
         className="mb-10 md:mb-14"
       />
 
-      <ProjectsBoard projects={projects} allLabel={allLabel} />
+      <ProjectsBoard
+        projects={projects}
+        allLabel={allLabel}
+        narrativeLabels={narrativeLabels}
+      />
     </section>
   );
 }

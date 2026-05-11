@@ -3,20 +3,31 @@ import { ArrowUpRight, GitFork, Star } from "lucide-react";
 import type { Project } from "@/utils/projects/fetch";
 import { TechChip } from "@/components/site/atoms/tech-chip";
 
+export interface NarrativeLabels {
+  problem: string;
+  solution: string;
+  outcome: string;
+}
+
 interface ProjectCardProps {
   project: Project;
   priority?: boolean;
+  labels: NarrativeLabels;
 }
 
-export function ProjectCard({ project, priority = false }: ProjectCardProps) {
+export function ProjectCard({ project, priority = false, labels }: ProjectCardProps) {
   const href = project.homepage || project.url || "#";
   const imgSrc =
     project.screenshot_url ||
     project.og_image ||
     `https://opengraph.githubassets.com/1/${project.repo}`;
 
+  const hasNarrative = Boolean(
+    project.problem || project.solution || project.outcome
+  );
+
   return (
-    <article className="group flex flex-col overflow-hidden rounded-xl border border-dashed border-dashed-soft bg-card transition-all duration-300 hover:-translate-y-0.5 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft),0_8px_24px_-12px_rgb(0_0_0_/_0.18)]">
+    <article className="group flex flex-col overflow-hidden rounded-xl border border-dashed-soft bg-card transition-all duration-300 hover:-translate-y-0.5 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft),0_8px_24px_-12px_rgb(0_0_0_/_0.18)]">
       <a
         href={href}
         target="_blank"
@@ -24,7 +35,7 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
         className="flex flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         aria-label={`${project.name ?? project.repo} — open project`}
       >
-        <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-dashed border-dashed-soft bg-muted/30">
+        <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-dashed-soft bg-muted/30">
           <Image
             src={imgSrc}
             alt=""
@@ -50,10 +61,24 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
             />
           </header>
 
-          {project.description && (
+          {project.description && !hasNarrative && (
             <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
               {project.description}
             </p>
+          )}
+
+          {hasNarrative && (
+            <dl className="flex flex-col gap-2.5 text-sm leading-relaxed">
+              {project.problem && (
+                <NarrativeRow label={labels.problem} value={project.problem} tone="muted" />
+              )}
+              {project.solution && (
+                <NarrativeRow label={labels.solution} value={project.solution} tone="foreground" />
+              )}
+              {project.outcome && (
+                <NarrativeRow label={labels.outcome} value={project.outcome} tone="accent" />
+              )}
+            </dl>
           )}
 
           {project.topics && project.topics.length > 0 && (
@@ -92,5 +117,32 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
         </div>
       </a>
     </article>
+  );
+}
+
+interface NarrativeRowProps {
+  label: string;
+  value: string;
+  tone: "muted" | "foreground" | "accent";
+}
+
+function NarrativeRow({ label, value, tone }: NarrativeRowProps) {
+  const valueClass =
+    tone === "accent"
+      ? "text-foreground"
+      : tone === "foreground"
+        ? "text-foreground/90"
+        : "text-muted-foreground";
+  const labelClass =
+    tone === "accent" ? "text-accent-blue" : "text-muted-foreground";
+  return (
+    <div className="flex flex-col gap-0.5">
+      <dt
+        className={`font-mono text-[10px] uppercase tracking-[0.18em] ${labelClass}`}
+      >
+        {label}
+      </dt>
+      <dd className={`line-clamp-2 ${valueClass}`}>{value}</dd>
+    </div>
   );
 }

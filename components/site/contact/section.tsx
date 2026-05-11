@@ -61,10 +61,10 @@ export async function Contact({
         {identity.email && (
           <a
             href={`mailto:${identity.email}`}
-            className="group flex flex-col gap-3 rounded-xl border border-dashed border-dashed-soft bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft)] sm:col-span-2"
+            className="group flex flex-col gap-3 rounded-xl border border-dashed-soft bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft)] sm:col-span-2"
           >
             <div className="flex items-center justify-between gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-lg border border-dashed border-dashed-soft text-accent-blue">
+              <span className="grid h-10 w-10 place-items-center rounded-lg border border-dashed-soft text-accent-blue">
                 <Mail className="h-5 w-5" aria-hidden="true" />
               </span>
               <ArrowUpRight
@@ -97,10 +97,10 @@ export async function Contact({
               href={href}
               target={external ? "_blank" : undefined}
               rel={external ? "noopener noreferrer" : undefined}
-              className="group flex flex-col gap-3 rounded-xl border border-dashed border-dashed-soft bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft)]"
+              className="group flex flex-col gap-3 rounded-xl border border-dashed-soft bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft)]"
             >
               <div className="flex items-center justify-between gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-lg border border-dashed border-dashed-soft text-foreground">
+                <span className="grid h-10 w-10 place-items-center rounded-lg border border-dashed-soft text-foreground">
                   <Icon className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <ArrowUpRight

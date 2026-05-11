@@ -1,107 +1,182 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import Image from "next/image";
 import type { Skill } from "@/utils/skills/fetch";
 import { SkillCard } from "@/components/site/skills/skill-card";
-import { cn } from "@/lib/utils";
 
 interface SkillsBoardProps {
   skills: Skill[];
   allLabel: string;
+  locale?: string;
 }
 
-const UNCATEGORIZED = "__uncat__";
+type TierId = "core" | "proficient" | "familiar";
 
-export function SkillsBoard({ skills, allLabel }: SkillsBoardProps) {
-  const categories = useMemo(() => {
-    const set = new Set<string>();
+interface TierMeta {
+  id: TierId;
+  threshold: number;
+  label: { it: string; en: string };
+  caption: { it: string; en: string };
+}
+
+const TIERS: TierMeta[] = [
+  {
+    id: "core",
+    threshold: 85,
+    label: { it: "Stack principale", en: "Core stack" },
+    caption: {
+      it: "Strumenti che uso ogni giorno, con cui spedisco prodotti reali.",
+      en: "Tools I use daily to ship real products.",
+    },
+  },
+  {
+    id: "proficient",
+    threshold: 60,
+    label: { it: "A mio agio", en: "Proficient" },
+    caption: {
+      it: "Tecnologie con cui ho lavorato su progetti completi.",
+      en: "Tech I've shipped full projects with.",
+    },
+  },
+  {
+    id: "familiar",
+    threshold: 0,
+    label: { it: "Familiari", en: "Familiar" },
+    caption: {
+      it: "Strumenti che conosco e su cui so muovermi quando serve.",
+      en: "Tools I know and can pick up when needed.",
+    },
+  },
+];
+
+const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL ?? "";
+
+function tierFor(percentage: number): TierId {
+  if (percentage >= 85) return "core";
+  if (percentage >= 60) return "proficient";
+  return "familiar";
+}
+
+export function SkillsBoard({ skills, allLabel: _allLabel, locale = "it" }: SkillsBoardProps) {
+  const grouped = useMemo(() => {
+    const map = new Map<TierId, Skill[]>([
+      ["core", []],
+      ["proficient", []],
+      ["familiar", []],
+    ]);
     for (const s of skills) {
-      const cat = (s as Skill & { category?: string | null }).category;
-      if (cat) set.add(cat);
+      map.get(tierFor(s.percentage))?.push(s);
     }
-    const list = Array.from(set);
-    list.sort((a, b) => a.localeCompare(b));
-    return list;
+    return map;
   }, [skills]);
-
-  const [active, setActive] = useState<string | null>(null);
-
-  const filtered = useMemo(() => {
-    if (!active) return skills;
-    if (active === UNCATEGORIZED) {
-      return skills.filter(
-        (s) => !(s as Skill & { category?: string | null }).category
-      );
-    }
-    return skills.filter(
-      (s) => (s as Skill & { category?: string | null }).category === active
-    );
-  }, [skills, active]);
 
   if (skills.length === 0) {
     return <p className="text-muted-foreground">—</p>;
   }
 
-  return (
-    <div className="flex flex-col gap-6">
-      {categories.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          <FilterChip
-            label={allLabel}
-            active={active === null}
-            onClick={() => setActive(null)}
-          />
-          {categories.map((cat) => (
-            <FilterChip
-              key={cat}
-              label={cat}
-              active={active === cat}
-              onClick={() => setActive(cat)}
-            />
-          ))}
-        </div>
-      )}
+  const lang = locale === "it" ? "it" : "en";
 
-      <ul className="grid list-none gap-3 p-0 sm:gap-4 grid-cols-[repeat(auto-fit,minmax(140px,1fr))]">
-        {filtered.map((skill, i) => (
-          <SkillCard
-            key={skill.id}
-            id={skill.id}
-            name={skill.name}
-            percentage={skill.percentage}
-            dark={skill.dark}
-            icon_url={skill.icon_url}
-            icon_dark_url={skill.icon_dark_url}
-            priority={i < 6}
-          />
-        ))}
-      </ul>
+  return (
+    <div className="flex flex-col gap-14">
+      {TIERS.map((tier) => {
+        const items = grouped.get(tier.id) ?? [];
+        if (items.length === 0) return null;
+        return (
+          <section key={tier.id} aria-labelledby={`skills-tier-${tier.id}`}>
+            <header className="mb-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+              <div className="flex items-baseline gap-3">
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  {String(TIERS.indexOf(tier) + 1).padStart(2, "0")}
+                </span>
+                <h3
+                  id={`skills-tier-${tier.id}`}
+                  className="text-xl font-semibold tracking-tight md:text-2xl"
+                >
+                  {tier.label[lang]}
+                </h3>
+                <span className="font-mono text-xs tabular-nums text-muted-foreground">
+                  {items.length}
+                </span>
+              </div>
+              <p className="max-w-md text-sm text-muted-foreground">
+                {tier.caption[lang]}
+              </p>
+            </header>
+
+            {tier.id === "core" && (
+              <ul className="grid list-none gap-4 p-0 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
+                {items.map((skill, i) => (
+                  <SkillCard
+                    key={skill.id}
+                    id={skill.id}
+                    name={skill.name}
+                    percentage={skill.percentage}
+                    dark={skill.dark}
+                    icon_url={skill.icon_url}
+                    icon_dark_url={skill.icon_dark_url}
+                    priority={i < 6}
+                  />
+                ))}
+              </ul>
+            )}
+
+            {tier.id === "proficient" && (
+              <ul className="grid list-none gap-3 p-0 sm:gap-4 grid-cols-[repeat(auto-fit,minmax(140px,1fr))]">
+                {items.map((skill) => (
+                  <SkillCard
+                    key={skill.id}
+                    id={skill.id}
+                    name={skill.name}
+                    percentage={skill.percentage}
+                    dark={skill.dark}
+                    icon_url={skill.icon_url}
+                    icon_dark_url={skill.icon_dark_url}
+                  />
+                ))}
+              </ul>
+            )}
+
+            {tier.id === "familiar" && (
+              <ul className="flex list-none flex-wrap gap-2 p-0">
+                {items.map((skill) => (
+                  <FamiliarChip key={skill.id} skill={skill} />
+                ))}
+              </ul>
+            )}
+          </section>
+        );
+      })}
     </div>
   );
 }
 
-function FilterChip({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
+function FamiliarChip({ skill }: { skill: Skill }) {
+  const lightSrc = skill.icon_url ?? `${BASE_URL}/${skill.name}.png`;
+  const darkSrc = skill.icon_dark_url ?? `${BASE_URL}/${skill.name}-dark.png`;
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={cn(
-        "rounded-full border border-dashed px-3 py-1 font-mono text-[11px] uppercase tracking-wider transition-colors",
-        active
-          ? "border-accent-blue bg-accent-blue text-white"
-          : "border-dashed-soft text-muted-foreground hover:border-accent-blue hover:text-foreground"
-      )}
-    >
-      {label}
-    </button>
+    <li className="inline-flex items-center gap-2 rounded-full border border-dashed-soft bg-card px-3 py-1.5 text-xs text-foreground transition-colors hover:border-accent-blue">
+      <span className="relative h-4 w-4 shrink-0">
+        <Image
+          src={lightSrc}
+          alt=""
+          aria-hidden="true"
+          fill
+          sizes="16px"
+          className={skill.dark ? "object-contain dark:hidden" : "object-contain"}
+        />
+        {skill.dark && (
+          <Image
+            src={darkSrc}
+            alt=""
+            aria-hidden="true"
+            fill
+            sizes="16px"
+            className="hidden object-contain dark:block"
+          />
+        )}
+      </span>
+      <span className="font-mono tracking-wide">{skill.name}</span>
+    </li>
   );
 }

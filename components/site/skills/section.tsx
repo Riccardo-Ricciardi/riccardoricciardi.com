@@ -7,9 +7,10 @@ interface SkillsProps {
   eyebrow?: string;
   subtitle?: string;
   allLabel: string;
+  locale?: string;
 }
 
-export async function Skills({ heading, eyebrow, subtitle, allLabel }: SkillsProps) {
+export async function Skills({ heading, eyebrow, subtitle, allLabel, locale }: SkillsProps) {
   const skills = await getSkills();
 
   return (
@@ -26,7 +27,7 @@ export async function Skills({ heading, eyebrow, subtitle, allLabel }: SkillsPro
         className="mb-10 md:mb-14"
       />
 
-      <SkillsBoard skills={skills} allLabel={allLabel} />
+      <SkillsBoard skills={skills} allLabel={allLabel} locale={locale} />
     </section>
   );
 }

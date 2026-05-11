@@ -213,10 +213,10 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-dashed border-dashed-soft bg-card">
-      <header className="flex flex-col gap-3 border-b border-dashed border-dashed-soft p-6 md:flex-row md:items-center md:justify-between md:p-8">
+    <div className="overflow-hidden rounded-2xl border border-dashed-soft bg-card">
+      <header className="flex flex-col gap-3 border-b border-dashed-soft p-6 md:flex-row md:items-center md:justify-between md:p-8">
         <div className="flex items-start gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-dashed border-dashed-soft text-accent-blue">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-dashed-soft text-accent-blue">
             <Calendar className="h-5 w-5" aria-hidden="true" />
           </span>
           <div className="min-w-0">
@@ -246,7 +246,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
                 viewMonth.getFullYear() === today.getFullYear() &&
                 viewMonth.getMonth() === today.getMonth()
               }
-              className="grid h-9 w-9 place-items-center rounded-md border border-dashed border-dashed-soft text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
+              className="grid h-9 w-9 place-items-center rounded-md border border-dashed-soft text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -257,7 +257,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
               type="button"
               aria-label={labels.nextMonth}
               onClick={() => setViewMonth((m) => addMonths(m, 1))}
-              className="grid h-9 w-9 place-items-center rounded-md border border-dashed border-dashed-soft text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground"
+              className="grid h-9 w-9 place-items-center rounded-md border border-dashed-soft text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground"
             >
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -296,7 +296,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
                       ? "cursor-not-allowed text-muted-foreground/30"
                       : isSelected
                         ? "bg-accent-blue text-white shadow-sm"
-                        : "border border-dashed border-dashed-soft hover:border-accent-blue hover:text-accent-blue"
+                        : "border border-dashed-soft hover:border-accent-blue hover:text-accent-blue"
                   )}
                 >
                   <span className="tabular-nums">{cell.getDate()}</span>
@@ -330,19 +330,19 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
           {loading ? (
             <SlotsSkeleton />
           ) : error ? (
-            <p className="rounded-md border border-dashed border-rose-500/40 bg-rose-500/5 px-3 py-2.5 text-sm text-rose-700 dark:text-rose-300">
+            <p className="rounded-md border border-rose-500/40 bg-rose-500/5 px-3 py-2.5 text-sm text-rose-700 dark:text-rose-300">
               {labels.errorTitle}
             </p>
           ) : !hasAnySlots ? (
-            <p className="rounded-md border border-dashed border-dashed-soft bg-background/40 px-3 py-6 text-center text-sm text-muted-foreground">
+            <p className="rounded-md border border-dashed-soft bg-background/40 px-3 py-6 text-center text-sm text-muted-foreground">
               {labels.noSlots}
             </p>
           ) : !selectedDate ? (
-            <p className="rounded-md border border-dashed border-dashed-soft bg-background/40 px-3 py-6 text-center text-sm text-muted-foreground">
+            <p className="rounded-md border border-dashed-soft bg-background/40 px-3 py-6 text-center text-sm text-muted-foreground">
               {labels.pickDay}
             </p>
           ) : slotsForSelected.length === 0 ? (
-            <p className="rounded-md border border-dashed border-dashed-soft bg-background/40 px-3 py-6 text-center text-sm text-muted-foreground">
+            <p className="rounded-md border border-dashed-soft bg-background/40 px-3 py-6 text-center text-sm text-muted-foreground">
               {labels.noSlots}
             </p>
           ) : (
@@ -357,7 +357,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
                     <button
                       type="button"
                       onClick={() => setSelectedSlot(slot)}
-                      className="w-full rounded-md border border-dashed border-dashed-soft bg-background py-2.5 font-mono text-sm tabular-nums transition-all hover:-translate-y-0.5 hover:border-accent-blue hover:text-accent-blue"
+                      className="w-full rounded-md border border-dashed-soft bg-background py-2.5 font-mono text-sm tabular-nums transition-all hover:-translate-y-0.5 hover:border-accent-blue hover:text-accent-blue"
                     >
                       {time}
                     </button>
@@ -410,7 +410,7 @@ function SlotsSkeleton() {
     <ul className="grid list-none grid-cols-2 gap-2 p-0 sm:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
         <li key={i}>
-          <div className="h-11 animate-pulse rounded-md border border-dashed border-dashed-soft bg-background/60" />
+          <div className="h-11 animate-pulse rounded-md border border-dashed-soft bg-background/60" />
         </li>
       ))}
     </ul>
@@ -467,8 +467,8 @@ function ConfirmDialog({
         if (e.target === e.currentTarget) onCancel();
       }}
     >
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-dashed border-dashed-soft bg-card shadow-xl">
-        <header className="border-b border-dashed border-dashed-soft p-5">
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-dashed-soft bg-card shadow-xl">
+        <header className="border-b border-dashed-soft p-5">
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
             {labels.confirmTitle}
           </p>
@@ -511,7 +511,7 @@ function ConfirmDialog({
               rows={3}
               maxLength={1000}
               placeholder={labels.notesPlaceholder}
-              className="min-h-20 w-full resize-y rounded-lg border border-dashed border-dashed-soft bg-background px-3 py-2.5 text-sm leading-relaxed focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft"
+              className="min-h-20 w-full resize-y rounded-lg border border-dashed-soft bg-background px-3 py-2.5 text-sm leading-relaxed focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft"
             />
           </label>
 
@@ -528,7 +528,7 @@ function ConfirmDialog({
             <button
               type="button"
               onClick={onCancel}
-              className="inline-flex h-11 items-center justify-center rounded-lg border border-dashed border-dashed-soft bg-background px-4 text-sm font-medium text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground"
+              className="inline-flex h-11 items-center justify-center rounded-lg border border-dashed-soft bg-background px-4 text-sm font-medium text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground"
             >
               {labels.cancel}
             </button>
@@ -569,7 +569,7 @@ function Field({
         required={required}
         autoComplete={autoComplete}
         placeholder={placeholder}
-        className="h-11 w-full rounded-lg border border-dashed border-dashed-soft bg-background px-3 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft"
+        className="h-11 w-full rounded-lg border border-dashed-soft bg-background px-3 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft"
       />
     </label>
   );
@@ -625,9 +625,9 @@ function SuccessCard({
   );
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-dashed border-dashed-soft bg-card">
+    <div className="overflow-hidden rounded-2xl border border-dashed-soft bg-card">
       <div className="flex flex-col items-center gap-4 p-8 text-center md:p-12">
-        <span className="grid h-12 w-12 place-items-center rounded-full border border-dashed border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+        <span className="grid h-12 w-12 place-items-center rounded-full border border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
           <Check className="h-6 w-6" aria-hidden="true" />
         </span>
         <div>
@@ -651,7 +651,7 @@ function SuccessCard({
         <button
           type="button"
           onClick={onReset}
-          className="mt-2 inline-flex h-10 items-center gap-1.5 rounded-lg border border-dashed border-dashed-soft px-3.5 text-sm font-medium text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground"
+          className="mt-2 inline-flex h-10 items-center gap-1.5 rounded-lg border border-dashed-soft px-3.5 text-sm font-medium text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           {labels.cancel}

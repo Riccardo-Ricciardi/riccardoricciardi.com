@@ -52,10 +52,10 @@ function UsesCard({ item }: { item: UsesItem }) {
   return (
     <Wrapper
       {...wrapperProps}
-      className="group relative flex h-full flex-col gap-3 rounded-xl border border-dashed border-dashed-soft bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft)]"
+      className="group relative flex h-full flex-col gap-3 rounded-xl border border-dashed-soft bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft)]"
     >
       <div className="flex items-start justify-between gap-2">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-dashed border-dashed-soft bg-background/60">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-dashed-soft bg-background/60">
           {item.icon_url ? (
             <Image
               src={item.icon_url}
