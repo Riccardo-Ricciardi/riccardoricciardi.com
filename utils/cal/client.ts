@@ -111,8 +111,8 @@ export async function getSlots(params: {
   timeZone: string;
 }): Promise<CalSlots> {
   const qs = new URLSearchParams({
+    username: params.username,
     eventTypeSlug: params.eventTypeSlug,
-    usernameList: params.username,
     start: params.start,
     end: params.end,
     timeZone: params.timeZone,
