@@ -191,10 +191,32 @@ export default async function ContactPage({ params }: PageProps) {
       {calEnabled && (
         <section
           aria-label={isIt ? "Prenota una chiamata" : "Book a call"}
-          className="container-page pb-20 pt-16 md:pb-28 md:pt-20"
+          className="container-page pb-20 pt-10 md:pb-28 md:pt-12"
         >
           <div className="mx-auto max-w-4xl">
-            <BookingWidget locale={locale} labels={bookingLabels(locale)} />
+            <details className="group [&_summary::-webkit-details-marker]:hidden">
+              <summary className="card-base card-interactive flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 transition-colors">
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-eyebrow">
+                    {isIt ? "Alternativa" : "Alternative"}
+                  </span>
+                  <span className="text-h4 text-left">
+                    {isIt
+                      ? "Preferisci scegliere un orario?"
+                      : "Prefer to pick a time slot?"}
+                  </span>
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-pill border border-dashed-soft text-accent-blue transition-transform group-open:rotate-45"
+                >
+                  +
+                </span>
+              </summary>
+              <div className="mt-4">
+                <BookingWidget locale={locale} labels={bookingLabels(locale)} />
+              </div>
+            </details>
           </div>
         </section>
       )}
