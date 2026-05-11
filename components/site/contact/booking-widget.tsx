@@ -272,18 +272,16 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
                     type="button"
                     onClick={() => setEventSlug(t.slug)}
                     aria-pressed={active}
+                    aria-label={`${t.lengthInMinutes} ${labels.durationUnit} — ${t.title}`}
                     className={cn(
-                      "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all",
+                      "inline-flex items-center rounded-full border px-3 py-1.5 font-mono text-xs font-medium tabular-nums transition-all",
                       active
                         ? "border-accent-blue bg-accent-blue text-white shadow-sm"
                         : "border-dashed-soft bg-background text-foreground hover:border-accent-blue hover:text-accent-blue"
                     )}
                   >
-                    <span className="font-mono tabular-nums">
-                      {t.lengthInMinutes}
-                      {labels.durationUnit}
-                    </span>
-                    <span className="truncate">{t.title}</span>
+                    {t.lengthInMinutes}
+                    {labels.durationUnit}
                   </button>
                 </li>
               );

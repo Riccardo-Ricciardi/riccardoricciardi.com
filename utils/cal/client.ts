@@ -60,32 +60,18 @@ type EventTypesResponse = {
   }>;
 };
 
-let eventTypeCache: { username: string; types: CalEventType[]; ts: number } | null =
-  null;
-const EVENT_TYPES_TTL = 5 * 60 * 1000;
-
 export async function getEventTypes(username: string): Promise<CalEventType[]> {
-  if (
-    eventTypeCache &&
-    eventTypeCache.username === username &&
-    Date.now() - eventTypeCache.ts < EVENT_TYPES_TTL
-  ) {
-    return eventTypeCache.types;
-  }
-
   const json = await calFetch<EventTypesResponse>(
     `/event-types?username=${encodeURIComponent(username)}`,
     { apiVersion: "2024-06-14" }
   );
-  const types: CalEventType[] = (json.data ?? []).map((r) => ({
+  return (json.data ?? []).map((r) => ({
     id: r.id,
     slug: r.slug,
     title: r.title,
     lengthInMinutes: r.lengthInMinutes ?? r.length ?? 30,
     description: r.description ?? null,
   }));
-  eventTypeCache = { username, types, ts: Date.now() };
-  return types;
 }
 
 export async function getEventTypeBySlug(
