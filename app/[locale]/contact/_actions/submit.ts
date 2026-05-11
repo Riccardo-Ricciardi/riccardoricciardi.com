@@ -97,6 +97,7 @@ export async function submitContactMessageAction(
     }
   }
 
+  let insertedId: number;
   try {
     const supabase = createAdminClient();
     const { data, error } = await supabase
@@ -117,11 +118,70 @@ export async function submitContactMessageAction(
       });
       return { error: t("server_error") };
     }
-    return { ok: true, messageId: (data as { id: number }).id };
+    insertedId = (data as { id: number }).id;
   } catch (err) {
     logger.error("contact: server error", {
       message: err instanceof Error ? err.message : "unknown",
     });
     return { error: t("server_error") };
+  }
+
+  await sendNotificationEmail({ name, email, message, locale }).catch((err) => {
+    logger.warn("contact: notification email failed", {
+      message: err instanceof Error ? err.message : "unknown",
+    });
+  });
+
+  return { ok: true, messageId: insertedId };
+}
+
+async function sendNotificationEmail(params: {
+  name: string;
+  email: string;
+  message: string;
+  locale: string;
+}): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM;
+  const to =
+    process.env.RESEND_TO ??
+    process.env.ADMIN_EMAILS?.split(",")[0]?.trim() ??
+    null;
+
+  if (!apiKey || !from || !to) return;
+
+  const subject = `New contact from ${params.name} (${params.locale})`;
+  const escape = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  const html = `
+    <div style="font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;max-width:560px;margin:0 auto;padding:24px;">
+      <p style="font-family:ui-monospace,monospace;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b7280;margin:0 0 8px;">riccardoricciardi.com / contact</p>
+      <h1 style="font-size:20px;font-weight:600;letter-spacing:-0.01em;margin:0 0 16px;">New message from ${escape(params.name)}</h1>
+      <p style="margin:0 0 4px;color:#6b7280;font-size:12px;">Reply to:</p>
+      <p style="margin:0 0 20px;"><a href="mailto:${escape(params.email)}">${escape(params.email)}</a></p>
+      <div style="border-top:1px dashed #d1d5db;padding-top:16px;white-space:pre-wrap;line-height:1.6;">${escape(params.message)}</div>
+      <p style="margin:24px 0 0;font-size:11px;color:#9ca3af;">Locale: ${params.locale}</p>
+    </div>
+  `.trim();
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: [to],
+      subject,
+      html,
+      reply_to: params.email,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Resend ${res.status}: ${text.slice(0, 200)}`);
   }
 }

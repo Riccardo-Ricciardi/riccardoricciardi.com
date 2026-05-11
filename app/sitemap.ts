@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { APP_CONFIG } from "@/utils/config/app";
 
-const ROUTES = ["", "about", "contact"] as const;
+const ROUTES = ["", "about", "work", "uses", "contact"] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = APP_CONFIG.siteUrl;

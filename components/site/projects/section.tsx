@@ -1,16 +1,23 @@
 import { getProjects } from "@/utils/projects/fetch";
 import type { SupportedLanguage } from "@/utils/config/app";
 import { SectionHeading } from "@/components/site/atoms/section-heading";
-import { ProjectCard } from "@/components/site/projects/project-card";
+import { ProjectsBoard } from "@/components/site/projects/projects-board";
 
 interface ProjectsProps {
   heading: string;
   eyebrow?: string;
   subtitle?: string;
   locale: SupportedLanguage;
+  allLabel: string;
 }
 
-export async function Projects({ heading, eyebrow, subtitle, locale }: ProjectsProps) {
+export async function Projects({
+  heading,
+  eyebrow,
+  subtitle,
+  locale,
+  allLabel,
+}: ProjectsProps) {
   const projects = await getProjects(locale);
 
   if (projects.length === 0) return null;
@@ -29,13 +36,7 @@ export async function Projects({ heading, eyebrow, subtitle, locale }: ProjectsP
         className="mb-10 md:mb-14"
       />
 
-      <ul className="grid list-none items-start gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project, i) => (
-          <li key={project.id}>
-            <ProjectCard project={project} priority={i < 3} />
-          </li>
-        ))}
-      </ul>
+      <ProjectsBoard projects={projects} allLabel={allLabel} />
     </section>
   );
 }

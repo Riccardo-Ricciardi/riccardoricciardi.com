@@ -11,6 +11,7 @@ export type Skill = {
   dark: boolean;
   icon_url: string | null;
   icon_dark_url: string | null;
+  category: string | null;
 };
 
 export const getSkills = cache(async (): Promise<Skill[]> => {
@@ -19,7 +20,7 @@ export const getSkills = cache(async (): Promise<Skill[]> => {
   const supabase = createStaticClient();
   const { data, error } = await supabase
     .from("skills")
-    .select("id, name, position, percentage, dark, icon_url, icon_dark_url")
+    .select("id, name, position, percentage, dark, icon_url, icon_dark_url, category")
     .order("position", { ascending: true });
 
   if (error) {

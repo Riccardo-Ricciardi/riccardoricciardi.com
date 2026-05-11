@@ -9,11 +9,13 @@ import {
   Home,
   Image as ImageIcon,
   Inbox,
+  Landmark,
   Languages,
   Menu,
   Paintbrush,
   Sparkles,
   User,
+  Wrench,
 } from "lucide-react";
 
 export type AdminNavItem = {
@@ -40,6 +42,8 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     items: [
       { href: "/admin/skills", label: "Skills", icon: Sparkles },
       { href: "/admin/projects", label: "Projects", icon: Briefcase },
+      { href: "/admin/work", label: "Work timeline", icon: Landmark },
+      { href: "/admin/uses", label: "Uses", icon: Wrench },
     ],
   },
   {

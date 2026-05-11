@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Contact } from "@/components/site/contact/section";
 import { ContactForm } from "@/components/site/contact/contact-form";
+import { CalEmbed } from "@/components/site/contact/cal-embed";
 import {
   APP_CONFIG,
   isSupportedLanguage,
@@ -47,6 +48,7 @@ export default async function ContactPage({ params }: PageProps) {
 
   const isIt = locale === "it";
   const blocks = await getContentBlocks(locale as SupportedLanguage);
+  const calUsername = process.env.NEXT_PUBLIC_CAL_USERNAME?.trim() || null;
 
   const heading = content(blocks, "contact_heading", isIt ? "Parliamone" : "Let's talk");
   const eyebrow = content(blocks, "contact_eyebrow", "/contact");
@@ -104,12 +106,32 @@ export default async function ContactPage({ params }: PageProps) {
       />
       <section
         aria-labelledby="contact-form-heading"
-        className="container-page section-divider-b pb-20 md:pb-28"
+        className="container-page pb-12 md:pb-16"
       >
         <div className="mx-auto max-w-2xl">
           <ContactForm locale={locale} labels={formLabels} />
         </div>
       </section>
+
+      {calUsername && (
+        <section
+          aria-label={isIt ? "Prenota una chiamata" : "Book a call"}
+          className="container-page section-divider-b pb-20 md:pb-28"
+        >
+          <div className="mx-auto max-w-3xl">
+            <CalEmbed
+              username={calUsername}
+              heading={isIt ? "Prenota una chiamata" : "Book a call"}
+              description={
+                isIt
+                  ? "Trenta minuti, video call, gratuiti. Scegli uno slot qui sotto."
+                  : "Thirty minutes, video call, free. Pick a slot below."
+              }
+              ctaLabel={isIt ? "Apri Cal.com" : "Open on Cal.com"}
+            />
+          </div>
+        </section>
+      )}
     </>
   );
 }

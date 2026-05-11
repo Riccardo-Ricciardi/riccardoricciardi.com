@@ -100,7 +100,11 @@ export default async function Page({ params }: PageProps) {
         locale={locale}
       />
       <Suspense fallback={<GlobalLoader />}>
-        <Skills heading={skillsHeading} eyebrow={skillsEyebrow} />
+        <Skills
+          heading={skillsHeading}
+          eyebrow={skillsEyebrow}
+          allLabel={isIt ? "Tutto" : "All"}
+        />
       </Suspense>
       <Suspense fallback={<GlobalLoader />}>
         <Projects
@@ -108,6 +112,7 @@ export default async function Page({ params }: PageProps) {
           eyebrow={projectsEyebrow}
           subtitle={projectsSubtitle}
           locale={locale as SupportedLanguage}
+          allLabel={isIt ? "Tutti" : "All"}
         />
       </Suspense>
     </>
