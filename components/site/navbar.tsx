@@ -2,8 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { LanguagePicker } from "@/components/language-picker";
 import { ThemePicker } from "@/components/theme-picker";
-import { NavbarMobile } from "@/components/navbar-mobile";
-import { ScrolledHeader } from "@/components/scrolled-header";
+import { NavbarMobile } from "@/components/site/navbar-mobile";
+import { ScrolledHeader } from "@/components/site/scrolled-header";
 import type { Dictionary } from "@/utils/i18n/types";
 import type { SupportedLanguage } from "@/utils/config/app";
 
@@ -47,24 +47,28 @@ export function Navbar({ locale, dictionary, ariaLabels }: NavbarProps) {
           />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-2 text-card-foreground">
-          <ul className="flex items-center gap-2">
+        <nav className="hidden md:flex items-center gap-1 text-card-foreground">
+          <ul className="flex items-center gap-0.5">
             {items.map(({ slug, label }) => (
               <li key={slug || "home"}>
                 <Link
                   href={slug ? `/${locale}/${slug}` : `/${locale}`}
-                  className="whitespace-nowrap rounded px-2 py-1 transition-colors hover:text-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="relative inline-block whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {label}
                 </Link>
               </li>
             ))}
           </ul>
+          <span
+            aria-hidden="true"
+            className="mx-2 h-4 w-px bg-border"
+          />
           <ThemePicker labels={dictionary.theme} ariaLabel={ariaLabels.theme} />
           <LanguagePicker locale={locale} ariaLabel={ariaLabels.language} />
         </nav>
 
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-1 md:hidden">
           <ThemePicker labels={dictionary.theme} ariaLabel={ariaLabels.theme} />
           <LanguagePicker locale={locale} ariaLabel={ariaLabels.language} />
           <NavbarMobile

@@ -1,12 +1,13 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { Hero } from "@/components/hero";
-import { Skills } from "@/components/skills";
-import { Projects } from "@/components/projects";
+import { Hero } from "@/components/site/hero";
+import { Skills } from "@/components/site/skills/section";
+import { Projects } from "@/components/site/projects/section";
 import { GlobalLoader } from "@/components/global-loader";
 import { isSupportedLanguage, type SupportedLanguage } from "@/utils/config/app";
 import { APP_CONFIG } from "@/utils/config/app";
 import { content, getContentBlocks } from "@/utils/content/fetch";
+import { getSiteIdentity } from "@/utils/identity/fetch";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
@@ -20,7 +21,10 @@ export default async function Page({ params }: PageProps) {
   if (!isSupportedLanguage(locale)) notFound();
 
   const isIt = locale === "it";
-  const blocks = await getContentBlocks(locale as SupportedLanguage);
+  const [blocks, identity] = await Promise.all([
+    getContentBlocks(locale as SupportedLanguage),
+    getSiteIdentity(),
+  ]);
 
   const heroEyebrow = content(
     blocks,
@@ -56,10 +60,20 @@ export default async function Page({ params }: PageProps) {
     "skills_heading",
     isIt ? "Le mie competenze" : "My skills"
   );
+  const skillsEyebrow = content(
+    blocks,
+    "skills_eyebrow",
+    isIt ? "Stack" : "Stack"
+  );
   const projectsHeading = content(
     blocks,
     "projects_heading",
     isIt ? "I miei progetti" : "My projects"
+  );
+  const projectsEyebrow = content(
+    blocks,
+    "projects_eyebrow",
+    isIt ? "Lavori recenti" : "Recent work"
   );
   const projectsSubtitle = content(
     blocks,
@@ -75,16 +89,23 @@ export default async function Page({ params }: PageProps) {
         eyebrow={heroEyebrow}
         title={heroTitle}
         subtitle={heroSubtitle}
-        primaryCta={{ label: heroPrimary, href: "#projects" }}
-        secondaryCta={{ label: heroSecondary, href: "#skills" }}
+        primaryCta={{
+          label: heroPrimary,
+          href: identity.primary_cta_href,
+        }}
+        secondaryCta={{
+          label: heroSecondary,
+          href: identity.secondary_cta_href,
+        }}
         locale={locale}
       />
       <Suspense fallback={<GlobalLoader />}>
-        <Skills heading={skillsHeading} />
+        <Skills heading={skillsHeading} eyebrow={skillsEyebrow} />
       </Suspense>
       <Suspense fallback={<GlobalLoader />}>
         <Projects
           heading={projectsHeading}
+          eyebrow={projectsEyebrow}
           subtitle={projectsSubtitle}
           locale={locale as SupportedLanguage}
         />

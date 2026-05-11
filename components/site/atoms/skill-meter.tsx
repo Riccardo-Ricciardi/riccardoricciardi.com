@@ -17,7 +17,7 @@ export function SkillMeter({ value, label, segments = 4 }: SkillMeterProps) {
       aria-valuenow={Math.round(clamped)}
       aria-valuemin={0}
       aria-valuemax={100}
-      className="flex w-full gap-[3px] rounded-full overflow-hidden"
+      className="flex w-full gap-[3px] overflow-hidden rounded-full"
     >
       {Array.from({ length: segments }).map((_, i) => {
         const overlay =
@@ -34,10 +34,10 @@ export function SkillMeter({ value, label, segments = 4 }: SkillMeterProps) {
               isFull
                 ? { backgroundColor: "var(--accent-blue)" }
                 : isPartial
-                ? {
-                    backgroundImage: `linear-gradient(to right, var(--accent-blue) ${overlay}%, var(--color-muted) ${overlay}%)`,
-                  }
-                : undefined
+                  ? {
+                      backgroundImage: `linear-gradient(to right, var(--accent-blue) ${overlay}%, var(--color-muted) ${overlay}%)`,
+                    }
+                  : undefined
             }
           />
         );

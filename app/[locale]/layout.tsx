@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
+import { Navbar } from "@/components/site/navbar";
+import { Footer } from "@/components/site/footer";
 import { SkipLink } from "@/components/skip-link";
 import { JsonLd } from "@/components/json-ld";
 import { HtmlLangUpdater } from "@/components/html-lang-updater";

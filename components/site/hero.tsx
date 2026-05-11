@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { MouseParticles } from "@/components/mouse-particles";
 
 interface HeroProps {
@@ -32,18 +32,25 @@ export function Hero({
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10"
+        className="pointer-events-none absolute inset-0 -z-10 hidden md:block"
       >
         <MouseParticles count={55} linkDistance={110} repelRadius={130} />
       </div>
 
-      <div className="container-page py-20 md:py-28 lg:py-36">
+      <div className="container-page py-24 md:py-32 lg:py-40">
         <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
           {eyebrow && (
             <Link
               href={`/${locale}`}
-              className="group mb-6 inline-flex items-center gap-2 rounded-full border border-dashed border-dashed-soft bg-background/80 px-3 py-1 text-xs font-medium text-foreground/80 backdrop-blur transition-colors hover:border-accent-blue hover:text-foreground"
+              className="group mb-7 inline-flex items-center gap-2 rounded-full border border-dashed border-dashed-soft bg-background/80 px-3 py-1 text-xs font-medium text-foreground/80 backdrop-blur transition-colors hover:border-accent-blue hover:text-foreground"
             >
+              <span
+                aria-hidden="true"
+                className="relative inline-flex h-1.5 w-1.5"
+              >
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              </span>
               <Sparkles
                 className="h-3 w-3 text-accent-blue"
                 aria-hidden="true"
@@ -55,13 +62,13 @@ export function Hero({
               />
             </Link>
           )}
-          <h1 className="text-balance text-5xl font-semibold tracking-tight leading-[1.05] md:text-6xl lg:text-7xl">
+          <h1 className="text-balance text-[clamp(2.75rem,8vw,5.5rem)] font-semibold tracking-[-0.03em] leading-[0.98]">
             {title}
           </h1>
           <p className="mt-6 max-w-2xl text-balance text-lg text-muted-foreground md:text-xl">
             {subtitle}
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
             <Button
               asChild
               size="lg"

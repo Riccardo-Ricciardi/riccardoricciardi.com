@@ -1,14 +1,16 @@
 import { getProjects } from "@/utils/projects/fetch";
-import { ProjectCard } from "@/components/project-card";
 import type { SupportedLanguage } from "@/utils/config/app";
+import { SectionHeading } from "@/components/site/atoms/section-heading";
+import { ProjectCard } from "@/components/site/projects/project-card";
 
 interface ProjectsProps {
   heading: string;
+  eyebrow?: string;
   subtitle?: string;
   locale: SupportedLanguage;
 }
 
-export async function Projects({ heading, subtitle, locale }: ProjectsProps) {
+export async function Projects({ heading, eyebrow, subtitle, locale }: ProjectsProps) {
   const projects = await getProjects(locale);
 
   if (projects.length === 0) return null;
@@ -19,19 +21,13 @@ export async function Projects({ heading, subtitle, locale }: ProjectsProps) {
       aria-labelledby="projects-heading"
       className="container-page section-divider-b py-16 md:py-24 lg:py-28"
     >
-      <header className="mb-10 md:mb-14 max-w-2xl">
-        <h2
-          id="projects-heading"
-          className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground"
-        >
-          {heading}
-        </h2>
-        {subtitle && (
-          <p className="mt-3 text-base text-muted-foreground md:text-lg">
-            {subtitle}
-          </p>
-        )}
-      </header>
+      <SectionHeading
+        eyebrow={eyebrow}
+        title={heading}
+        subtitle={subtitle}
+        id="projects-heading"
+        className="mb-10 md:mb-14"
+      />
 
       <ul className="grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project, i) => (
