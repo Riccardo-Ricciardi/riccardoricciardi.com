@@ -86,20 +86,17 @@ export function SkillsBoard({ skills, allLabel: _allLabel, locale = "it" }: Skil
           <section key={tier.id} aria-labelledby={`skills-tier-${tier.id}`}>
             <header className="mb-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
               <div className="flex items-baseline gap-3">
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                <span className="text-eyebrow tabular-nums">
                   {String(TIERS.indexOf(tier) + 1).padStart(2, "0")}
                 </span>
-                <h3
-                  id={`skills-tier-${tier.id}`}
-                  className="text-xl font-semibold tracking-tight md:text-2xl"
-                >
+                <h3 id={`skills-tier-${tier.id}`} className="text-h3">
                   {tier.label[lang]}
                 </h3>
-                <span className="font-mono text-xs tabular-nums text-muted-foreground">
+                <span className="text-eyebrow tabular-nums">
                   {items.length}
                 </span>
               </div>
-              <p className="max-w-md text-sm text-muted-foreground">
+              <p className="text-body-sm max-w-md text-muted-foreground">
                 {tier.caption[lang]}
               </p>
             </header>

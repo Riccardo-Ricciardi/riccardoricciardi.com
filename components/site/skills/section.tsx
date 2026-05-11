@@ -17,7 +17,7 @@ export async function Skills({ heading, eyebrow, subtitle, allLabel, locale }: S
     <section
       id="skills"
       aria-labelledby="skills-heading"
-      className="container-page section-divider-b py-16 md:py-24 lg:py-28"
+      className="container-page section-divider-b section-y"
     >
       <SectionHeading
         eyebrow={eyebrow}
