@@ -53,11 +53,11 @@ export interface BookingLabels {
   submitting: string;
   cancel: string;
   successTitle: string;
-  successBody: (whenLabel: string) => string;
+  successBodyTemplate: string;
   errorTitle: string;
   prevMonth: string;
   nextMonth: string;
-  duration: (mins: number) => string;
+  durationUnit: string;
   timezoneLabel: string;
 }
 
@@ -323,7 +323,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
                 : labels.pickDay}
             </p>
             <span className="font-mono text-[10px] text-muted-foreground">
-              {labels.duration(eventLength)}
+              {eventLength} {labels.durationUnit}
             </span>
           </div>
 
@@ -635,7 +635,7 @@ function SuccessCard({
             {labels.successTitle}
           </h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            {labels.successBody(whenLabel)}
+            {labels.successBodyTemplate.replace("{when}", whenLabel)}
           </p>
         </div>
         {meetingUrl && (

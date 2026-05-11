@@ -71,12 +71,12 @@ function bookingLabels(locale: string): BookingLabels {
         submitting: "Prenoto…",
         cancel: "Annulla",
         successTitle: "Prenotazione confermata",
-        successBody: (when) =>
-          `Ti aspetto ${when}. Riceverai un'email di conferma a breve.`,
+        successBodyTemplate:
+          "Ti aspetto {when}. Riceverai un'email di conferma a breve.",
         errorTitle: "Qualcosa è andato storto, riprova.",
         prevMonth: "Mese precedente",
         nextMonth: "Mese successivo",
-        duration: (m) => `${m} min`,
+        durationUnit: "min",
         timezoneLabel: "Fuso",
       }
     : {
@@ -100,12 +100,12 @@ function bookingLabels(locale: string): BookingLabels {
         submitting: "Booking…",
         cancel: "Cancel",
         successTitle: "Booking confirmed",
-        successBody: (when) =>
-          `See you ${when}. A confirmation email is on its way.`,
+        successBodyTemplate:
+          "See you {when}. A confirmation email is on its way.",
         errorTitle: "Something went wrong, please try again.",
         prevMonth: "Previous month",
         nextMonth: "Next month",
-        duration: (m) => `${m} min`,
+        durationUnit: "min",
         timezoneLabel: "TZ",
       };
 }
