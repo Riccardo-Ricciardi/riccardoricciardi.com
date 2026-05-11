@@ -1,5 +1,9 @@
+"use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
 import { Calendar, ArrowUpRight } from "lucide-react";
+import { useTheme } from "next-themes";
 
 interface CalEmbedProps {
   username: string;
@@ -7,6 +11,14 @@ interface CalEmbedProps {
   heading: string;
   description: string;
   ctaLabel: string;
+}
+
+declare global {
+  interface Window {
+    Cal?: ((...args: unknown[]) => void) & {
+      ns?: Record<string, (...args: unknown[]) => void>;
+    };
+  }
 }
 
 export function CalEmbed({
@@ -17,10 +29,68 @@ export function CalEmbed({
   ctaLabel,
 }: CalEmbedProps) {
   const base = `https://cal.com/${username}/${eventSlug}`;
-  const embedUrl = `${base}?embed=true&theme=auto&layout=month_view`;
+  const calLink = `${username}/${eventSlug}`;
+  const namespace = eventSlug.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const elementId = `cal-inline-${namespace}`;
+  const { resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const init = () => {
+      const C = window as typeof window & {
+        Cal?: ((...args: unknown[]) => void) & {
+          ns?: Record<string, (...args: unknown[]) => void>;
+          loaded?: boolean;
+          q?: unknown[];
+        };
+      };
+      const A = "https://app.cal.com/embed/embed.js";
+
+      if (!C.Cal) {
+        type Stub = ((...args: unknown[]) => void) & {
+          ns?: Record<string, (...args: unknown[]) => void>;
+          loaded?: boolean;
+          q?: unknown[];
+        };
+        const stub: Stub = function (this: unknown, ...args: unknown[]) {
+          (stub.q = stub.q || []).push(args);
+        } as Stub;
+        stub.ns = {};
+        stub.q = [];
+        C.Cal = stub;
+
+        const script = document.createElement("script");
+        script.src = A;
+        document.head.appendChild(script);
+        stub.loaded = true;
+      }
+
+      const cal = C.Cal;
+      if (!cal) return;
+
+      cal("init", namespace, { origin: "https://cal.com" });
+
+      const ns = cal.ns?.[namespace];
+      if (ns) {
+        ns("inline", {
+          elementOrSelector: `#${elementId}`,
+          calLink,
+          layout: "month_view",
+        });
+        ns("ui", {
+          theme: resolvedTheme === "dark" ? "dark" : "light",
+          hideEventTypeDetails: false,
+          layout: "month_view",
+        });
+      }
+    };
+
+    init();
+  }, [calLink, namespace, elementId, resolvedTheme]);
 
   return (
-    <div className="rounded-2xl border border-dashed border-dashed-soft bg-card overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-dashed border-dashed-soft bg-card">
       <header className="flex flex-col gap-3 p-6 md:flex-row md:items-center md:justify-between md:p-8">
         <div className="flex items-start gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-dashed border-dashed-soft text-accent-blue">
@@ -43,15 +113,10 @@ export function CalEmbed({
           <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </header>
-      <div className="aspect-[4/5] w-full border-t border-dashed border-dashed-soft sm:aspect-[5/4] md:aspect-[16/10]">
-        <iframe
-          src={embedUrl}
-          title={heading}
-          loading="lazy"
-          className="h-full w-full"
-          allow="payment"
-        />
-      </div>
+      <div
+        id={elementId}
+        className="min-h-[640px] w-full border-t border-dashed border-dashed-soft"
+      />
     </div>
   );
 }
