@@ -60,6 +60,8 @@ function bookingLabels(locale: string): BookingLabels {
           "30 minuti in video, gratuiti. Scegli giorno e ora che ti vanno.",
         loading: "Carico gli slot…",
         noSlots: "Nessuno slot disponibile in questo giorno.",
+        noSlotsHint:
+          "Non vedi orari disponibili? Scrivimi direttamente qui sopra.",
         pickDay: "Scegli un giorno",
         pickSlot: "Scegli un orario",
         pickEventType: "Tipo di chiamata",
@@ -90,6 +92,8 @@ function bookingLabels(locale: string): BookingLabels {
         description: "30-minute video call, free. Pick the day and time that works.",
         loading: "Loading slots…",
         noSlots: "No slots available on this day.",
+        noSlotsHint:
+          "Don't see a time that works? Send me a message above instead.",
         pickDay: "Pick a day",
         pickSlot: "Pick a time",
         pickEventType: "Call type",

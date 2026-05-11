@@ -38,6 +38,7 @@ export interface BookingLabels {
   description: string;
   loading: string;
   noSlots: string;
+  noSlotsHint?: string;
   pickDay: string;
   pickSlot: string;
   pickEventType: string;
@@ -389,17 +390,27 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
               {labels.errorTitle}
             </p>
           ) : !hasAnySlots ? (
-            <p className="rounded-md border border-dashed-soft bg-background/40 px-3 py-6 text-center text-sm text-muted-foreground">
-              {labels.noSlots}
-            </p>
+            <div className="rounded-md border border-dashed-soft bg-background/40 px-3 py-6 text-center text-sm text-muted-foreground">
+              <p>{labels.noSlots}</p>
+              {labels.noSlotsHint && (
+                <p className="text-caption mt-2 text-foreground/80">
+                  {labels.noSlotsHint}
+                </p>
+              )}
+            </div>
           ) : !selectedDate ? (
             <p className="rounded-md border border-dashed-soft bg-background/40 px-3 py-6 text-center text-sm text-muted-foreground">
               {labels.pickDay}
             </p>
           ) : slotsForSelected.length === 0 ? (
-            <p className="rounded-md border border-dashed-soft bg-background/40 px-3 py-6 text-center text-sm text-muted-foreground">
-              {labels.noSlots}
-            </p>
+            <div className="rounded-md border border-dashed-soft bg-background/40 px-3 py-6 text-center text-sm text-muted-foreground">
+              <p>{labels.noSlots}</p>
+              {labels.noSlotsHint && (
+                <p className="text-caption mt-2 text-foreground/80">
+                  {labels.noSlotsHint}
+                </p>
+              )}
+            </div>
           ) : (
             <ul className="grid list-none grid-cols-2 gap-2 p-0 sm:grid-cols-3">
               {slotsForSelected.map((slot) => {
