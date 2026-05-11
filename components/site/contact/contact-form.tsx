@@ -57,7 +57,7 @@ export function ContactForm({ locale, labels }: ContactFormProps) {
   }, [state, labels.successTitle, labels.successBody]);
 
   return (
-    <div className="card-base card-pad-lg rounded-surface shadow-sm">
+    <div className="card-base card-pad-lg rounded-surface">
       {(labels.title || labels.description) && (
         <header className="mb-6">
           {labels.title && (

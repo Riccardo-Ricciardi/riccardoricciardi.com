@@ -277,7 +277,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
                     className={cn(
                       "inline-flex items-center rounded-full border px-3 py-1.5 font-mono text-xs font-medium tabular-nums transition-all",
                       active
-                        ? "border-accent-blue bg-accent-blue text-white shadow-sm"
+                        ? "border-accent-blue bg-accent-blue text-white"
                         : "border-dashed-soft bg-background text-foreground hover:border-accent-blue hover:text-accent-blue"
                     )}
                   >
@@ -351,7 +351,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
                     disabled
                       ? "cursor-not-allowed text-muted-foreground/30"
                       : isSelected
-                        ? "bg-accent-blue text-white shadow-sm"
+                        ? "bg-accent-blue text-white"
                         : "border border-dashed-soft hover:border-accent-blue hover:text-accent-blue"
                   )}
                 >
@@ -536,7 +536,7 @@ function ConfirmDialog({
         if (e.target === e.currentTarget) onCancel();
       }}
     >
-      <div className="w-full max-w-md card-base card-flush rounded-surface overflow-hidden shadow-xl">
+      <div className="w-full max-w-md card-base card-flush rounded-surface overflow-hidden">
         <header className="border-b border-dashed-soft p-5">
           <p className="text-eyebrow">
             {labels.confirmTitle}
@@ -663,7 +663,7 @@ function SubmitBtn({
       type="submit"
       disabled={pending}
       aria-busy={pending}
-      className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-accent-blue px-4 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--accent-blue-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft disabled:cursor-not-allowed disabled:opacity-60"
+      className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-accent-blue px-4 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-blue-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft disabled:cursor-not-allowed disabled:opacity-60"
     >
       {pending ? (
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />

@@ -512,7 +512,6 @@
   .btn-primary {
     background: var(--accent);
     color: #fff;
-    box-shadow: 0 1px 2px color-mix(in oklab, var(--accent) 30%, transparent);
   }
   .btn-primary:hover {
     background: var(--accent-hover);
@@ -542,8 +541,7 @@
     border: 1px solid var(--border-dashed);
     border-radius: var(--radius-card);
     padding: var(--card-padding);
-    transition: border-color 160ms ease, transform 160ms ease,
-      box-shadow 160ms ease;
+    transition: border-color 150ms ease, transform 150ms ease;
   }
   .card-flush {
     padding: 0;
@@ -553,9 +551,7 @@
   }
   .card-interactive:hover {
     border-color: var(--accent);
-    transform: translateY(-2px);
-    box-shadow: 0 0 0 1px var(--accent-soft),
-      0 4px 12px color-mix(in oklab, var(--accent) 6%, transparent);
+    transform: translateY(-1px);
   }
   .card-pad-lg {
     padding: var(--card-padding-lg);
@@ -731,7 +727,6 @@
   .admin-button-primary {
     background: var(--accent);
     color: #fff;
-    box-shadow: 0 1px 2px color-mix(in oklab, var(--accent) 30%, transparent);
   }
   .admin-button-primary:hover {
     background: var(--accent-hover);

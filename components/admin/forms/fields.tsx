@@ -173,7 +173,7 @@ export function SwitchField({
         aria-hidden="true"
         className="relative mt-0.5 inline-flex h-5 w-9 shrink-0 items-center rounded-full bg-muted transition-colors peer-checked:bg-accent-blue peer-focus-visible:ring-2 peer-focus-visible:ring-ring"
       >
-        <span className="ml-0.5 inline-block h-4 w-4 transform rounded-full bg-background shadow-sm transition-transform peer-checked:translate-x-4" />
+        <span className="ml-0.5 inline-block h-4 w-4 transform rounded-full bg-background transition-transform peer-checked:translate-x-4" />
       </span>
       <span className="min-w-0">
         <span className="block text-sm font-medium">{label}</span>

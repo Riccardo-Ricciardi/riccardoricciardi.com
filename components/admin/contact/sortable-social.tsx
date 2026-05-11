@@ -101,7 +101,7 @@ function SortableRow({
       style={style}
       className={cn(
         "grid grid-cols-[2.25rem_minmax(0,1fr)_2.25rem_3rem] items-center gap-2 px-3 py-3 sm:grid-cols-[2.25rem_8rem_minmax(0,1fr)_minmax(0,1.4fr)_2.25rem_3rem] sm:gap-3",
-        isDragging && "z-10 bg-accent/40 shadow-sm"
+        isDragging && "z-10 bg-accent/40"
       )}
     >
       <input type="hidden" name={`social[${row.id}][__row]`} value="1" />

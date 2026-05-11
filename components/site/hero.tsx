@@ -72,7 +72,7 @@ export function Hero({
             <Button
               asChild
               size="lg"
-              className="bg-accent-blue text-white shadow-sm hover:bg-[var(--accent-blue-hover)]"
+              className="bg-accent-blue text-white hover:bg-[var(--accent-blue-hover)]"
             >
               <Link href={primaryCta.href}>
                 {primaryCta.label}

@@ -104,7 +104,7 @@ function SortableRow({
       style={style}
       className={cn(
         "grid grid-cols-[2.25rem_4rem_minmax(0,1fr)_2.5rem_3rem] items-center gap-2 px-3 py-3 sm:grid-cols-[2.25rem_5.5rem_minmax(0,1fr)_4rem_3rem] sm:gap-3",
-        isDragging && "z-10 bg-accent/40 shadow-sm"
+        isDragging && "z-10 bg-accent/40"
       )}
     >
       <input type="hidden" name={`project[${row.id}][__row]`} value="1" />

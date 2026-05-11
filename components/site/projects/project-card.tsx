@@ -28,7 +28,7 @@ export function ProjectCard({ project, priority = false, labels }: ProjectCardPr
   );
 
   return (
-    <article className="group card-base card-flush flex flex-col overflow-hidden hover:-translate-y-0.5 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft),0_8px_24px_-12px_rgb(0_0_0_/_0.18)]">
+    <article className="group card-base card-flush flex flex-col overflow-hidden transition-all hover:-translate-y-0.5 hover:border-accent-blue">
       <a
         href={href}
         target="_blank"

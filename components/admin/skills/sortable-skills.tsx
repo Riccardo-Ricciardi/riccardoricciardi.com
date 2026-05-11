@@ -126,7 +126,7 @@ function SortableRow({
       style={style}
       className={cn(
         "grid grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_5rem_2rem] items-center gap-2 px-3 py-3 transition-colors sm:grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_7rem_5.5rem_3rem] sm:gap-3",
-        isDragging && "z-10 bg-accent/40 shadow-sm"
+        isDragging && "z-10 bg-accent/40"
       )}
     >
       <input type="hidden" name={`skill[${row.id}][__row]`} value="1" />

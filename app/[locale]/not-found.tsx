@@ -68,7 +68,7 @@ export default async function LocaleNotFound() {
           <Button
             asChild
             size="lg"
-            className="mt-8 bg-accent-blue text-white shadow-sm hover:bg-[var(--accent-blue-hover)]"
+            className="mt-8 bg-accent-blue text-white hover:bg-[var(--accent-blue-hover)]"
           >
             <Link href={`/${locale}`}>
               <ArrowLeft className="mr-1 h-4 w-4" aria-hidden="true" />

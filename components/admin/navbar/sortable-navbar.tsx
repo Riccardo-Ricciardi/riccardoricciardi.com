@@ -121,7 +121,7 @@ function SortableRow({
       style={style}
       className={cn(
         "admin-card flex items-start gap-3 p-3",
-        isDragging && "z-10 shadow-md"
+        isDragging && "z-10"
       )}
     >
       <button
