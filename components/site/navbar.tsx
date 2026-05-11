@@ -1,8 +1,9 @@
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { LanguagePicker } from "@/components/language-picker";
 import { ThemePicker } from "@/components/theme-picker";
 import { NavbarMobile } from "@/components/site/navbar-mobile";
+import { NavLinks } from "@/components/site/nav-links";
 import { ScrolledHeader } from "@/components/site/scrolled-header";
 import type { Dictionary } from "@/utils/i18n/types";
 import type { SupportedLanguage } from "@/utils/config/app";
@@ -23,10 +24,11 @@ interface NavbarProps {
   };
 }
 
-const NAV_WHITELIST = ["", "work", "contact"] as const;
+const NAV_WHITELIST = ["", "about", "work", "contact"] as const;
 const NAV_FALLBACK_LABELS: Record<string, { it: string; en: string }> = {
   "": { it: "Home", en: "Home" },
-  work: { it: "Progetti", en: "Projects" },
+  about: { it: "Chi sono", en: "About me" },
+  work: { it: "Lavori", en: "Work" },
   contact: { it: "Contatti", en: "Contact" },
 };
 
@@ -72,18 +74,7 @@ export function Navbar({ locale, dictionary, ariaLabels }: NavbarProps) {
         </Link>
 
         <nav className="hidden md:flex items-center gap-1 text-card-foreground">
-          <ul className="flex items-center gap-0.5">
-            {items.map(({ slug, label }) => (
-              <li key={slug || "home"}>
-                <Link
-                  href={slug ? `/${locale}/${slug}` : `/${locale}`}
-                  className="relative inline-block whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  {label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <NavLinks items={items} locale={locale} />
           <span
             aria-hidden="true"
             className="mx-2 h-4 w-px bg-border"

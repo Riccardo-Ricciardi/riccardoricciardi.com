@@ -1,9 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import type { NavbarItem } from "@/utils/i18n/types";
+
+function isActive(pathname: string, locale: string, slug: string): boolean {
+  if (!slug) {
+    return pathname === `/${locale}` || pathname === `/${locale}/`;
+  }
+  const target = `/${locale}/${slug}`;
+  return pathname === target || pathname.startsWith(`${target}/`);
+}
 
 interface NavbarMobileProps {
   items: NavbarItem[];
@@ -13,6 +22,7 @@ interface NavbarMobileProps {
 
 export function NavbarMobile({ items, locale, ariaLabel }: NavbarMobileProps) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!open) return;
@@ -62,20 +72,29 @@ export function NavbarMobile({ items, locale, ariaLabel }: NavbarMobileProps) {
           </div>
           <nav className="flex flex-1 flex-col px-4 py-6">
             <ul className="flex list-none flex-col gap-1 p-0">
-              {items.map(({ slug, label }, i) => (
-                <li key={slug || "home"}>
-                  <Link
-                    href={slug ? `/${locale}/${slug}` : `/${locale}`}
-                    onClick={() => setOpen(false)}
-                    className="group flex items-baseline justify-between rounded-md px-3 py-4 text-2xl font-semibold tracking-tight transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    <span>{label}</span>
-                    <span className="font-mono text-[11px] text-muted-foreground">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                  </Link>
-                </li>
-              ))}
+              {items.map(({ slug, label }, i) => {
+                const active = isActive(pathname, locale, slug);
+                return (
+                  <li key={slug || "home"}>
+                    <Link
+                      href={slug ? `/${locale}/${slug}` : `/${locale}`}
+                      onClick={() => setOpen(false)}
+                      aria-current={active ? "page" : undefined}
+                      className={
+                        "group flex items-baseline justify-between rounded-md px-3 py-4 text-2xl font-semibold tracking-tight transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring " +
+                        (active
+                          ? "text-accent-blue"
+                          : "text-foreground")
+                      }
+                    >
+                      <span>{label}</span>
+                      <span className="font-mono text-[11px] text-muted-foreground">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         </div>
