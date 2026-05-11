@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowRight, Clock4 } from "lucide-react";
 import { SectionHeading } from "@/components/site/atoms/section-heading";
 import { WorkTimeline } from "@/components/site/work/timeline";
 import { getWorkExperience } from "@/utils/work/fetch";
@@ -65,10 +67,22 @@ export default async function WorkPage({ params }: PageProps) {
   );
   const currentLabel = content(blocks, "work_current_label", "current");
   const presentLabel = content(blocks, "work_present_label", "present");
-  const emptyLabel = content(
+  const emptyTitle = content(
     blocks,
-    "common_empty_work",
-    "Still filling in the timeline."
+    "work_empty_title",
+    locale === "it" ? "Presto qui." : "Soon here."
+  );
+  const emptyBody = content(
+    blocks,
+    "work_empty_body",
+    locale === "it"
+      ? "Sto preparando una timeline curata delle esperienze più rilevanti. Nel frattempo, se vuoi parlarne con me, scrivimi."
+      : "I'm putting together a curated timeline of the most relevant roles. In the meantime, drop me a line if you want to talk."
+  );
+  const emptyCta = content(
+    blocks,
+    "work_empty_cta",
+    locale === "it" ? "Parliamone" : "Get in touch"
   );
 
   return (
@@ -85,7 +99,24 @@ export default async function WorkPage({ params }: PageProps) {
       />
 
       {items.length === 0 ? (
-        <p className="text-body-lg text-muted-foreground">{emptyLabel}</p>
+        <div className="card-base card-pad-lg mx-auto flex max-w-2xl flex-col items-center gap-4 text-center">
+          <span className="grid h-12 w-12 place-items-center rounded-pill border border-dashed-soft bg-background/60 text-accent-blue">
+            <Clock4 className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <div>
+            <h3 className="text-h3">{emptyTitle}</h3>
+            <p className="text-body-sm mt-2 max-w-prose text-muted-foreground">
+              {emptyBody}
+            </p>
+          </div>
+          <Link
+            href={`/${locale}/contact`}
+            className="btn-base btn-primary"
+          >
+            {emptyCta}
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </div>
       ) : (
         <div className="mx-auto max-w-3xl">
           <WorkTimeline
