@@ -45,7 +45,7 @@ export function WorkTimeline({
 
           <header className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <div className="min-w-0">
-              <h3 className="text-lg font-semibold tracking-tight md:text-xl">
+              <h3 className="text-h4">
                 {item.role}
                 <span className="text-muted-foreground"> · </span>
                 {item.url ? (
@@ -63,12 +63,10 @@ export function WorkTimeline({
                 )}
               </h3>
               {item.location && (
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {item.location}
-                </p>
+                <p className="text-caption mt-0.5">{item.location}</p>
               )}
             </div>
-            <p className="font-mono text-[11px] tabular-nums text-muted-foreground">
+            <p className="text-caption font-mono tabular-nums text-muted-foreground">
               {formatMonth(item.started_at, locale)}
               {" — "}
               {item.is_current
@@ -80,13 +78,13 @@ export function WorkTimeline({
           </header>
 
           {item.summary && (
-            <p className="mt-3 text-sm leading-relaxed text-foreground/85 md:text-base">
+            <p className="text-body-sm mt-3 leading-relaxed text-foreground/85">
               {item.summary}
             </p>
           )}
 
           {item.bullets.length > 0 && (
-            <ul className="mt-3 list-none space-y-1.5 p-0 text-sm text-muted-foreground">
+            <ul className="text-body-sm mt-3 list-none space-y-1.5 p-0 text-muted-foreground">
               {item.bullets.map((b, i) => (
                 <li key={i} className="flex gap-2">
                   <span aria-hidden="true" className="mt-2 inline-block h-1 w-1 shrink-0 rounded-full bg-foreground/40" />
