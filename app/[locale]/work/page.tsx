@@ -75,7 +75,7 @@ export default async function WorkPage({ params }: PageProps) {
       />
 
       {items.length === 0 ? (
-        <p className="text-base text-muted-foreground">
+        <p className="text-body-lg text-muted-foreground">
           {isIt ? "Sto ancora compilando la timeline." : "Still filling in the timeline."}
         </p>
       ) : (

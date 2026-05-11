@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { Pill } from "@/components/site/atoms/pill";
 
 interface TechChipProps {
   children: React.ReactNode;
@@ -7,13 +7,8 @@ interface TechChipProps {
 
 export function TechChip({ children, className }: TechChipProps) {
   return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full border border-dashed-soft bg-background px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide text-muted-foreground",
-        className
-      )}
-    >
+    <Pill tone="mono" className={className}>
       {children}
-    </span>
+    </Pill>
   );
 }

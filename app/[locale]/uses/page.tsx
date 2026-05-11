@@ -75,7 +75,7 @@ export default async function UsesPage({ params }: PageProps) {
       />
 
       {items.length === 0 ? (
-        <p className="text-base text-muted-foreground">
+        <p className="text-body-lg text-muted-foreground">
           {isIt ? "Sto ancora preparando questa pagina." : "Still putting this together."}
         </p>
       ) : (

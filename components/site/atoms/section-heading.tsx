@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Eyebrow } from "@/components/site/atoms/eyebrow";
 
 interface SectionHeadingProps {
   eyebrow?: string;
@@ -25,21 +26,14 @@ export function SectionHeading({
         className
       )}
     >
-      {eyebrow && (
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-          {eyebrow}
-        </p>
-      )}
-      <h2
-        id={id}
-        className="text-balance text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.5rem] lg:leading-[1.1]"
-      >
+      {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+      <h2 id={id} className="text-h2 text-balance">
         {title}
       </h2>
       {subtitle && (
         <p
           className={cn(
-            "max-w-prose text-base text-muted-foreground md:text-lg",
+            "text-body-lg max-w-prose text-muted-foreground",
             align === "center" && "mx-auto"
           )}
         >

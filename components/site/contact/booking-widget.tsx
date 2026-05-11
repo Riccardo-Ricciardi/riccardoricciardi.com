@@ -251,7 +251,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
             </p>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-1.5 self-start font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground md:self-auto">
+        <div className="flex shrink-0 items-center gap-1.5 self-start text-eyebrow md:self-auto">
           <Globe className="h-3 w-3" aria-hidden="true" />
           <span>{labels.timezoneLabel}</span>
           <span className="text-foreground">{timezone}</span>
@@ -260,7 +260,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
 
       {eventTypes.length > 1 && (
         <div className="border-b border-dashed-soft px-6 py-4 md:px-8">
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="mb-2 text-eyebrow">
             {labels.pickEventType}
           </p>
           <ul className="flex flex-wrap gap-2">
@@ -322,7 +322,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
             {labels.weekdays.map((w) => (
               <div
                 key={w}
-                className="py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground"
+                className="text-eyebrow py-1"
               >
                 {w}
               </div>
@@ -369,7 +369,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
 
         <section aria-label={labels.pickSlot} className="flex flex-col gap-3">
           <div className="flex items-baseline justify-between gap-2">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            <p className="text-eyebrow">
               {selectedDate
                 ? selectedDate.toLocaleDateString(
                     locale === "it" ? "it-IT" : "en-US",
@@ -377,7 +377,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
                   )
                 : labels.pickDay}
             </p>
-            <span className="font-mono text-[10px] text-muted-foreground">
+            <span className="text-caption font-mono tabular-nums text-muted-foreground">
               {eventLength} {labels.durationUnit}
             </span>
           </div>
@@ -527,7 +527,7 @@ function ConfirmDialog({
     >
       <div className="w-full max-w-md card-base card-flush rounded-surface overflow-hidden shadow-xl">
         <header className="border-b border-dashed-soft p-5">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="text-eyebrow">
             {labels.confirmTitle}
           </p>
           <p className="mt-1.5 text-base font-medium tracking-tight">
@@ -566,7 +566,7 @@ function ConfirmDialog({
             autoComplete="email"
           />
           <label htmlFor="b-notes" className="flex flex-col gap-1.5">
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            <span className="text-eyebrow">
               {labels.notes}
             </span>
             <textarea
@@ -623,7 +623,7 @@ function Field({
 }) {
   return (
     <label htmlFor={id} className="flex flex-col gap-1.5">
-      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+      <span className="text-eyebrow">
         {label}
       </span>
       <input
