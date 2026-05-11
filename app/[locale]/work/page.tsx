@@ -90,43 +90,43 @@ export default async function WorkPage({ params }: PageProps) {
       aria-labelledby="work-heading"
       className="container-page section-divider-b section-y"
     >
-      <SectionHeading
-        eyebrow={eyebrow}
-        title={heading}
-        subtitle={subtitle}
-        id="work-heading"
-        className="mb-12 md:mb-16"
-      />
+      <div className="mx-auto max-w-3xl">
+        <SectionHeading
+          eyebrow={eyebrow}
+          title={heading}
+          subtitle={subtitle}
+          id="work-heading"
+          className="mb-12 md:mb-16"
+        />
 
-      {items.length === 0 ? (
-        <div className="card-base card-pad-lg mx-auto flex max-w-2xl flex-col items-center gap-4 text-center">
-          <span className="grid h-12 w-12 place-items-center rounded-pill border border-dashed-soft bg-background/60 text-accent-blue">
-            <Clock4 className="h-5 w-5" aria-hidden="true" />
-          </span>
-          <div>
-            <h3 className="text-h3">{emptyTitle}</h3>
-            <p className="text-body-sm mt-2 max-w-prose text-muted-foreground">
-              {emptyBody}
-            </p>
+        {items.length === 0 ? (
+          <div className="card-base card-pad-lg flex flex-col items-center gap-4 text-center">
+            <span className="grid h-12 w-12 place-items-center rounded-pill border border-dashed-soft bg-background/60 text-accent-blue">
+              <Clock4 className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <div>
+              <h3 className="text-h3">{emptyTitle}</h3>
+              <p className="text-body-sm mt-2 max-w-prose text-muted-foreground">
+                {emptyBody}
+              </p>
+            </div>
+            <Link
+              href={`/${locale}/contact`}
+              className="btn-base btn-primary"
+            >
+              {emptyCta}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
           </div>
-          <Link
-            href={`/${locale}/contact`}
-            className="btn-base btn-primary"
-          >
-            {emptyCta}
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
-        </div>
-      ) : (
-        <div className="mx-auto max-w-3xl">
+        ) : (
           <WorkTimeline
             items={items}
             locale={locale}
             currentLabel={currentLabel}
             presentLabel={presentLabel}
           />
-        </div>
-      )}
+        )}
+      </div>
     </section>
   );
 }
