@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Contact } from "@/components/site/contact/section";
+import { ContactForm } from "@/components/site/contact/contact-form";
 import {
   APP_CONFIG,
   isSupportedLanguage,
@@ -29,8 +30,8 @@ export async function generateMetadata({
   return {
     title,
     description: isIt
-      ? "Parliamone — email e canali social."
-      : "Let's talk — email and social channels.",
+      ? "Parliamone — email, social, o scrivimi direttamente."
+      : "Let's talk — email, socials, or write to me directly.",
     alternates: {
       canonical: `/${locale}/contact`,
       languages: Object.fromEntries(
@@ -53,8 +54,8 @@ export default async function ContactPage({ params }: PageProps) {
     blocks,
     "contact_subtitle",
     isIt
-      ? "Email è il modo più veloce. Sono anche sui social qui sotto."
-      : "Email is fastest. I'm also on the social channels below."
+      ? "Email è il modo più veloce, oppure scrivimi qui sotto."
+      : "Email is fastest, or write to me below."
   );
   const emailLabel = content(
     blocks,
@@ -62,13 +63,53 @@ export default async function ContactPage({ params }: PageProps) {
     isIt ? "Scrivimi" : "Email me"
   );
 
+  const formLabels = isIt
+    ? {
+        title: "Scrivimi un messaggio",
+        description: "Compila i campi qui sotto. Ti rispondo di solito entro 24 ore.",
+        name: "Nome",
+        email: "Email",
+        message: "Messaggio",
+        submit: "Invia messaggio",
+        sending: "Invio…",
+        successTitle: "Messaggio inviato",
+        successBody: "Ti risponderò appena possibile.",
+        namePlaceholder: "Come ti chiami?",
+        emailPlaceholder: "tua@email.com",
+        messagePlaceholder: "Raccontami il progetto o l'idea…",
+      }
+    : {
+        title: "Send me a message",
+        description: "Fill in the fields below. I usually reply within 24 hours.",
+        name: "Name",
+        email: "Email",
+        message: "Message",
+        submit: "Send message",
+        sending: "Sending…",
+        successTitle: "Message sent",
+        successBody: "I'll get back to you as soon as possible.",
+        namePlaceholder: "Your name",
+        emailPlaceholder: "you@email.com",
+        messagePlaceholder: "Tell me about your project or idea…",
+      };
+
   return (
-    <Contact
-      heading={heading}
-      eyebrow={eyebrow}
-      subtitle={subtitle}
-      emailLabel={emailLabel}
-      locale={locale}
-    />
+    <>
+      <Contact
+        heading={heading}
+        eyebrow={eyebrow}
+        subtitle={subtitle}
+        emailLabel={emailLabel}
+        locale={locale}
+      />
+      <section
+        aria-labelledby="contact-form-heading"
+        className="container-page section-divider-b pb-20 md:pb-28"
+      >
+        <div className="mx-auto max-w-2xl">
+          <ContactForm locale={locale} labels={formLabels} />
+        </div>
+      </section>
+    </>
   );
 }

@@ -8,6 +8,7 @@ import {
   Globe,
   Home,
   Image as ImageIcon,
+  Inbox,
   Languages,
   Menu,
   Paintbrush,
@@ -29,7 +30,10 @@ export type AdminNavGroup = {
 export const ADMIN_NAV: AdminNavGroup[] = [
   {
     label: "Overview",
-    items: [{ href: "/admin", label: "Dashboard", icon: Activity }],
+    items: [
+      { href: "/admin", label: "Dashboard", icon: Activity },
+      { href: "/admin/messages", label: "Messages", icon: Inbox },
+    ],
   },
   {
     label: "Catalog",

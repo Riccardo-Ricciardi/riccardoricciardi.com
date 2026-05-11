@@ -140,11 +140,14 @@
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 4rem;
+    overflow-x: clip;
   }
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans), system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: clip;
+    min-width: 320px;
   }
   :focus-visible {
     @apply outline-none ring-2 ring-ring rounded-sm;

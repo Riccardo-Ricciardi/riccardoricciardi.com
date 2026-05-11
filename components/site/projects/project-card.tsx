@@ -16,7 +16,7 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
     `https://opengraph.githubassets.com/1/${project.repo}`;
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-dashed border-dashed-soft bg-card transition-all duration-300 hover:-translate-y-0.5 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft),0_8px_24px_-12px_rgb(0_0_0_/_0.18)]">
+    <article className="group flex flex-col overflow-hidden rounded-xl border border-dashed border-dashed-soft bg-card transition-all duration-300 hover:-translate-y-0.5 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft),0_8px_24px_-12px_rgb(0_0_0_/_0.18)]">
       <a
         href={href}
         target="_blank"

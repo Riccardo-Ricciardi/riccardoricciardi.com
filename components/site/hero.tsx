@@ -41,7 +41,7 @@ export function Hero({
         <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
           {eyebrow && (
             <Link
-              href={`/${locale}`}
+              href={`/${locale}/contact`}
               className="group mb-7 inline-flex items-center gap-2 rounded-full border border-dashed border-dashed-soft bg-background/80 px-3 py-1 text-xs font-medium text-foreground/80 backdrop-blur transition-colors hover:border-accent-blue hover:text-foreground"
             >
               <span
@@ -62,7 +62,7 @@ export function Hero({
               />
             </Link>
           )}
-          <h1 className="text-balance text-[clamp(2.75rem,8vw,5.5rem)] font-semibold tracking-[-0.03em] leading-[0.98]">
+          <h1 className="text-balance text-5xl font-semibold tracking-[-0.03em] leading-[1.02] md:text-6xl lg:text-7xl">
             {title}
           </h1>
           <p className="mt-6 max-w-2xl text-balance text-lg text-muted-foreground md:text-xl">

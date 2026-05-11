@@ -29,7 +29,7 @@ export async function Projects({ heading, eyebrow, subtitle, locale }: ProjectsP
         className="mb-10 md:mb-14"
       />
 
-      <ul className="grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid list-none items-start gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project, i) => (
           <li key={project.id}>
             <ProjectCard project={project} priority={i < 3} />

@@ -7,7 +7,6 @@ import { logoutAction } from "@/app/admin/_actions/auth";
 import { Sidebar } from "@/components/admin/shell/sidebar";
 import { BottomNav } from "@/components/admin/shell/bottom-nav";
 import { Topbar } from "@/components/admin/shell/topbar";
-import { Toaster } from "@/components/ui/sonner";
 import { AdminToastListener } from "@/components/admin/actions/toast-listener";
 
 export const metadata: Metadata = {
@@ -66,7 +65,6 @@ export default async function AdminLayout({
         email={email}
         logoutSlot={<LogoutButton />}
       />
-      <Toaster position="top-right" richColors closeButton />
       <Suspense fallback={null}>
         <AdminToastListener />
       </Suspense>
