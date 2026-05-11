@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Contact } from "@/components/site/contact/section";
-import { ContactSecondaryLinks } from "@/components/site/contact/secondary-links";
 import { ContactForm } from "@/components/site/contact/contact-form";
 import {
   BookingWidget,
@@ -140,18 +139,8 @@ export default async function ContactPage({ params }: PageProps) {
       ? "Risposta entro 24h · Trattato con riservatezza"
       : "Reply within 24h · Treated with confidence"
   );
-  const secondaryHeading = content(
-    blocks,
-    "contact_secondary_heading",
-    isIt ? "Oppure scrivimi direttamente" : "Or reach out directly"
-  );
-  const emailLabel = content(blocks, "contact_email_label", "Email");
-
   const formLabels = isIt
     ? {
-        title: "Scrivimi un messaggio",
-        description:
-          "Compila i campi qui sotto. Ti rispondo di solito entro 24 ore.",
         name: "Nome",
         email: "Email",
         message: "Messaggio",
@@ -164,9 +153,6 @@ export default async function ContactPage({ params }: PageProps) {
         messagePlaceholder: "Raccontami il progetto o l'idea…",
       }
     : {
-        title: "Send me a message",
-        description:
-          "Fill in the fields below. I usually reply within 24 hours.",
         name: "Name",
         email: "Email",
         message: "Message",
@@ -190,22 +176,23 @@ export default async function ContactPage({ params }: PageProps) {
 
       <section
         aria-labelledby="contact-form-heading"
-        className="container-page section-divider-b pb-12 pt-10 md:pb-16 md:pt-12"
+        className={
+          "container-page pb-16 pt-10 md:pt-12 " +
+          (calEnabled ? "section-divider-b md:pb-20" : "md:pb-24")
+        }
       >
+        <h2 id="contact-form-heading" className="sr-only">
+          {isIt ? "Modulo di contatto" : "Contact form"}
+        </h2>
         <div className="mx-auto max-w-2xl">
           <ContactForm locale={locale} labels={formLabels} />
         </div>
       </section>
 
-      <ContactSecondaryLinks
-        heading={secondaryHeading}
-        emailLabel={emailLabel}
-      />
-
       {calEnabled && (
         <section
           aria-label={isIt ? "Prenota una chiamata" : "Book a call"}
-          className="container-page section-divider-t pb-20 pt-16 md:pb-28 md:pt-20"
+          className="container-page pb-20 pt-16 md:pb-28 md:pt-20"
         >
           <div className="mx-auto max-w-4xl">
             <BookingWidget locale={locale} labels={bookingLabels(locale)} />

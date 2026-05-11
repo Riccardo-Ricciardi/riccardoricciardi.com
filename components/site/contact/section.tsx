@@ -32,32 +32,37 @@ export function Contact({
   return (
     <section
       aria-labelledby="contact-heading"
-      className="container-page pt-16 md:pt-24 lg:pt-28"
+      className="container-page pt-20 md:pt-28 lg:pt-32"
     >
-      <SectionHeading
-        eyebrow={eyebrow}
-        title={heading}
-        subtitle={subtitle}
-        id="contact-heading"
-        className="mb-8 md:mb-10"
-      />
+      <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+        <SectionHeading
+          eyebrow={eyebrow}
+          title={heading}
+          subtitle={subtitle}
+          align="center"
+          id="contact-heading"
+          className="mb-8"
+        />
 
-      {items.length > 0 && (
-        <ul className="flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-          {items.map((item, idx) => {
-            const Icon = icons[idx] ?? Clock;
-            return (
-              <li key={`${item}-${idx}`} className="flex items-center gap-2">
-                <Icon
-                  className="h-3.5 w-3.5 text-accent-blue"
-                  aria-hidden="true"
-                />
-                <span>{item}</span>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+        {items.length > 0 && (
+          <ul className="flex flex-wrap items-center justify-center gap-2">
+            {items.map((item, idx) => {
+              const Icon = icons[idx] ?? Clock;
+              return (
+                <li key={`${item}-${idx}`}>
+                  <span className="inline-flex items-center gap-2 rounded-full border border-dashed-soft bg-background/60 px-3 py-1 text-xs font-medium text-muted-foreground">
+                    <Icon
+                      className="h-3.5 w-3.5 text-accent-blue"
+                      aria-hidden="true"
+                    />
+                    {item}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
     </section>
   );
 }

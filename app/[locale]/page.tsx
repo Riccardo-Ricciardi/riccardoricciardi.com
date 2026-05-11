@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { Hero } from "@/components/site/hero";
 import { Skills } from "@/components/site/skills/section";
 import { Projects } from "@/components/site/projects/section";
-import { AboutTeaser } from "@/components/site/about/teaser";
 import { GlobalLoader } from "@/components/global-loader";
 import { isSupportedLanguage, type SupportedLanguage } from "@/utils/config/app";
 import { APP_CONFIG } from "@/utils/config/app";
@@ -79,36 +78,6 @@ export default async function Page({ params }: PageProps) {
       ? "Una selezione di lavori recenti, sincronizzata da GitHub."
       : "A selection of recent work, synced from GitHub."
   );
-  const aboutEyebrow = content(
-    blocks,
-    "about_eyebrow",
-    isIt ? "Chi sono" : "About me"
-  );
-  const aboutHeading = content(
-    blocks,
-    "about_heading",
-    isIt
-      ? "Costruisco prodotti che le persone usano davvero."
-      : "I build products people actually use."
-  );
-  const aboutBody = content(
-    blocks,
-    "about_teaser",
-    isIt
-      ? "Sono Riccardo. Mi piace partire da un problema vero — non da una checklist tecnica — e portarlo a un prodotto che funziona, è veloce e si capisce.\n\nLavoro come full-stack: React e Next.js davanti, Node e Supabase dietro, ma quello che conta è che il pezzo finale sia chiaro per chi lo userà."
-      : "I'm Riccardo. I like to start from a real problem — not a tech checklist — and ship something that works, is fast, and makes sense.\n\nI work full-stack: React and Next.js on the front, Node and Supabase on the back. What matters is that the final piece feels obvious to whoever uses it."
-  );
-  const aboutReadMore = content(
-    blocks,
-    "about_read_more",
-    isIt ? "Leggi tutto" : "Read more"
-  );
-  const aboutContactLabel = content(
-    blocks,
-    "about_contact_cta",
-    isIt ? "Parliamone" : "Get in touch"
-  );
-
   return (
     <>
       <Hero
@@ -125,16 +94,6 @@ export default async function Page({ params }: PageProps) {
         }}
         locale={locale}
       />
-      <Suspense fallback={<GlobalLoader />}>
-        <AboutTeaser
-          locale={locale as SupportedLanguage}
-          eyebrow={aboutEyebrow}
-          heading={aboutHeading}
-          fallbackBody={aboutBody}
-          readMoreLabel={aboutReadMore}
-          contactLabel={aboutContactLabel}
-        />
-      </Suspense>
       <Suspense fallback={<GlobalLoader />}>
         <Skills
           heading={skillsHeading}

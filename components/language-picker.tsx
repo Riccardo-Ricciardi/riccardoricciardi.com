@@ -62,6 +62,7 @@ export function LanguagePicker({ locale, ariaLabel }: LanguagePickerProps) {
           size="icon"
           aria-label={ariaLabel}
           disabled={isPending}
+          className="text-foreground/80 transition-colors hover:bg-transparent hover:text-accent-blue"
         >
           <Languages />
         </Button>

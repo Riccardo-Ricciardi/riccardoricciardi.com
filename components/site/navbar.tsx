@@ -24,33 +24,8 @@ interface NavbarProps {
   };
 }
 
-const NAV_WHITELIST = ["", "about", "work", "contact"] as const;
-const NAV_FALLBACK_LABELS: Record<string, { it: string; en: string }> = {
-  "": { it: "Home", en: "Home" },
-  about: { it: "Chi sono", en: "About me" },
-  work: { it: "Lavori", en: "Work" },
-  contact: { it: "Contatti", en: "Contact" },
-};
-
-function buildNavItems(
-  dictionaryItems: NavbarProps["dictionary"]["navbar"],
-  locale: SupportedLanguage
-): NavbarProps["dictionary"]["navbar"] {
-  const bySlug = new Map(dictionaryItems.map((item) => [item.slug, item]));
-  return NAV_WHITELIST.map((slug, index) => {
-    const existing = bySlug.get(slug);
-    if (existing) return existing;
-    const fallback = NAV_FALLBACK_LABELS[slug];
-    return {
-      slug,
-      label: fallback ? fallback[locale === "it" ? "it" : "en"] : slug,
-      position: index,
-    };
-  });
-}
-
 export function Navbar({ locale, dictionary, ariaLabels }: NavbarProps) {
-  const items = buildNavItems(dictionary.navbar, locale);
+  const items = [...dictionary.navbar].sort((a, b) => a.position - b.position);
 
   return (
     <ScrolledHeader

@@ -12,8 +12,8 @@ import {
 interface ContactFormProps {
   locale: string;
   labels: {
-    title: string;
-    description: string;
+    title?: string;
+    description?: string;
     name: string;
     email: string;
     message: string;
@@ -52,17 +52,23 @@ export function ContactForm({ locale, labels }: ContactFormProps) {
   }, [state, labels.successTitle, labels.successBody]);
 
   return (
-    <div className="rounded-2xl border border-dashed-soft bg-card p-6 md:p-8">
-      <header className="mb-6">
-        <h3 className="text-xl font-semibold tracking-tight md:text-2xl">
-          {labels.title}
-        </h3>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          {labels.description}
-        </p>
-      </header>
+    <div className="rounded-2xl border border-dashed-soft bg-card p-6 shadow-sm md:p-8">
+      {(labels.title || labels.description) && (
+        <header className="mb-6">
+          {labels.title && (
+            <h3 className="text-xl font-semibold tracking-tight md:text-2xl">
+              {labels.title}
+            </h3>
+          )}
+          {labels.description && (
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              {labels.description}
+            </p>
+          )}
+        </header>
+      )}
 
-      <form ref={formRef} action={formAction} className="flex flex-col gap-4">
+      <form ref={formRef} action={formAction} className="flex flex-col gap-5">
         <input type="hidden" name="locale" value={locale} />
         <input
           type="text"
@@ -109,7 +115,7 @@ export function ContactForm({ locale, labels }: ContactFormProps) {
           />
         </label>
 
-        <div className="flex items-center justify-end pt-1">
+        <div className="flex flex-col items-stretch gap-3 pt-1 sm:flex-row sm:items-center sm:justify-end">
           <SubmitBtn label={labels.submit} pendingLabel={labels.sending} />
         </div>
       </form>
@@ -168,7 +174,7 @@ function SubmitBtn({
       type="submit"
       disabled={pending}
       aria-busy={pending}
-      className="inline-flex h-11 items-center gap-2 rounded-lg bg-accent-blue px-4 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--accent-blue-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft disabled:cursor-not-allowed disabled:opacity-60"
+      className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-accent-blue px-5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--accent-blue-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
     >
       {pending ? (
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
