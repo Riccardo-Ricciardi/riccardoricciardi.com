@@ -92,29 +92,39 @@ export function ProjectCard({ project, priority = false, labels }: ProjectCardPr
             </ul>
           )}
 
-          <footer className="text-caption mt-auto flex items-center gap-4 pt-2 text-muted-foreground">
-            {project.language && (
-              <span className="inline-flex items-center gap-1.5">
-                <span
-                  aria-hidden="true"
-                  className="h-2 w-2 rounded-full bg-foreground/60"
-                />
-                {project.language}
-              </span>
-            )}
-            {project.stars != null && project.stars > 0 && (
-              <span className="inline-flex items-center gap-1">
-                <Star className="h-3 w-3" aria-hidden="true" />
-                {project.stars}
-              </span>
-            )}
-            {project.forks != null && project.forks > 0 && (
-              <span className="inline-flex items-center gap-1">
-                <GitFork className="h-3 w-3" aria-hidden="true" />
-                {project.forks}
-              </span>
-            )}
-          </footer>
+          {(() => {
+            const hasLanguage = Boolean(project.language);
+            const hasStars =
+              project.stars != null && project.stars > 0;
+            const hasForks =
+              project.forks != null && project.forks > 0;
+            if (!hasLanguage && !hasStars && !hasForks) return null;
+            return (
+              <footer className="text-caption mt-auto flex items-center gap-4 pt-2 text-muted-foreground">
+                {hasLanguage && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <span
+                      aria-hidden="true"
+                      className="h-2 w-2 rounded-full bg-foreground/60"
+                    />
+                    {project.language}
+                  </span>
+                )}
+                {hasStars && (
+                  <span className="inline-flex items-center gap-1">
+                    <Star className="h-3 w-3" aria-hidden="true" />
+                    {project.stars}
+                  </span>
+                )}
+                {hasForks && (
+                  <span className="inline-flex items-center gap-1">
+                    <GitFork className="h-3 w-3" aria-hidden="true" />
+                    {project.forks}
+                  </span>
+                )}
+              </footer>
+            );
+          })()}
         </div>
       </a>
     </article>
