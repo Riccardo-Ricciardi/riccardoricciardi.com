@@ -37,12 +37,12 @@ export function Hero({
         <MouseParticles count={55} linkDistance={110} repelRadius={130} />
       </div>
 
-      <div className="container-page py-16 md:py-20 lg:py-24">
+      <div className="container-page section-y">
         <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
           {eyebrow && (
             <Link
               href={`/${locale}/contact`}
-              className="group mb-5 inline-flex items-center gap-2 rounded-full border border-dashed-soft bg-background/80 px-3 py-1 text-xs font-medium text-foreground/80 backdrop-blur transition-colors hover:border-accent-blue hover:text-foreground"
+              className="group mb-5 inline-flex items-center gap-2 rounded-pill border border-dashed-soft bg-background/80 px-3 py-1 text-xs font-medium text-foreground/80 backdrop-blur transition-colors hover:border-accent-blue hover:text-foreground"
             >
               <span
                 aria-hidden="true"
@@ -62,10 +62,10 @@ export function Hero({
               />
             </Link>
           )}
-          <h1 className="text-balance text-5xl font-semibold tracking-[-0.03em] leading-[1.02] md:text-6xl lg:text-[5.25rem]">
+          <h1 className="text-display text-balance">
             {title}
           </h1>
-          <p className="mt-5 max-w-2xl text-balance text-lg text-muted-foreground md:text-xl">
+          <p className="text-body-lg mt-5 max-w-2xl text-balance text-muted-foreground">
             {subtitle}
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
