@@ -3,19 +3,20 @@ import { notFound } from "next/navigation";
 import { SectionHeading } from "@/components/site/atoms/section-heading";
 import { WorkTimeline } from "@/components/site/work/timeline";
 import { getWorkExperience } from "@/utils/work/fetch";
+import { APP_CONFIG } from "@/utils/config/app";
 import {
-  APP_CONFIG,
-  isSupportedLanguage,
-  type SupportedLanguage,
-} from "@/utils/config/app";
+  getLanguageCodes,
+  isKnownLocale,
+} from "@/utils/i18n/languages";
 import { content, getContentBlocks } from "@/utils/content/fetch";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
-export const dynamicParams = false;
+export const dynamicParams = true;
 
-export function generateStaticParams() {
-  return APP_CONFIG.languages.map((locale) => ({ locale }));
+export async function generateStaticParams() {
+  const codes = await getLanguageCodes();
+  return codes.map((code) => ({ locale: code }));
 }
 
 interface PageProps {
@@ -26,16 +27,21 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const isIt = locale === "it";
+  const blocks = await getContentBlocks(locale);
+  const codes = await getLanguageCodes();
+  const title = content(blocks, "work_heading", "Work");
+  const description = content(
+    blocks,
+    "work_subtitle",
+    "My career timeline."
+  );
   return {
-    title: isIt ? "Esperienze" : "Work",
-    description: isIt
-      ? "Il mio percorso professionale e le esperienze più rilevanti."
-      : "My career timeline and most relevant experience.",
+    title,
+    description,
     alternates: {
       canonical: `/${locale}/work`,
       languages: Object.fromEntries(
-        APP_CONFIG.languages.map((l) => [l, `${APP_CONFIG.siteUrl}/${l}/work`])
+        codes.map((l) => [l, `${APP_CONFIG.siteUrl}/${l}/work`])
       ),
     },
   };
@@ -43,22 +49,26 @@ export async function generateMetadata({
 
 export default async function WorkPage({ params }: PageProps) {
   const { locale } = await params;
-  if (!isSupportedLanguage(locale)) notFound();
+  if (!(await isKnownLocale(locale))) notFound();
 
-  const isIt = locale === "it";
   const [items, blocks] = await Promise.all([
-    getWorkExperience(locale as SupportedLanguage),
-    getContentBlocks(locale as SupportedLanguage),
+    getWorkExperience(locale),
+    getContentBlocks(locale),
   ]);
 
-  const heading = content(blocks, "work_heading", isIt ? "Esperienze" : "Work");
+  const heading = content(blocks, "work_heading", "Work");
   const eyebrow = content(blocks, "work_eyebrow", "/work");
   const subtitle = content(
     blocks,
     "work_subtitle",
-    isIt
-      ? "Una timeline di ruoli, aziende e momenti chiave."
-      : "A timeline of roles, companies, and turning points."
+    "A timeline of roles, companies, and turning points."
+  );
+  const currentLabel = content(blocks, "work_current_label", "current");
+  const presentLabel = content(blocks, "work_present_label", "present");
+  const emptyLabel = content(
+    blocks,
+    "common_empty_work",
+    "Still filling in the timeline."
   );
 
   return (
@@ -75,16 +85,14 @@ export default async function WorkPage({ params }: PageProps) {
       />
 
       {items.length === 0 ? (
-        <p className="text-body-lg text-muted-foreground">
-          {isIt ? "Sto ancora compilando la timeline." : "Still filling in the timeline."}
-        </p>
+        <p className="text-body-lg text-muted-foreground">{emptyLabel}</p>
       ) : (
         <div className="mx-auto max-w-3xl">
           <WorkTimeline
             items={items}
             locale={locale}
-            currentLabel={isIt ? "in corso" : "current"}
-            presentLabel={isIt ? "presente" : "present"}
+            currentLabel={currentLabel}
+            presentLabel={presentLabel}
           />
         </div>
       )}

@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { DynamicThemeVars } from "@/components/dynamic-theme-vars";
 import { ScrollbarWidth } from "@/components/scrollbar-width";
-import { APP_CONFIG } from "@/utils/config/app";
+import { getDefaultLanguageCode } from "@/utils/i18n/languages";
 
 export const metadata: Metadata = {
   icons: {
@@ -29,14 +29,15 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const defaultLang = await getDefaultLanguageCode();
   return (
     <html
-      lang={APP_CONFIG.defaultLanguage}
+      lang={defaultLang}
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable}`}
     >

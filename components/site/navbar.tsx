@@ -1,6 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { LanguagePicker } from "@/components/language-picker";
+import {
+  LanguagePicker,
+  type LanguageOption,
+} from "@/components/language-picker";
 import { ThemePicker } from "@/components/theme-picker";
 import { NavbarMobile } from "@/components/site/navbar-mobile";
 import { NavLinks } from "@/components/site/nav-links";
@@ -15,6 +18,7 @@ const LOGO_URL =
 interface NavbarProps {
   locale: SupportedLanguage;
   dictionary: Dictionary;
+  languages: LanguageOption[];
   ariaLabels: {
     nav: string;
     menu: string;
@@ -24,7 +28,12 @@ interface NavbarProps {
   };
 }
 
-export function Navbar({ locale, dictionary, ariaLabels }: NavbarProps) {
+export function Navbar({
+  locale,
+  dictionary,
+  languages,
+  ariaLabels,
+}: NavbarProps) {
   const items = [...dictionary.navbar].sort((a, b) => a.position - b.position);
 
   return (
@@ -55,12 +64,20 @@ export function Navbar({ locale, dictionary, ariaLabels }: NavbarProps) {
             className="mx-2 h-4 w-px bg-border"
           />
           <ThemePicker labels={dictionary.theme} ariaLabel={ariaLabels.theme} />
-          <LanguagePicker locale={locale} ariaLabel={ariaLabels.language} />
+          <LanguagePicker
+            locale={locale}
+            ariaLabel={ariaLabels.language}
+            languages={languages}
+          />
         </nav>
 
         <div className="flex items-center gap-1 md:hidden">
           <ThemePicker labels={dictionary.theme} ariaLabel={ariaLabels.theme} />
-          <LanguagePicker locale={locale} ariaLabel={ariaLabels.language} />
+          <LanguagePicker
+            locale={locale}
+            ariaLabel={ariaLabels.language}
+            languages={languages}
+          />
           <NavbarMobile
             items={items}
             locale={locale}

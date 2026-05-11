@@ -3,13 +3,10 @@ import { cookies, headers } from "next/headers";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MouseParticles } from "@/components/mouse-particles";
-import {
-  APP_CONFIG,
-  isSupportedLanguage,
-  type SupportedLanguage,
-} from "@/utils/config/app";
+import { isSupportedLanguage } from "@/utils/config/app";
+import { getDefaultLanguageCode } from "@/utils/i18n/languages";
 
-async function detectLocale(): Promise<SupportedLanguage> {
+async function detectLocale(): Promise<string> {
   const cookieStore = await cookies();
   const cookieLocale = cookieStore.get("NEXT_LOCALE")?.value;
   if (cookieLocale && isSupportedLanguage(cookieLocale)) return cookieLocale;
@@ -19,7 +16,7 @@ async function detectLocale(): Promise<SupportedLanguage> {
   const preferred = accept.split(",")[0]?.split("-")[0]?.toLowerCase() ?? "";
   if (isSupportedLanguage(preferred)) return preferred;
 
-  return APP_CONFIG.defaultLanguage;
+  return getDefaultLanguageCode();
 }
 
 const COPY = {
@@ -39,7 +36,7 @@ const COPY = {
 
 export default async function LocaleNotFound() {
   const locale = await detectLocale();
-  const copy = COPY[locale];
+  const copy = COPY[locale as keyof typeof COPY] ?? COPY.en;
 
   return (
     <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden">

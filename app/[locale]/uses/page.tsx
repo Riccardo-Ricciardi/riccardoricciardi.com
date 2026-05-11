@@ -3,19 +3,20 @@ import { notFound } from "next/navigation";
 import { SectionHeading } from "@/components/site/atoms/section-heading";
 import { UsesList } from "@/components/site/uses/uses-list";
 import { getUsesItems } from "@/utils/uses/fetch";
+import { APP_CONFIG } from "@/utils/config/app";
 import {
-  APP_CONFIG,
-  isSupportedLanguage,
-  type SupportedLanguage,
-} from "@/utils/config/app";
+  getLanguageCodes,
+  isKnownLocale,
+} from "@/utils/i18n/languages";
 import { content, getContentBlocks } from "@/utils/content/fetch";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
-export const dynamicParams = false;
+export const dynamicParams = true;
 
-export function generateStaticParams() {
-  return APP_CONFIG.languages.map((locale) => ({ locale }));
+export async function generateStaticParams() {
+  const codes = await getLanguageCodes();
+  return codes.map((code) => ({ locale: code }));
 }
 
 interface PageProps {
@@ -26,16 +27,21 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const isIt = locale === "it";
+  const blocks = await getContentBlocks(locale);
+  const codes = await getLanguageCodes();
+  const title = content(blocks, "uses_heading", "Uses");
+  const description = content(
+    blocks,
+    "uses_subtitle",
+    "Hardware, editors, libraries, services."
+  );
   return {
-    title: isIt ? "Strumenti" : "Uses",
-    description: isIt
-      ? "L'hardware, gli editor e i tool che uso ogni giorno."
-      : "The hardware, editors, and tools I use every day.",
+    title,
+    description,
     alternates: {
       canonical: `/${locale}/uses`,
       languages: Object.fromEntries(
-        APP_CONFIG.languages.map((l) => [l, `${APP_CONFIG.siteUrl}/${l}/uses`])
+        codes.map((l) => [l, `${APP_CONFIG.siteUrl}/${l}/uses`])
       ),
     },
   };
@@ -43,22 +49,24 @@ export async function generateMetadata({
 
 export default async function UsesPage({ params }: PageProps) {
   const { locale } = await params;
-  if (!isSupportedLanguage(locale)) notFound();
+  if (!(await isKnownLocale(locale))) notFound();
 
-  const isIt = locale === "it";
   const [items, blocks] = await Promise.all([
-    getUsesItems(locale as SupportedLanguage),
-    getContentBlocks(locale as SupportedLanguage),
+    getUsesItems(locale),
+    getContentBlocks(locale),
   ]);
 
-  const heading = content(blocks, "uses_heading", isIt ? "Strumenti" : "Uses");
+  const heading = content(blocks, "uses_heading", "Uses");
   const eyebrow = content(blocks, "uses_eyebrow", "/uses");
   const subtitle = content(
     blocks,
     "uses_subtitle",
-    isIt
-      ? "Hardware, editor, librerie, servizi. Cosa uso davvero."
-      : "Hardware, editors, libraries, services. What I actually use."
+    "Hardware, editors, libraries, services. What I actually use."
+  );
+  const emptyLabel = content(
+    blocks,
+    "common_empty_uses",
+    "Still putting this together."
   );
 
   return (
@@ -75,9 +83,7 @@ export default async function UsesPage({ params }: PageProps) {
       />
 
       {items.length === 0 ? (
-        <p className="text-body-lg text-muted-foreground">
-          {isIt ? "Sto ancora preparando questa pagina." : "Still putting this together."}
-        </p>
+        <p className="text-body-lg text-muted-foreground">{emptyLabel}</p>
       ) : (
         <UsesList items={items} />
       )}

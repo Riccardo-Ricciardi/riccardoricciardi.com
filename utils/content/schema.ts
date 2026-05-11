@@ -28,14 +28,56 @@ export const CONTENT_SCHEMA: ContentSection[] = [
   {
     key: "skills",
     title: "Skills section",
-    fields: [{ slug: "skills_heading", label: "Heading" }],
+    fields: [
+      { slug: "skills_eyebrow", label: "Eyebrow" },
+      { slug: "skills_heading", label: "Heading" },
+    ],
   },
   {
     key: "projects",
     title: "Projects section",
     fields: [
+      { slug: "projects_eyebrow", label: "Eyebrow" },
       { slug: "projects_heading", label: "Heading" },
       { slug: "projects_subtitle", label: "Subtitle", multiline: true },
+    ],
+  },
+  {
+    key: "about",
+    title: "About page",
+    fields: [
+      { slug: "about_eyebrow", label: "Eyebrow" },
+      { slug: "about_heading", label: "Heading" },
+      { slug: "about_subtitle", label: "Subtitle", multiline: true },
+    ],
+  },
+  {
+    key: "work",
+    title: "Work page",
+    fields: [
+      { slug: "work_eyebrow", label: "Eyebrow" },
+      { slug: "work_heading", label: "Heading" },
+      { slug: "work_subtitle", label: "Subtitle", multiline: true },
+    ],
+  },
+  {
+    key: "uses",
+    title: "Uses page",
+    fields: [
+      { slug: "uses_eyebrow", label: "Eyebrow" },
+      { slug: "uses_heading", label: "Heading" },
+      { slug: "uses_subtitle", label: "Subtitle", multiline: true },
+    ],
+  },
+  {
+    key: "common",
+    title: "Common labels",
+    description: "Shared UI strings reused across pages",
+    fields: [
+      { slug: "common_all", label: "All / filter reset" },
+      { slug: "common_empty_uses", label: "Empty state — /uses" },
+      { slug: "common_empty_work", label: "Empty state — /work" },
+      { slug: "common_empty_about", label: "Empty state — /about" },
     ],
   },
   {

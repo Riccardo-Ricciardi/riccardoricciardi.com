@@ -8,13 +8,13 @@ import { SkipLink } from "@/components/skip-link";
 import { HtmlLangUpdater } from "@/components/html-lang-updater";
 import { MouseParticles } from "@/components/mouse-particles";
 import { getDictionary } from "@/utils/i18n/dictionary";
+import { isSupportedLanguage } from "@/utils/config/app";
 import {
-  APP_CONFIG,
-  isSupportedLanguage,
-  type SupportedLanguage,
-} from "@/utils/config/app";
+  getDefaultLanguageCode,
+  getLanguages,
+} from "@/utils/i18n/languages";
 
-async function detectLocale(): Promise<SupportedLanguage> {
+async function detectLocale(): Promise<string> {
   const cookieStore = await cookies();
   const cookieLocale = cookieStore.get("NEXT_LOCALE")?.value;
   if (cookieLocale && isSupportedLanguage(cookieLocale)) return cookieLocale;
@@ -24,7 +24,7 @@ async function detectLocale(): Promise<SupportedLanguage> {
   const preferred = accept.split(",")[0]?.split("-")[0]?.toLowerCase() ?? "";
   if (isSupportedLanguage(preferred)) return preferred;
 
-  return APP_CONFIG.defaultLanguage;
+  return getDefaultLanguageCode();
 }
 
 const COPY = {
@@ -60,14 +60,26 @@ const COPY = {
 
 export default async function NotFound() {
   const locale = await detectLocale();
-  const dictionary = await getDictionary(locale);
-  const copy = COPY[locale];
+  const [dictionary, languageRows] = await Promise.all([
+    getDictionary(locale),
+    getLanguages(),
+  ]);
+  const copy = COPY[locale as keyof typeof COPY] ?? COPY.en;
+  const languageOptions = languageRows.map((l) => ({
+    code: l.code,
+    name: l.name,
+  }));
 
   return (
     <>
       <HtmlLangUpdater lang={locale} />
       <SkipLink label={copy.aria.skip} />
-      <Navbar locale={locale} dictionary={dictionary} ariaLabels={copy.aria} />
+      <Navbar
+        locale={locale}
+        dictionary={dictionary}
+        languages={languageOptions}
+        ariaLabels={copy.aria}
+      />
       <main id="main" className="flex-1">
         <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden">
           <div

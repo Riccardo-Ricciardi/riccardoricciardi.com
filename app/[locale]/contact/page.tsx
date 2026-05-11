@@ -6,20 +6,21 @@ import {
   BookingWidget,
   type BookingLabels,
 } from "@/components/site/contact/booking-widget";
+import { APP_CONFIG } from "@/utils/config/app";
 import {
-  APP_CONFIG,
-  isSupportedLanguage,
-  type SupportedLanguage,
-} from "@/utils/config/app";
+  getLanguageCodes,
+  isKnownLocale,
+} from "@/utils/i18n/languages";
 import { content, getContentBlocks } from "@/utils/content/fetch";
 import { isCalConfigured } from "@/utils/cal/client";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
-export const dynamicParams = false;
+export const dynamicParams = true;
 
-export function generateStaticParams() {
-  return APP_CONFIG.languages.map((locale) => ({ locale }));
+export async function generateStaticParams() {
+  const codes = await getLanguageCodes();
+  return codes.map((code) => ({ locale: code }));
 }
 
 interface PageProps {
@@ -30,17 +31,21 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const isIt = locale === "it";
-  const title = isIt ? "Contatti" : "Contact";
+  const blocks = await getContentBlocks(locale);
+  const codes = await getLanguageCodes();
+  const title = content(blocks, "contact_heading", "Contact");
+  const description = content(
+    blocks,
+    "contact_subtitle",
+    "Got a project? Let's talk."
+  );
   return {
     title,
-    description: isIt
-      ? "Hai un progetto? Parliamone. Scrivimi o prenota una chiamata."
-      : "Got a project? Let's talk. Write to me or book a call.",
+    description,
     alternates: {
       canonical: `/${locale}/contact`,
       languages: Object.fromEntries(
-        APP_CONFIG.languages.map((l) => [l, `${APP_CONFIG.siteUrl}/${l}/contact`])
+        codes.map((l) => [l, `${APP_CONFIG.siteUrl}/${l}/contact`])
       ),
     },
   };
@@ -114,32 +119,24 @@ function bookingLabels(locale: string): BookingLabels {
 
 export default async function ContactPage({ params }: PageProps) {
   const { locale } = await params;
-  if (!isSupportedLanguage(locale)) notFound();
+  if (!(await isKnownLocale(locale))) notFound();
 
   const isIt = locale === "it";
-  const blocks = await getContentBlocks(locale as SupportedLanguage);
+  const blocks = await getContentBlocks(locale);
   const calEnabled =
     isCalConfigured() && !!process.env.NEXT_PUBLIC_CAL_USERNAME;
 
-  const heading = content(
-    blocks,
-    "contact_heading",
-    isIt ? "Hai un progetto? Parliamone." : "Got a project? Let's talk."
-  );
+  const heading = content(blocks, "contact_heading", "Got a project? Let's talk.");
   const eyebrow = content(blocks, "contact_eyebrow", "/contact");
   const subtitle = content(
     blocks,
     "contact_subtitle",
-    isIt
-      ? "Raccontami cosa stai costruendo o quale problema vuoi risolvere. Di solito rispondo entro 24 ore, nei giorni feriali."
-      : "Tell me what you're building or what problem you're trying to solve. I usually reply within 24 hours, weekdays."
+    "Tell me what you're building or what problem you're trying to solve. I usually reply within 24 hours, weekdays."
   );
   const trust = content(
     blocks,
     "contact_trust",
-    isIt
-      ? "Risposta entro 24h · Trattato con riservatezza"
-      : "Reply within 24h · Treated with confidence"
+    "Reply within 24h · Treated with confidence"
   );
   const formLabels = isIt
     ? {

@@ -5,15 +5,18 @@ import { Footer } from "@/components/site/footer";
 import { SkipLink } from "@/components/skip-link";
 import { JsonLd } from "@/components/json-ld";
 import { HtmlLangUpdater } from "@/components/html-lang-updater";
+import { APP_CONFIG } from "@/utils/config/app";
 import {
-  APP_CONFIG,
-  isSupportedLanguage,
-  type SupportedLanguage,
-} from "@/utils/config/app";
+  getDefaultLanguageCode,
+  getLanguageCodes,
+  getLanguages,
+  isKnownLocale,
+} from "@/utils/i18n/languages";
 import { getDictionary } from "@/utils/i18n/dictionary";
 
-export function generateStaticParams() {
-  return APP_CONFIG.languages.map((locale) => ({ locale }));
+export async function generateStaticParams() {
+  const codes = await getLanguageCodes();
+  return codes.map((code) => ({ locale: code }));
 }
 
 interface LocaleLayoutProps {
@@ -25,7 +28,7 @@ export async function generateMetadata({
   params,
 }: LocaleLayoutProps): Promise<Metadata> {
   const { locale } = await params;
-  if (!isSupportedLanguage(locale)) return {};
+  if (!(await isKnownLocale(locale))) return {};
 
   const title = APP_CONFIG.siteName;
   const description =
@@ -36,8 +39,13 @@ export async function generateMetadata({
   const baseUrl = APP_CONFIG.siteUrl;
   const path = `/${locale}`;
 
+  const [codes, defaultCode] = await Promise.all([
+    getLanguageCodes(),
+    getDefaultLanguageCode(),
+  ]);
+
   const languages = Object.fromEntries(
-    APP_CONFIG.languages.map((l) => [l, `${baseUrl}/${l}`])
+    codes.map((l) => [l, `${baseUrl}/${l}`])
   );
 
   return {
@@ -50,7 +58,7 @@ export async function generateMetadata({
     publisher: APP_CONFIG.author.name,
     alternates: {
       canonical: path,
-      languages: { ...languages, "x-default": `${baseUrl}/${APP_CONFIG.defaultLanguage}` },
+      languages: { ...languages, "x-default": `${baseUrl}/${defaultCode}` },
     },
     openGraph: {
       type: "website",
@@ -85,9 +93,16 @@ export default async function LocaleLayout({
   params,
 }: LocaleLayoutProps) {
   const { locale } = await params;
-  if (!isSupportedLanguage(locale)) notFound();
+  if (!(await isKnownLocale(locale))) notFound();
 
-  const dictionary = await getDictionary(locale as SupportedLanguage);
+  const [dictionary, languageRows] = await Promise.all([
+    getDictionary(locale),
+    getLanguages(),
+  ]);
+  const languageOptions = languageRows.map((l) => ({
+    code: l.code,
+    name: l.name,
+  }));
 
   const ariaLabels =
     locale === "it"
@@ -113,15 +128,16 @@ export default async function LocaleLayout({
       <HtmlLangUpdater lang={locale} />
       <SkipLink label={ariaLabels.skip} />
       <Navbar
-        locale={locale as SupportedLanguage}
+        locale={locale}
         dictionary={dictionary}
+        languages={languageOptions}
         ariaLabels={ariaLabels}
       />
       <main id="main" className="flex-1">
         {children}
       </main>
       <Footer locale={locale} />
-      <JsonLd locale={locale as SupportedLanguage} />
+      <JsonLd locale={locale} />
     </>
   );
 }

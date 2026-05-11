@@ -4,12 +4,20 @@ import { Hero } from "@/components/site/hero";
 import { Skills } from "@/components/site/skills/section";
 import { Projects } from "@/components/site/projects/section";
 import { GlobalLoader } from "@/components/global-loader";
-import { isSupportedLanguage, type SupportedLanguage } from "@/utils/config/app";
-import { APP_CONFIG } from "@/utils/config/app";
+import {
+  getLanguageCodes,
+  isKnownLocale,
+} from "@/utils/i18n/languages";
 import { content, getContentBlocks } from "@/utils/content/fetch";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const codes = await getLanguageCodes();
+  return codes.map((code) => ({ locale: code }));
+}
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -17,67 +25,38 @@ interface PageProps {
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  if (!isSupportedLanguage(locale)) notFound();
+  if (!(await isKnownLocale(locale))) notFound();
 
-  const isIt = locale === "it";
-  const blocks = await getContentBlocks(locale as SupportedLanguage);
+  const blocks = await getContentBlocks(locale);
 
-  const heroEyebrow = content(
-    blocks,
-    "hero_eyebrow",
-    isIt ? "Disponibile per nuovi progetti" : "Available for new projects"
-  );
+  const heroEyebrow = content(blocks, "hero_eyebrow", "Available for new projects");
   const heroTitle = content(
     blocks,
     "hero_title",
-    isIt
-      ? "Costruisco prodotti web moderni e accessibili."
-      : "I build modern, accessible web products."
+    "I build modern, accessible web products."
   );
   const heroSubtitle = content(
     blocks,
     "hero_subtitle",
-    isIt
-      ? "Sviluppatore full-stack focalizzato su React, Next.js e architetture serverless."
-      : "Full-stack developer focused on React, Next.js, and serverless architectures."
+    "Full-stack developer focused on React, Next.js, and serverless architectures."
   );
   const heroPrimary = content(
     blocks,
     "hero_primary_cta",
-    isIt ? "Hai un progetto? Parliamone" : "Got a project? Let's talk"
+    "Got a project? Let's talk"
   );
-  const heroSecondary = content(
-    blocks,
-    "hero_secondary_cta",
-    isIt ? "Vedi i progetti" : "View projects"
-  );
-  const skillsHeading = content(
-    blocks,
-    "skills_heading",
-    isIt ? "Le mie competenze" : "My skills"
-  );
-  const skillsEyebrow = content(
-    blocks,
-    "skills_eyebrow",
-    isIt ? "Stack" : "Stack"
-  );
-  const projectsHeading = content(
-    blocks,
-    "projects_heading",
-    isIt ? "I miei progetti" : "My projects"
-  );
-  const projectsEyebrow = content(
-    blocks,
-    "projects_eyebrow",
-    isIt ? "Lavori recenti" : "Recent work"
-  );
+  const heroSecondary = content(blocks, "hero_secondary_cta", "View projects");
+  const skillsHeading = content(blocks, "skills_heading", "My skills");
+  const skillsEyebrow = content(blocks, "skills_eyebrow", "Stack");
+  const projectsHeading = content(blocks, "projects_heading", "My projects");
+  const projectsEyebrow = content(blocks, "projects_eyebrow", "Recent work");
   const projectsSubtitle = content(
     blocks,
     "projects_subtitle",
-    isIt
-      ? "Una selezione di lavori recenti, sincronizzata da GitHub."
-      : "A selection of recent work, synced from GitHub."
+    "A selection of recent work, synced from GitHub."
   );
+  const allLabel = content(blocks, "common_all", "All");
+
   return (
     <>
       <Hero
@@ -98,7 +77,7 @@ export default async function Page({ params }: PageProps) {
         <Skills
           heading={skillsHeading}
           eyebrow={skillsEyebrow}
-          allLabel={isIt ? "Tutto" : "All"}
+          allLabel={allLabel}
           locale={locale}
         />
       </Suspense>
@@ -107,16 +86,10 @@ export default async function Page({ params }: PageProps) {
           heading={projectsHeading}
           eyebrow={projectsEyebrow}
           subtitle={projectsSubtitle}
-          locale={locale as SupportedLanguage}
-          allLabel={isIt ? "Tutti" : "All"}
+          locale={locale}
+          allLabel={allLabel}
         />
       </Suspense>
     </>
   );
-}
-
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return APP_CONFIG.languages.map((locale) => ({ locale }));
 }

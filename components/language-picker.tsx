@@ -3,7 +3,22 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { Languages } from "lucide-react";
-import { GB, IT } from "country-flag-icons/react/3x2";
+import {
+  GB,
+  IT,
+  FR,
+  DE,
+  ES,
+  PT,
+  US,
+  CN,
+  JP,
+  KR,
+  RU,
+  NL,
+  PL,
+  type FlagComponent,
+} from "country-flag-icons/react/3x2";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,26 +27,43 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { GlobalLoader } from "@/components/global-loader";
-import {
-  APP_CONFIG,
-  isSupportedLanguage,
-  type SupportedLanguage,
-} from "@/utils/config/app";
 
-const FLAGS: Record<SupportedLanguage, { component: typeof GB; label: string }> = {
-  en: { component: GB, label: "English" },
-  it: { component: IT, label: "Italiano" },
+const FLAGS: Record<string, FlagComponent> = {
+  en: GB,
+  "en-gb": GB,
+  "en-us": US,
+  it: IT,
+  fr: FR,
+  de: DE,
+  es: ES,
+  pt: PT,
+  zh: CN,
+  ja: JP,
+  ko: KR,
+  ru: RU,
+  nl: NL,
+  pl: PL,
 };
 
-interface LanguagePickerProps {
-  locale: SupportedLanguage;
-  ariaLabel: string;
+export interface LanguageOption {
+  code: string;
+  name: string;
 }
 
-function swapLocale(pathname: string, next: SupportedLanguage): string {
+interface LanguagePickerProps {
+  locale: string;
+  ariaLabel: string;
+  languages: LanguageOption[];
+}
+
+function swapLocale(
+  pathname: string,
+  next: string,
+  knownCodes: string[]
+): string {
   const segments = pathname.split("/").filter(Boolean);
   if (segments.length === 0) return `/${next}`;
-  if (isSupportedLanguage(segments[0])) {
+  if (knownCodes.includes(segments[0])) {
     segments[0] = next;
   } else {
     segments.unshift(next);
@@ -39,16 +71,21 @@ function swapLocale(pathname: string, next: SupportedLanguage): string {
   return `/${segments.join("/")}`;
 }
 
-export function LanguagePicker({ locale, ariaLabel }: LanguagePickerProps) {
+export function LanguagePicker({
+  locale,
+  ariaLabel,
+  languages,
+}: LanguagePickerProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
+  const codes = languages.map((l) => l.code);
 
-  const handleSelect = (next: SupportedLanguage) => {
+  const handleSelect = (next: string) => {
     if (next === locale) return;
     document.cookie = `NEXT_LOCALE=${next}; path=/; max-age=31536000; SameSite=Lax`;
     startTransition(() => {
-      router.replace(swapLocale(pathname, next));
+      router.replace(swapLocale(pathname, next, codes));
       router.refresh();
     });
   };
@@ -68,8 +105,8 @@ export function LanguagePicker({ locale, ariaLabel }: LanguagePickerProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {APP_CONFIG.languages.map((code) => {
-          const Flag = FLAGS[code].component;
+        {languages.map(({ code, name }) => {
+          const Flag = FLAGS[code.toLowerCase()];
           const isActive = code === locale;
           return (
             <DropdownMenuItem
@@ -78,8 +115,8 @@ export function LanguagePicker({ locale, ariaLabel }: LanguagePickerProps) {
               className={`flex items-center gap-2 ${isActive ? "font-bold" : ""}`}
               aria-current={isActive ? "true" : undefined}
             >
-              <Flag title={FLAGS[code].label} />
-              {FLAGS[code].label}
+              {Flag ? <Flag title={name} /> : null}
+              {name}
             </DropdownMenuItem>
           );
         })}
