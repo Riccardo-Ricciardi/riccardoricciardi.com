@@ -38,7 +38,7 @@ export function Hero({
       </div>
 
       <div className="container-page section-y">
-        <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
+        <div className="content-narrow flex flex-col items-center text-center">
           {eyebrow && (
             <Link
               href={`/${locale}/contact`}

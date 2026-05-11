@@ -90,7 +90,7 @@ export default async function WorkPage({ params }: PageProps) {
       aria-labelledby="work-heading"
       className="container-page section-divider-b section-y"
     >
-      <div className="mx-auto max-w-3xl">
+      <div className="content-narrow">
         <SectionHeading
           eyebrow={eyebrow}
           title={heading}

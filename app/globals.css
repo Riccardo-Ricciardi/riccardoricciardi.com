@@ -90,6 +90,10 @@
   --card-padding-lg: 2rem;
   --card-gap: var(--sp-md);
 
+  /* content widths */
+  --content-narrow: 45rem;          /* ≈ 720px — hero copy, timelines, forms */
+  --content-wide: var(--container-max-width, 1400px);
+
   /* semantic radius */
   --radius-chip: 0.375rem;
   --radius-control: 0.5rem;
@@ -245,6 +249,10 @@
   --radius-surface: 1rem;
   --radius-hero: 1.25rem;
   --radius-pill: 9999px;
+
+  /* content widths exposed as Tailwind tokens (max-w-content-narrow / -wide) */
+  --container-content-narrow: 45rem;
+  --container-content-wide: 1400px;
 }
 
 @layer base {
@@ -447,6 +455,14 @@
   .section-y {
     padding-top: var(--section-y);
     padding-bottom: var(--section-y);
+  }
+  .content-narrow {
+    max-width: var(--content-narrow);
+    margin-inline: auto;
+  }
+  .content-wide {
+    max-width: var(--content-wide);
+    margin-inline: auto;
   }
   .section-y-top {
     padding-top: var(--section-y);
