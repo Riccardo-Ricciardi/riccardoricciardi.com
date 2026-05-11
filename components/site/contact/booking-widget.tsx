@@ -22,9 +22,10 @@ import { toast } from "sonner";
 import {
   createBookingAction,
   fetchSlotsAction,
+  listEventTypesAction,
   type BookingState,
 } from "@/app/[locale]/contact/_actions/booking";
-import type { CalSlot, CalSlots } from "@/utils/cal/client";
+import type { CalEventType, CalSlot, CalSlots } from "@/utils/cal/client";
 import { cn } from "@/lib/utils";
 
 interface BookingWidgetProps {
@@ -39,6 +40,7 @@ export interface BookingLabels {
   noSlots: string;
   pickDay: string;
   pickSlot: string;
+  pickEventType: string;
   weekdays: string[];
   monthFormat: "long";
   confirmTitle: string;
@@ -107,14 +109,35 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
   const [timezone] = useState<string>(detectTimezone());
   const [, startTransition] = useTransition();
   const [bookingResult, setBookingResult] = useState<BookingState>(null);
+  const [eventTypes, setEventTypes] = useState<CalEventType[]>([]);
+  const [eventSlug, setEventSlug] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+    listEventTypesAction()
+      .then((res) => {
+        if (cancelled) return;
+        if (res.ok) {
+          setEventTypes(res.types);
+          setEventSlug((prev) => prev ?? res.defaultSlug);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!eventSlug) return;
+    let cancelled = false;
     setLoading(true);
     setError(null);
+    setSelectedDate(null);
+    setSelectedSlot(null);
     const start = startOfMonth(viewMonth).toISOString();
     const end = endOfMonth(viewMonth).toISOString();
-    fetchSlotsAction({ start, end, timeZone: timezone })
+    fetchSlotsAction({ start, end, timeZone: timezone, eventTypeSlug: eventSlug })
       .then((res) => {
         if (cancelled) return;
         if (res.ok) {
@@ -136,7 +159,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
     return () => {
       cancelled = true;
     };
-  }, [viewMonth, timezone]);
+  }, [viewMonth, timezone, eventSlug]);
 
   const today = new Date();
   const monthLabel = useMemo(
@@ -234,6 +257,40 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
           <span className="text-foreground">{timezone}</span>
         </div>
       </header>
+
+      {eventTypes.length > 1 && (
+        <div className="border-b border-dashed-soft px-6 py-4 md:px-8">
+          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            {labels.pickEventType}
+          </p>
+          <ul className="flex flex-wrap gap-2">
+            {eventTypes.map((t) => {
+              const active = t.slug === eventSlug;
+              return (
+                <li key={t.id}>
+                  <button
+                    type="button"
+                    onClick={() => setEventSlug(t.slug)}
+                    aria-pressed={active}
+                    className={cn(
+                      "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all",
+                      active
+                        ? "border-accent-blue bg-accent-blue text-white shadow-sm"
+                        : "border-dashed-soft bg-background text-foreground hover:border-accent-blue hover:text-accent-blue"
+                    )}
+                  >
+                    <span className="font-mono tabular-nums">
+                      {t.lengthInMinutes}
+                      {labels.durationUnit}
+                    </span>
+                    <span className="truncate">{t.title}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
 
       <div className="grid gap-6 p-6 md:grid-cols-[1.2fr_1fr] md:gap-8 md:p-8">
         <section aria-label={labels.pickDay}>
@@ -375,6 +432,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
           locale={locale}
           timezone={timezone}
           labels={labels}
+          eventTypeSlug={eventSlug ?? ""}
           onCancel={() => setSelectedSlot(null)}
           onResult={(res) => {
             startTransition(() => {
@@ -422,6 +480,7 @@ function ConfirmDialog({
   locale,
   timezone,
   labels,
+  eventTypeSlug,
   onCancel,
   onResult,
 }: {
@@ -429,6 +488,7 @@ function ConfirmDialog({
   locale: string;
   timezone: string;
   labels: BookingLabels;
+  eventTypeSlug: string;
   onCancel: () => void;
   onResult: (res: BookingState) => void;
 }) {
@@ -483,6 +543,12 @@ function ConfirmDialog({
           <input type="hidden" name="start" value={slot.start} />
           <input type="hidden" name="timeZone" value={timezone} />
           <input type="hidden" name="locale" value={locale} />
+          <input
+            type="hidden"
+            name="eventTypeSlug"
+            value={eventTypeSlug}
+          />
+
 
           <Field
             id="b-name"

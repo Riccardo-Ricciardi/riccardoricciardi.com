@@ -3,8 +3,10 @@
 import {
   createBooking,
   getEventTypeBySlug,
+  getEventTypes,
   getSlots,
   isCalConfigured,
+  type CalEventType,
   type CalSlots,
 } from "@/utils/cal/client";
 import { logger } from "@/utils/logger";
@@ -15,8 +17,37 @@ function username(): string {
   return process.env.NEXT_PUBLIC_CAL_USERNAME?.trim() || "";
 }
 
-function eventSlug(): string {
+function defaultEventSlug(): string {
   return process.env.NEXT_PUBLIC_CAL_EVENT_SLUG?.trim() || "30min";
+}
+
+export type EventTypesResult =
+  | { ok: true; types: CalEventType[]; defaultSlug: string }
+  | { ok: false; error: string };
+
+export async function listEventTypesAction(): Promise<EventTypesResult> {
+  if (!isCalConfigured()) return { ok: false, error: "not_configured" };
+  const user = username();
+  if (!user) return { ok: false, error: "no_username" };
+
+  try {
+    const types = await getEventTypes(user);
+    const visible = types.filter((t) => t.slug && t.lengthInMinutes > 0);
+    const sorted = [...visible].sort(
+      (a, b) => a.lengthInMinutes - b.lengthInMinutes
+    );
+    const fallback = defaultEventSlug();
+    const defaultSlug =
+      sorted.find((t) => t.slug === fallback)?.slug ??
+      sorted[0]?.slug ??
+      fallback;
+    return { ok: true, types: sorted, defaultSlug };
+  } catch (err) {
+    logger.error("cal: event types fetch failed", {
+      message: err instanceof Error ? err.message : "unknown",
+    });
+    return { ok: false, error: "fetch_failed" };
+  }
 }
 
 export type SlotsFetchResult =
@@ -27,6 +58,7 @@ export async function fetchSlotsAction(input: {
   start: string;
   end: string;
   timeZone: string;
+  eventTypeSlug?: string;
 }): Promise<SlotsFetchResult> {
   if (!isCalConfigured()) {
     return { ok: false, error: "not_configured" };
@@ -35,7 +67,7 @@ export async function fetchSlotsAction(input: {
   if (!user) return { ok: false, error: "no_username" };
 
   try {
-    const slug = eventSlug();
+    const slug = input.eventTypeSlug?.trim() || defaultEventSlug();
     const [slots, type] = await Promise.all([
       getSlots({
         username: user,
@@ -84,6 +116,8 @@ export async function createBookingAction(
     String(formData.get("timeZone") ?? "").trim() || "Europe/Rome";
   const notes = String(formData.get("notes") ?? "").trim();
   const locale = String(formData.get("locale") ?? "en").slice(0, 5);
+  const slug =
+    String(formData.get("eventTypeSlug") ?? "").trim() || defaultEventSlug();
 
   if (!start || !name || !email) {
     return { ok: false, error: "fields_required" };
@@ -96,7 +130,7 @@ export async function createBookingAction(
   }
 
   try {
-    const type = await getEventTypeBySlug(user, eventSlug());
+    const type = await getEventTypeBySlug(user, slug);
     if (!type) return { ok: false, error: "event_not_found" };
 
     const result = await createBooking({
