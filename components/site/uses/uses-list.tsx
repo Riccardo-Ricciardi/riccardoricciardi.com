@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { Eyebrow } from "@/components/site/atoms/eyebrow";
 import type { UsesItem } from "@/utils/uses/fetch";
 
 interface UsesListProps {
@@ -23,9 +24,7 @@ export function UsesList({ items }: UsesListProps) {
     <div className="flex flex-col gap-12 md:gap-16">
       {categories.map((category) => (
         <section key={category}>
-          <h3 className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-            {category}
-          </h3>
+          <Eyebrow as="span">{category}</Eyebrow>
           <ul className="mt-4 grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-3">
             {grouped.get(category)!.map((item) => (
               <li key={item.id}>
@@ -40,22 +39,13 @@ export function UsesList({ items }: UsesListProps) {
 }
 
 function UsesCard({ item }: { item: UsesItem }) {
-  const Wrapper: React.ElementType = item.url ? Link : "div";
-  const wrapperProps = item.url
-    ? {
-        href: item.url,
-        target: "_blank",
-        rel: "noopener noreferrer",
-      }
-    : {};
+  const className =
+    "group relative flex h-full flex-col gap-3 card-base card-interactive no-underline";
 
-  return (
-    <Wrapper
-      {...wrapperProps}
-      className="group relative flex h-full flex-col gap-3 rounded-xl border border-dashed-soft bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-accent-blue hover:shadow-[0_0_0_1px_var(--accent-blue-soft)]"
-    >
+  const Inner = (
+    <>
       <div className="flex items-start justify-between gap-2">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-dashed-soft bg-background/60">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-control border border-dashed-soft bg-background/60">
           {item.icon_url ? (
             <Image
               src={item.icon_url}
@@ -80,15 +70,30 @@ function UsesCard({ item }: { item: UsesItem }) {
       </div>
 
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium tracking-tight">
+        <p className="text-body-sm truncate font-medium tracking-tight">
           {item.name}
         </p>
         {item.description && (
-          <p className="mt-1 line-clamp-3 text-xs leading-relaxed text-muted-foreground">
+          <p className="text-caption mt-1 line-clamp-3 leading-relaxed">
             {item.description}
           </p>
         )}
       </div>
-    </Wrapper>
+    </>
   );
+
+  if (item.url) {
+    return (
+      <Link
+        href={item.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+      >
+        {Inner}
+      </Link>
+    );
+  }
+
+  return <div className={className}>{Inner}</div>;
 }

@@ -64,7 +64,7 @@ export default async function UsesPage({ params }: PageProps) {
   return (
     <section
       aria-labelledby="uses-heading"
-      className="container-page section-divider-b py-16 md:py-24 lg:py-28"
+      className="container-page section-divider-b section-y"
     >
       <SectionHeading
         eyebrow={eyebrow}
