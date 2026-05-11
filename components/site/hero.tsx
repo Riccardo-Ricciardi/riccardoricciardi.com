@@ -21,7 +21,7 @@ export function Hero({
   locale,
 }: HeroProps) {
   return (
-    <section className="section-divider-b relative overflow-hidden">
+    <section className="section-divider-b relative">
       <div
         aria-hidden="true"
         className="bg-dot bg-dot-mask pointer-events-none absolute inset-0 -z-20"

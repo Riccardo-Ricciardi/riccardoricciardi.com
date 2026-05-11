@@ -189,11 +189,26 @@
     border-style: solid;
     border-color: var(--border);
   }
-  .section-divider-b {
-    border-bottom: 1px solid var(--border-dashed);
-  }
+  .section-divider-b,
   .section-divider-t {
-    border-top: 1px solid var(--border-dashed);
+    position: relative;
+  }
+  .section-divider-b::after,
+  .section-divider-t::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: 100vw;
+    height: 1px;
+    background-color: var(--border-dashed);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .section-divider-b::after {
+    bottom: 0;
+  }
+  .section-divider-t::before {
+    top: 0;
   }
   .border-dashed-soft {
     border-color: var(--border-dashed);
