@@ -65,15 +65,17 @@ export function SortableSocial({ initial, bulkAction, deleteAction }: Props) {
   return (
     <form action={bulkAction} className="flex flex-col gap-3">
       <input type="hidden" name="order" value={order} />
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-        <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
-          <div className="admin-card flex flex-col divide-y admin-divider overflow-hidden">
-            {rows.map((row) => (
-              <SortableRow key={row.id} row={row} deleteAction={deleteAction} />
-            ))}
-          </div>
-        </SortableContext>
-      </DndContext>
+      <div className="admin-table-wrap">
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+          <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
+            <div className="admin-card flex flex-col divide-y admin-divider overflow-hidden">
+              {rows.map((row) => (
+                <SortableRow key={row.id} row={row} deleteAction={deleteAction} />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      </div>
       <SubmitButton className="w-full sm:w-auto sm:self-end" pendingLabel="Saving…">
         Save links
       </SubmitButton>

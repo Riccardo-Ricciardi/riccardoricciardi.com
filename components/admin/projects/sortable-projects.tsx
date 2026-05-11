@@ -60,16 +60,18 @@ export function SortableProjects({ initial, bulkAction, deleteAction }: Props) {
   return (
     <form action={bulkAction} className="flex flex-col gap-3">
       <input type="hidden" name="order" value={order} />
-      <div className="admin-card overflow-hidden">
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-          <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
-            <ul className="list-none divide-y admin-divider p-0">
-              {rows.map((row) => (
-                <SortableRow key={row.id} row={row} deleteAction={deleteAction} />
-              ))}
-            </ul>
-          </SortableContext>
-        </DndContext>
+      <div className="admin-table-wrap">
+        <div className="admin-card overflow-hidden">
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+            <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
+              <ul className="list-none divide-y admin-divider p-0">
+                {rows.map((row) => (
+                  <SortableRow key={row.id} row={row} deleteAction={deleteAction} />
+                ))}
+              </ul>
+            </SortableContext>
+          </DndContext>
+        </div>
       </div>
       <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
         <SubmitButton className="w-full sm:w-auto" pendingLabel="Saving…">

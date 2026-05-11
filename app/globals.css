@@ -753,6 +753,13 @@
     min-height: 44px;
     min-width: 44px;
   }
+  .admin-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
   .admin-skeleton {
     background: linear-gradient(
       90deg,

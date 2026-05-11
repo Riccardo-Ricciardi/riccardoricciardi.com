@@ -70,15 +70,17 @@ export function SortableAbout({
       {rows.length > 0 ? (
         <form action={bulkAction} className="flex flex-col gap-3">
           <input type="hidden" name="order" value={order} />
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-            <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
-              <div className="flex flex-col gap-2">
-                {rows.map((row) => (
-                  <SortableRow key={row.id} row={row} deleteAction={deleteAction} />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
+          <div className="admin-table-wrap">
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+              <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
+                <div className="flex flex-col gap-2">
+                  {rows.map((row) => (
+                    <SortableRow key={row.id} row={row} deleteAction={deleteAction} />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          </div>
           <SubmitButton className="w-full sm:w-auto sm:self-end" pendingLabel="Saving…">
             Save {languageCode} sections
           </SubmitButton>

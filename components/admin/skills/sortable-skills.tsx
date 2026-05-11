@@ -64,6 +64,7 @@ export function SortableSkills({ initial, bulkAction, deleteAction }: Props) {
   return (
     <form action={bulkAction} className="flex flex-col gap-3">
       <input type="hidden" name="order" value={order} />
+      <div className="admin-table-wrap">
       <div className="admin-card overflow-hidden">
         <div className="hidden border-b admin-divider px-3 py-2 text-[10px] uppercase tracking-wider text-muted-foreground sm:grid sm:grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_7rem_5.5rem_3rem] sm:items-center sm:gap-3">
           <span></span>
@@ -86,6 +87,7 @@ export function SortableSkills({ initial, bulkAction, deleteAction }: Props) {
             </ul>
           </SortableContext>
         </DndContext>
+      </div>
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
