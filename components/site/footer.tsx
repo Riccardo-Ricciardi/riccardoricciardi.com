@@ -41,7 +41,7 @@ export async function Footer({ locale }: FooterProps) {
 
   return (
     <footer className="section-divider-t mt-auto" role="contentinfo">
-      <div className="container-page flex flex-row items-center justify-between gap-4 py-6 text-xs text-muted-foreground sm:text-sm">
+      <div className="container-page text-caption flex flex-row items-center justify-between gap-4 py-6 text-muted-foreground sm:text-sm">
         <p className="truncate">
           © {year} {built}.
         </p>
