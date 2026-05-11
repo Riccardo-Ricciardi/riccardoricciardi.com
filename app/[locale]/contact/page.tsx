@@ -197,7 +197,7 @@ export default async function ContactPage({ params }: PageProps) {
           aria-label={isIt ? "Prenota una chiamata" : "Book a call"}
           className="container-page pb-20 pt-10 md:pb-28 md:pt-12"
         >
-          <div className="mx-auto max-w-4xl">
+          <div className="mx-auto max-w-2xl">
             <details className="group [&_summary::-webkit-details-marker]:hidden">
               <summary className="card-base card-interactive flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 transition-colors">
                 <span className="flex flex-col gap-0.5">

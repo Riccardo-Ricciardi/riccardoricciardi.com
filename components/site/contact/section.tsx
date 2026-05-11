@@ -1,5 +1,20 @@
 import { Clock, ShieldCheck } from "lucide-react";
-import { SectionHeading } from "@/components/site/atoms/section-heading";
+import { Heading } from "@/components/site/atoms/heading";
+
+/**
+ * LAYOUT EXCEPTION
+ * ----------------
+ * /contact is a conversion page, not a content page. Unlike Skills /
+ * Projects / About / Work / Uses (which follow the left-default
+ * pattern), the contact hero is intentionally centered with a
+ * narrower column to focus the visitor on a single goal: writing a
+ * message. Form readability constrains the form card to max-w-2xl
+ * elsewhere; this hero matches that center alignment so the column
+ * feels continuous.
+ *
+ * Keep this section centered. Do not migrate to the left-default
+ * pattern.
+ */
 
 interface ContactProps {
   heading: string;
@@ -34,32 +49,36 @@ export function Contact({
       aria-labelledby="contact-heading"
       className="container-page pt-20 md:pt-28 lg:pt-32"
     >
-      <SectionHeading
-        eyebrow={eyebrow}
-        title={heading}
-        subtitle={subtitle}
-        id="contact-heading"
-        className="mb-8"
-      />
+      <div className="content-narrow flex flex-col items-center text-center">
+        <Heading
+          level="h1"
+          eyebrow={eyebrow}
+          title={heading}
+          subtitle={subtitle}
+          align="center"
+          id="contact-heading"
+          className="mb-8"
+        />
 
-      {items.length > 0 && (
-        <ul className="flex flex-wrap items-center gap-2">
-          {items.map((item, idx) => {
-            const Icon = icons[idx] ?? Clock;
-            return (
-              <li key={`${item}-${idx}`}>
-                <span className="inline-flex items-center gap-2 rounded-pill border border-dashed-soft bg-background/60 px-3 py-1 text-xs font-medium text-muted-foreground">
-                  <Icon
-                    className="h-3.5 w-3.5 text-accent-blue"
-                    aria-hidden="true"
-                  />
-                  {item}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+        {items.length > 0 && (
+          <ul className="flex flex-wrap items-center justify-center gap-2">
+            {items.map((item, idx) => {
+              const Icon = icons[idx] ?? Clock;
+              return (
+                <li key={`${item}-${idx}`}>
+                  <span className="inline-flex items-center gap-2 rounded-pill border border-dashed-soft bg-background/60 px-3 py-1 text-xs font-medium text-muted-foreground">
+                    <Icon
+                      className="h-3.5 w-3.5 text-accent-blue"
+                      aria-hidden="true"
+                    />
+                    {item}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
     </section>
   );
 }
