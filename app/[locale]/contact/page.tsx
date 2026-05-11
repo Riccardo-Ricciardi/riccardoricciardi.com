@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Contact } from "@/components/site/contact/section";
+import { ContactSecondaryLinks } from "@/components/site/contact/secondary-links";
 import { ContactForm } from "@/components/site/contact/contact-form";
 import {
   BookingWidget,
@@ -35,8 +36,8 @@ export async function generateMetadata({
   return {
     title,
     description: isIt
-      ? "Parliamone — email, social, o scrivimi direttamente."
-      : "Let's talk — email, socials, or write to me directly.",
+      ? "Hai un progetto? Parliamone. Scrivimi o prenota una chiamata."
+      : "Got a project? Let's talk. Write to me or book a call.",
     alternates: {
       canonical: `/${locale}/contact`,
       languages: Object.fromEntries(
@@ -119,25 +120,38 @@ export default async function ContactPage({ params }: PageProps) {
   const calEnabled =
     isCalConfigured() && !!process.env.NEXT_PUBLIC_CAL_USERNAME;
 
-  const heading = content(blocks, "contact_heading", isIt ? "Parliamone" : "Let's talk");
+  const heading = content(
+    blocks,
+    "contact_heading",
+    isIt ? "Hai un progetto? Parliamone." : "Got a project? Let's talk."
+  );
   const eyebrow = content(blocks, "contact_eyebrow", "/contact");
   const subtitle = content(
     blocks,
     "contact_subtitle",
     isIt
-      ? "Email è il modo più veloce, oppure scrivimi qui sotto."
-      : "Email is fastest, or write to me below."
+      ? "Raccontami cosa stai costruendo o quale problema vuoi risolvere. Di solito rispondo entro 24 ore, nei giorni feriali."
+      : "Tell me what you're building or what problem you're trying to solve. I usually reply within 24 hours, weekdays."
   );
-  const emailLabel = content(
+  const trust = content(
     blocks,
-    "contact_email_label",
-    isIt ? "Scrivimi" : "Email me"
+    "contact_trust",
+    isIt
+      ? "Risposta entro 24h · Trattato con riservatezza"
+      : "Reply within 24h · Treated with confidence"
   );
+  const secondaryHeading = content(
+    blocks,
+    "contact_secondary_heading",
+    isIt ? "Oppure scrivimi direttamente" : "Or reach out directly"
+  );
+  const emailLabel = content(blocks, "contact_email_label", "Email");
 
   const formLabels = isIt
     ? {
         title: "Scrivimi un messaggio",
-        description: "Compila i campi qui sotto. Ti rispondo di solito entro 24 ore.",
+        description:
+          "Compila i campi qui sotto. Ti rispondo di solito entro 24 ore.",
         name: "Nome",
         email: "Email",
         message: "Messaggio",
@@ -151,7 +165,8 @@ export default async function ContactPage({ params }: PageProps) {
       }
     : {
         title: "Send me a message",
-        description: "Fill in the fields below. I usually reply within 24 hours.",
+        description:
+          "Fill in the fields below. I usually reply within 24 hours.",
         name: "Name",
         email: "Email",
         message: "Message",
@@ -170,22 +185,27 @@ export default async function ContactPage({ params }: PageProps) {
         heading={heading}
         eyebrow={eyebrow}
         subtitle={subtitle}
-        emailLabel={emailLabel}
-        locale={locale}
+        trust={trust}
       />
+
       <section
         aria-labelledby="contact-form-heading"
-        className="container-page pb-12 md:pb-16"
+        className="container-page section-divider-b pb-12 pt-10 md:pb-16 md:pt-12"
       >
         <div className="mx-auto max-w-2xl">
           <ContactForm locale={locale} labels={formLabels} />
         </div>
       </section>
 
+      <ContactSecondaryLinks
+        heading={secondaryHeading}
+        emailLabel={emailLabel}
+      />
+
       {calEnabled && (
         <section
           aria-label={isIt ? "Prenota una chiamata" : "Book a call"}
-          className="container-page section-divider-b pb-20 md:pb-28"
+          className="container-page section-divider-t pb-20 pt-16 md:pb-28 md:pt-20"
         >
           <div className="mx-auto max-w-4xl">
             <BookingWidget locale={locale} labels={bookingLabels(locale)} />

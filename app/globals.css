@@ -198,7 +198,7 @@
     content: "";
     position: absolute;
     left: 50%;
-    width: 100vw;
+    width: calc(100vw - var(--scrollbar-w, 0px));
     height: 1px;
     background-color: var(--border-dashed);
     transform: translateX(-50%);

@@ -38,6 +38,19 @@ export const CONTENT_SCHEMA: ContentSection[] = [
       { slug: "projects_subtitle", label: "Subtitle", multiline: true },
     ],
   },
+  {
+    key: "contact",
+    title: "Contact page",
+    description: "Headline, subtitle and trust signals on /contact",
+    fields: [
+      { slug: "contact_eyebrow", label: "Eyebrow" },
+      { slug: "contact_heading", label: "Headline" },
+      { slug: "contact_subtitle", label: "Subtitle", multiline: true },
+      { slug: "contact_trust", label: "Trust badge" },
+      { slug: "contact_secondary_heading", label: "Secondary links heading" },
+      { slug: "contact_email_label", label: "Email card label" },
+    ],
+  },
 ];
 
 export const KNOWN_SLUGS = new Set(

@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { DynamicThemeVars } from "@/components/dynamic-theme-vars";
+import { ScrollbarWidth } from "@/components/scrollbar-width";
 import { APP_CONFIG } from "@/utils/config/app";
 
 export const metadata: Metadata = {
@@ -46,6 +47,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className="flex min-h-screen flex-col bg-background text-foreground"
       >
+        <ScrollbarWidth />
         <Providers>{children}</Providers>
       </body>
     </html>
