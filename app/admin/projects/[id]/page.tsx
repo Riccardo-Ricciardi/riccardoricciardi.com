@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink, Trash2, Upload } from "lucide-react";
 import { requireAdmin } from "@/utils/auth/admin";
 import { createAdminClient } from "@/utils/supabase/admin";
+import { logger } from "@/utils/logger";
 import { SectionHeader } from "@/components/admin/primitives/section-header";
 import { SubmitButton } from "@/components/admin/actions/submit-button";
 import {
@@ -25,24 +26,45 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   if (!id) notFound();
 
   const supabase = createAdminClient();
-  const [{ data: projectData }, { data: langsData }, { data: i18nData }] =
-    await Promise.all([
-      supabase
-        .from("projects")
-        .select(
-          "id, repo, name, description, url, homepage, language, stars, screenshot_url, og_image, problem, solution, outcome"
-        )
-        .eq("id", id)
-        .maybeSingle(),
-      supabase
-        .from("languages")
-        .select("id, code, name")
-        .order("id", { ascending: true }),
-      supabase
-        .from("projects_i18n")
-        .select("language_id, description, problem, solution, outcome")
-        .eq("project_id", id),
-    ]);
+  const [
+    { data: projectData, error: projectErr },
+    { data: langsData, error: langsErr },
+    { data: i18nData, error: i18nErr },
+  ] = await Promise.all([
+    supabase
+      .from("projects")
+      .select(
+        "id, repo, name, description, url, homepage, language, stars, screenshot_url, og_image, problem, solution, outcome"
+      )
+      .eq("id", id)
+      .maybeSingle(),
+    supabase
+      .from("languages")
+      .select("id, code, name")
+      .order("id", { ascending: true }),
+    supabase
+      .from("projects_i18n")
+      .select("language_id, description, problem, solution, outcome")
+      .eq("project_id", id),
+  ]);
+
+  if (projectErr) {
+    logger.error("admin/projects/[id]: project fetch failed", {
+      id,
+      message: projectErr.message,
+    });
+  }
+  if (langsErr) {
+    logger.error("admin/projects/[id]: languages fetch failed", {
+      message: langsErr.message,
+    });
+  }
+  if (i18nErr) {
+    logger.error("admin/projects/[id]: i18n fetch failed", {
+      id,
+      message: i18nErr.message,
+    });
+  }
 
   const project = projectData as
     | {
