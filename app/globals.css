@@ -483,8 +483,8 @@
     font-size: 0.875rem;
     font-weight: var(--weight-label);
     line-height: 1;
-    transition: background-color 120ms ease, border-color 120ms ease,
-      color 120ms ease, transform 80ms ease, box-shadow 120ms ease;
+    transition: background-color 150ms ease, border-color 150ms ease,
+      color 150ms ease, transform 150ms ease;
     cursor: pointer;
   }
   .btn-base:active {
@@ -492,7 +492,7 @@
   }
   .btn-base:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px var(--accent-soft);
+    box-shadow: 0 0 0 2px var(--accent-soft);
   }
   .btn-base:disabled,
   .btn-base[aria-disabled="true"] {
@@ -620,12 +620,12 @@
     background: var(--bg-default);
     font-size: 0.875rem;
     color: var(--fg-default);
-    transition: border-color 120ms ease, box-shadow 120ms ease;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
   }
   .field-input:focus-visible {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
+    box-shadow: 0 0 0 2px var(--accent-soft);
   }
   .field-textarea {
     min-height: 7rem;
@@ -684,7 +684,7 @@
     background: var(--bg-default);
     font-size: 0.875rem;
     color: var(--fg-default);
-    transition: border-color 120ms ease, box-shadow 120ms ease;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
   }
   @media (min-width: 768px) {
     .admin-input {
@@ -695,7 +695,7 @@
   .admin-input:focus-visible {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
+    box-shadow: 0 0 0 2px var(--accent-soft);
   }
   .admin-button {
     display: inline-flex;
@@ -708,8 +708,8 @@
     font-size: 0.8125rem;
     font-weight: var(--weight-label);
     line-height: 1;
-    transition: background-color 120ms ease, border-color 120ms ease,
-      color 120ms ease, transform 80ms ease, box-shadow 120ms ease;
+    transition: background-color 150ms ease, border-color 150ms ease,
+      color 150ms ease, transform 150ms ease;
     cursor: pointer;
   }
   .admin-button:active {
@@ -717,7 +717,7 @@
   }
   .admin-button:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px var(--accent-soft);
+    box-shadow: 0 0 0 2px var(--accent-soft);
   }
   .admin-button:disabled,
   .admin-button[aria-disabled="true"] {
