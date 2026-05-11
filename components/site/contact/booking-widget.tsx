@@ -236,7 +236,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-dashed-soft bg-card">
+    <div className="card-base card-flush rounded-surface overflow-hidden">
       <header className="flex flex-col gap-3 border-b border-dashed-soft p-6 md:flex-row md:items-center md:justify-between md:p-8">
         <div className="flex items-start gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-dashed-soft text-accent-blue">
@@ -525,7 +525,7 @@ function ConfirmDialog({
         if (e.target === e.currentTarget) onCancel();
       }}
     >
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-dashed-soft bg-card shadow-xl">
+      <div className="w-full max-w-md card-base card-flush rounded-surface overflow-hidden shadow-xl">
         <header className="border-b border-dashed-soft p-5">
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
             {labels.confirmTitle}
@@ -689,7 +689,7 @@ function SuccessCard({
   );
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-dashed-soft bg-card">
+    <div className="card-base card-flush rounded-surface overflow-hidden">
       <div className="flex flex-col items-center gap-4 p-8 text-center md:p-12">
         <span className="grid h-12 w-12 place-items-center rounded-full border border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
           <Check className="h-6 w-6" aria-hidden="true" />

@@ -5,6 +5,11 @@ import { useFormStatus } from "react-dom";
 import { Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
 import {
+  FieldShell,
+  FieldInput,
+  FieldTextarea,
+} from "@/components/site/atoms/field";
+import {
   submitContactMessageAction,
   type ContactFormState,
 } from "@/app/[locale]/contact/_actions/submit";
@@ -52,16 +57,14 @@ export function ContactForm({ locale, labels }: ContactFormProps) {
   }, [state, labels.successTitle, labels.successBody]);
 
   return (
-    <div className="rounded-2xl border border-dashed-soft bg-card p-6 shadow-sm md:p-8">
+    <div className="card-base card-pad-lg rounded-surface shadow-sm">
       {(labels.title || labels.description) && (
         <header className="mb-6">
           {labels.title && (
-            <h3 className="text-xl font-semibold tracking-tight md:text-2xl">
-              {labels.title}
-            </h3>
+            <h3 className="text-h3">{labels.title}</h3>
           )}
           {labels.description && (
-            <p className="mt-1.5 text-sm text-muted-foreground">
+            <p className="text-body-sm mt-1.5 text-muted-foreground">
               {labels.description}
             </p>
           )}
@@ -80,84 +83,45 @@ export function ContactForm({ locale, labels }: ContactFormProps) {
         />
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field
-            id="contact-name"
-            name="name"
-            label={labels.name}
-            placeholder={labels.namePlaceholder}
-            required
-            autoComplete="name"
-            maxLength={100}
-          />
-          <Field
-            id="contact-email"
-            name="email"
-            type="email"
-            label={labels.email}
-            placeholder={labels.emailPlaceholder}
-            required
-            autoComplete="email"
-            maxLength={200}
-          />
+          <FieldShell id="contact-name" label={labels.name}>
+            <FieldInput
+              id="contact-name"
+              name="name"
+              required
+              autoComplete="name"
+              maxLength={100}
+              placeholder={labels.namePlaceholder}
+            />
+          </FieldShell>
+          <FieldShell id="contact-email" label={labels.email}>
+            <FieldInput
+              id="contact-email"
+              name="email"
+              type="email"
+              required
+              autoComplete="email"
+              maxLength={200}
+              placeholder={labels.emailPlaceholder}
+            />
+          </FieldShell>
         </div>
 
-        <label className="flex flex-col gap-1.5">
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-            {labels.message}
-          </span>
-          <textarea
+        <FieldShell id="contact-message" label={labels.message}>
+          <FieldTextarea
+            id="contact-message"
             name="message"
             required
             rows={5}
             maxLength={2000}
             placeholder={labels.messagePlaceholder}
-            className="min-h-32 w-full resize-y rounded-lg border border-dashed-soft bg-background px-3 py-2.5 text-sm leading-relaxed focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft"
           />
-        </label>
+        </FieldShell>
 
         <div className="flex flex-col items-stretch gap-3 pt-1 sm:flex-row sm:items-center sm:justify-end">
           <SubmitBtn label={labels.submit} pendingLabel={labels.sending} />
         </div>
       </form>
     </div>
-  );
-}
-
-function Field({
-  id,
-  name,
-  type = "text",
-  label,
-  placeholder,
-  required,
-  autoComplete,
-  maxLength,
-}: {
-  id: string;
-  name: string;
-  type?: string;
-  label: string;
-  placeholder?: string;
-  required?: boolean;
-  autoComplete?: string;
-  maxLength?: number;
-}) {
-  return (
-    <label htmlFor={id} className="flex flex-col gap-1.5">
-      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-        {label}
-      </span>
-      <input
-        id={id}
-        name={name}
-        type={type}
-        required={required}
-        autoComplete={autoComplete}
-        maxLength={maxLength}
-        placeholder={placeholder}
-        className="h-11 w-full rounded-lg border border-dashed-soft bg-background px-3 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft"
-      />
-    </label>
   );
 }
 
@@ -174,7 +138,7 @@ function SubmitBtn({
       type="submit"
       disabled={pending}
       aria-busy={pending}
-      className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-accent-blue px-5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--accent-blue-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+      className="btn-base btn-primary w-full sm:w-auto"
     >
       {pending ? (
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
