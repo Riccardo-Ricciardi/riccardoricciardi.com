@@ -8,6 +8,7 @@ import { SectionHeader } from "@/components/admin/primitives/section-header";
 import { SubmitButton } from "@/components/admin/actions/submit-button";
 import {
   clearProjectScreenshotAction,
+  updateProjectNarrativeAction,
   upsertProjectI18nAction,
   uploadProjectScreenshotAction,
 } from "@/app/admin/_actions/projects";
@@ -29,7 +30,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
       supabase
         .from("projects")
         .select(
-          "id, repo, name, description, url, homepage, language, stars, screenshot_url, og_image"
+          "id, repo, name, description, url, homepage, language, stars, screenshot_url, og_image, problem, solution, outcome"
         )
         .eq("id", id)
         .maybeSingle(),
@@ -39,7 +40,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         .order("id", { ascending: true }),
       supabase
         .from("projects_i18n")
-        .select("language_id, description")
+        .select("language_id, description, problem, solution, outcome")
         .eq("project_id", id),
     ]);
 
@@ -55,6 +56,9 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         stars: number | null;
         screenshot_url: string | null;
         og_image: string | null;
+        problem: string | null;
+        solution: string | null;
+        outcome: string | null;
       }
     | null;
   if (!project) notFound();
@@ -64,12 +68,16 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     code: string;
     name: string;
   }>;
-  const i18nByLang = new Map<number, string>();
-  for (const r of (i18nData ?? []) as Array<{
+  type I18nRow = {
     language_id: number;
     description: string | null;
-  }>) {
-    if (r.description) i18nByLang.set(r.language_id, r.description);
+    problem: string | null;
+    solution: string | null;
+    outcome: string | null;
+  };
+  const i18nByLang = new Map<number, I18nRow>();
+  for (const r of (i18nData ?? []) as I18nRow[]) {
+    i18nByLang.set(r.language_id, r);
   }
 
   const imgSrc =
@@ -166,30 +174,123 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             </p>
           </div>
 
-          {langs.map((lang) => (
-            <form
-              key={lang.id}
-              action={upsertProjectI18nAction}
-              className="admin-card flex flex-col gap-2 p-3"
-            >
-              <input type="hidden" name="project_id" value={project.id} />
-              <input type="hidden" name="language_id" value={lang.id} />
-              <div className="flex items-center justify-between">
-                <span className="admin-eyebrow">
-                  {lang.code} · {lang.name}
-                </span>
-              </div>
-              <textarea
-                name="description"
-                rows={3}
-                defaultValue={i18nByLang.get(lang.id) ?? ""}
-                placeholder={project.description ?? "Translated description…"}
-                className="admin-input min-h-20"
-              />
-              <SubmitButton pendingLabel="Saving…">Save {lang.code}</SubmitButton>
-            </form>
-          ))}
+          {langs.map((lang) => {
+            const row = i18nByLang.get(lang.id);
+            return (
+              <form
+                key={lang.id}
+                action={upsertProjectI18nAction}
+                className="admin-card flex flex-col gap-3 p-3"
+              >
+                <input type="hidden" name="project_id" value={project.id} />
+                <input type="hidden" name="language_id" value={lang.id} />
+                <div className="flex items-center justify-between">
+                  <span className="admin-eyebrow">
+                    {lang.code} · {lang.name}
+                  </span>
+                </div>
+                <label className="flex flex-col gap-1">
+                  <span className="admin-eyebrow">Description</span>
+                  <textarea
+                    name="description"
+                    rows={3}
+                    defaultValue={row?.description ?? ""}
+                    placeholder={project.description ?? "Translated description…"}
+                    className="admin-input min-h-20"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="admin-eyebrow">Problem</span>
+                  <textarea
+                    name="problem"
+                    rows={2}
+                    defaultValue={row?.problem ?? ""}
+                    placeholder={
+                      project.problem ?? "What problem this project solves…"
+                    }
+                    className="admin-input min-h-16"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="admin-eyebrow">Solution</span>
+                  <textarea
+                    name="solution"
+                    rows={2}
+                    defaultValue={row?.solution ?? ""}
+                    placeholder={
+                      project.solution ?? "How the project tackles it…"
+                    }
+                    className="admin-input min-h-16"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="admin-eyebrow">Outcome</span>
+                  <textarea
+                    name="outcome"
+                    rows={2}
+                    defaultValue={row?.outcome ?? ""}
+                    placeholder={
+                      project.outcome ?? "Result, metric, or impact…"
+                    }
+                    className="admin-input min-h-16"
+                  />
+                </label>
+                <SubmitButton pendingLabel="Saving…">
+                  Save {lang.code}
+                </SubmitButton>
+              </form>
+            );
+          })}
         </div>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <header>
+          <p className="admin-eyebrow">Narrative · default</p>
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            Used as the base narrative for every language. Override per
+            language in the cards above.
+          </p>
+        </header>
+        <form
+          action={updateProjectNarrativeAction}
+          className="admin-card grid gap-3 p-4 lg:grid-cols-3"
+        >
+          <input type="hidden" name="id" value={project.id} />
+          <label className="flex flex-col gap-1">
+            <span className="admin-eyebrow">Problem</span>
+            <textarea
+              name="problem"
+              rows={3}
+              defaultValue={project.problem ?? ""}
+              placeholder="What problem this project solves…"
+              className="admin-input min-h-24"
+            />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="admin-eyebrow">Solution</span>
+            <textarea
+              name="solution"
+              rows={3}
+              defaultValue={project.solution ?? ""}
+              placeholder="How the project tackles it…"
+              className="admin-input min-h-24"
+            />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="admin-eyebrow">Outcome</span>
+            <textarea
+              name="outcome"
+              rows={3}
+              defaultValue={project.outcome ?? ""}
+              placeholder="Result, metric, or impact…"
+              className="admin-input min-h-24"
+            />
+          </label>
+          <div className="lg:col-span-3">
+            <SubmitButton pendingLabel="Saving…">Save narrative</SubmitButton>
+          </div>
+        </form>
       </section>
     </div>
   );

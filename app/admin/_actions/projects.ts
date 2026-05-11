@@ -171,9 +171,18 @@ export async function upsertProjectI18nAction(formData: FormData) {
   const project_id = String(formData.get("project_id") ?? "");
   const language_id = asInt(formData.get("language_id"));
   const description = asStr(formData.get("description"));
+  const problem = asStr(formData.get("problem"));
+  const solution = asStr(formData.get("solution"));
+  const outcome = asStr(formData.get("outcome"));
   if (!project_id || !language_id) bounce(PATH);
 
-  if (!description) {
+  const hasAnyValue =
+    Boolean(description) ||
+    Boolean(problem) ||
+    Boolean(solution) ||
+    Boolean(outcome);
+
+  if (!hasAnyValue) {
     await supabase
       .from("projects_i18n")
       .delete()
@@ -181,12 +190,42 @@ export async function upsertProjectI18nAction(formData: FormData) {
       .eq("language_id", language_id);
   } else {
     await supabase.from("projects_i18n").upsert(
-      { project_id, language_id, description },
+      {
+        project_id,
+        language_id,
+        description: description || null,
+        problem: problem || null,
+        solution: solution || null,
+        outcome: outcome || null,
+      },
       { onConflict: "project_id,language_id" }
     );
   }
 
   bounce(`${PATH}/${project_id}`, "saved");
+}
+
+export async function updateProjectNarrativeAction(formData: FormData) {
+  await requireAdmin();
+  const supabase = createAdminClient();
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) bounce(PATH);
+
+  const problem = asStr(formData.get("problem"));
+  const solution = asStr(formData.get("solution"));
+  const outcome = asStr(formData.get("outcome"));
+
+  await supabase
+    .from("projects")
+    .update({
+      problem: problem || null,
+      solution: solution || null,
+      outcome: outcome || null,
+    })
+    .eq("id", id);
+
+  bounce(`${PATH}/${id}`, "saved");
 }
 
 export async function triggerSyncAction() {
