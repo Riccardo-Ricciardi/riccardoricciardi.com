@@ -31,10 +31,10 @@ export async function About({ heading, eyebrow, subtitle, locale }: AboutProps) 
         className="mb-12 md:mb-16"
       />
 
-      <div className="grid gap-10 md:grid-cols-[1fr_2fr] md:gap-14 lg:gap-20">
+      <div className="grid gap-8 md:grid-cols-[1fr_2fr] md:gap-12 lg:gap-16">
         <aside className="md:sticky md:top-24 md:self-start">
           {identity.profile_photo_url ? (
-            <div className="relative aspect-[4/5] w-full max-w-sm overflow-hidden rounded-2xl border border-dashed-soft">
+            <div className="relative aspect-[4/5] w-full max-w-sm overflow-hidden rounded-surface border border-dashed-soft">
               <Image
                 src={identity.profile_photo_url}
                 alt={identity.name}
@@ -45,7 +45,7 @@ export async function About({ heading, eyebrow, subtitle, locale }: AboutProps) 
               />
             </div>
           ) : (
-            <div className="grid aspect-[4/5] w-full max-w-sm place-items-center rounded-2xl border border-dashed-soft bg-muted/30">
+            <div className="grid aspect-[4/5] w-full max-w-sm place-items-center rounded-surface border border-dashed-soft bg-muted/30">
               <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
                 {identity.name
                   .split(" ")
@@ -58,7 +58,7 @@ export async function About({ heading, eyebrow, subtitle, locale }: AboutProps) 
           <Eyebrow className="mt-4">{identity.name}</Eyebrow>
         </aside>
 
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-8 md:gap-10">
           {sections.length === 0 ? (
             <p className="text-body-lg text-muted-foreground">
               {locale === "it"
