@@ -39,29 +39,6 @@ export function Hero({
 
       <div className="container-page section-y">
         <div className="content-narrow flex flex-col items-center text-center">
-          {eyebrow && (
-            <Link
-              href={`/${locale}/contact`}
-              className="group mb-5 inline-flex items-center gap-2 rounded-pill border border-dashed-soft bg-background/80 px-3 py-1 text-xs font-medium text-foreground/80 backdrop-blur transition-colors hover:border-accent-blue hover:text-foreground"
-            >
-              <span
-                aria-hidden="true"
-                className="relative inline-flex h-1.5 w-1.5"
-              >
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              </span>
-              <Sparkles
-                className="h-3 w-3 text-accent-blue"
-                aria-hidden="true"
-              />
-              <span>{eyebrow}</span>
-              <ArrowRight
-                className="h-3 w-3 transition-transform group-hover:translate-x-0.5"
-                aria-hidden="true"
-              />
-            </Link>
-          )}
           <h1 className="text-display text-balance">
             {title}
           </h1>
