@@ -104,15 +104,45 @@ function detectTimezone(): string {
   }
 }
 
-export function BookingWidget({ locale, labels }: BookingWidgetProps) {
-  const [viewMonth, setViewMonth] = useState<Date>(() => startOfMonth(new Date()));
+export function BookingWidget(props: BookingWidgetProps) {
+  const [ready, setReady] = useState<{ month: Date; tz: string } | null>(null);
+
+  useEffect(() => {
+    setReady({ month: startOfMonth(new Date()), tz: detectTimezone() });
+  }, []);
+
+  if (!ready) {
+    return <BookingWidgetSkeleton labels={props.labels} />;
+  }
+
+  return (
+    <BookingWidgetInner
+      {...props}
+      initialMonth={ready.month}
+      initialTz={ready.tz}
+    />
+  );
+}
+
+interface BookingWidgetInnerProps extends BookingWidgetProps {
+  initialMonth: Date;
+  initialTz: string;
+}
+
+function BookingWidgetInner({
+  locale,
+  labels,
+  initialMonth,
+  initialTz,
+}: BookingWidgetInnerProps) {
+  const [viewMonth, setViewMonth] = useState<Date>(initialMonth);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<CalSlot | null>(null);
   const [slots, setSlots] = useState<CalSlots>({});
   const [eventLength, setEventLength] = useState<number>(30);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [timezone] = useState<string>(detectTimezone());
+  const [timezone] = useState<string>(initialTz);
   const [, startTransition] = useTransition();
   const [bookingResult, setBookingResult] = useState<BookingState>(null);
   const [eventTypes, setEventTypes] = useState<CalEventType[]>([]);
@@ -490,6 +520,36 @@ function SlotsSkeleton() {
         </li>
       ))}
     </ul>
+  );
+}
+
+function BookingWidgetSkeleton({ labels }: { labels: BookingLabels }) {
+  return (
+    <div className="card-base card-flush rounded-surface overflow-hidden">
+      <header className="flex flex-col gap-3 border-b border-dashed-soft p-6 md:flex-row md:items-center md:justify-between md:p-8">
+        <div className="flex items-start gap-3">
+          <span
+            aria-hidden="true"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-dashed-soft text-accent-blue"
+          >
+            <Calendar className="h-5 w-5" />
+          </span>
+          <div className="min-w-0">
+            <h3 className="text-h3">{labels.heading}</h3>
+            <p className="text-body-sm mt-1 text-muted-foreground">
+              {labels.description}
+            </p>
+          </div>
+        </div>
+      </header>
+      <div className="grid gap-6 p-6 md:grid-cols-[1.2fr_1fr] md:gap-8 md:p-8">
+        <div
+          aria-hidden="true"
+          className="h-72 animate-pulse rounded-md border border-dashed-soft bg-background/60"
+        />
+        <SlotsSkeleton />
+      </div>
+    </div>
   );
 }
 
