@@ -1,24 +1,20 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MouseParticles } from "@/components/mouse-particles";
 
 interface HeroProps {
-  eyebrow?: string;
   title: string;
   subtitle: string;
   primaryCta: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
-  locale: string;
 }
 
 export function Hero({
-  eyebrow,
   title,
   subtitle,
   primaryCta,
   secondaryCta,
-  locale,
 }: HeroProps) {
   return (
     <section className="section-divider-b relative">

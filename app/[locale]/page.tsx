@@ -30,7 +30,6 @@ export default async function Page({ params }: PageProps) {
 
   const blocks = await getContentBlocks(locale);
 
-  const heroEyebrow = content(blocks, "hero_eyebrow", "Available for new projects");
   const heroTitle = content(
     blocks,
     "hero_title",
@@ -102,7 +101,6 @@ export default async function Page({ params }: PageProps) {
   return (
     <>
       <Hero
-        eyebrow={heroEyebrow}
         title={heroTitle}
         subtitle={heroSubtitle}
         primaryCta={{
@@ -113,7 +111,6 @@ export default async function Page({ params }: PageProps) {
           label: heroSecondary,
           href: "#projects",
         }}
-        locale={locale}
       />
       <Services
         eyebrow={servicesEyebrow}
@@ -125,7 +122,6 @@ export default async function Page({ params }: PageProps) {
         <Skills
           heading={skillsHeading}
           eyebrow={skillsEyebrow}
-          allLabel={allLabel}
           locale={locale}
         />
       </Suspense>

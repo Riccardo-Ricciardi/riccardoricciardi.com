@@ -17,7 +17,30 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const GITHUB_TOKEN = Deno.env.get("GITHUB_TOKEN") ?? "";
 
+// owner/repo segments: alphanumerics, dashes, underscores, dots only.
+const REPO_RE = /^[A-Za-z0-9_.-]{1,100}\/[A-Za-z0-9_.-]{1,100}$/;
+
+function isValidRepo(repo: string): boolean {
+  if (!REPO_RE.test(repo)) return false;
+  // Defense in depth against path traversal / API path injection.
+  if (repo.includes("..") || repo.includes("//")) return false;
+  return true;
+}
+
+function safeEqual(a: string, b: string): boolean {
+  const ab = new TextEncoder().encode(a);
+  const bb = new TextEncoder().encode(b);
+  if (ab.length !== bb.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < ab.length; i++) mismatch |= ab[i] ^ bb[i];
+  return mismatch === 0;
+}
+
 async function fetchRepo(repo: string): Promise<GitHubRepo | null> {
+  if (!isValidRepo(repo)) {
+    console.error(`github reject invalid repo identifier`);
+    return null;
+  }
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28",
@@ -25,7 +48,7 @@ async function fetchRepo(repo: string): Promise<GitHubRepo | null> {
   };
   if (GITHUB_TOKEN) headers.Authorization = `Bearer ${GITHUB_TOKEN}`;
 
-  const res = await fetch(`https://api.github.com/repos/${repo}`, { headers });
+  const res = await fetch(`https://api.github.com/repos/${encodeURI(repo)}`, { headers });
   if (!res.ok) {
     console.error(`github ${repo}: ${res.status} ${res.statusText}`);
     return null;
@@ -39,8 +62,8 @@ Deno.serve(async (req: Request) => {
   }
 
   const auth = req.headers.get("authorization") ?? "";
-  const expected = `Bearer ${Deno.env.get("CRON_SECRET") ?? ""}`;
-  if (!Deno.env.get("CRON_SECRET") || auth !== expected) {
+  const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
+  if (!cronSecret || !auth.startsWith("Bearer ") || !safeEqual(auth.slice(7), cronSecret)) {
     return new Response("Unauthorized", { status: 401 });
   }
 

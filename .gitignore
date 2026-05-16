@@ -19,10 +19,12 @@
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
 *.pem
+Thumbs.db
 
 # debug
 npm-debug.log*
@@ -32,6 +34,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -41,7 +44,6 @@ yarn-error.log*
 next-env.d.ts
 .aider.chat.history.md
 .aider.input.history
-et --hard 973d537
 .aider.tags.cache.v4/cache.db
 
 # graphify

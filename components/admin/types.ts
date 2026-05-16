@@ -27,17 +27,6 @@ export type Project = {
   synced_at: string | null;
 };
 
-export type Language = { id: number; code: string; name: string };
-
-export type SiteIdentity = {
-  id: number;
-  name: string;
-  email: string | null;
-  profile_photo_url: string | null;
-  primary_cta_href: string | null;
-  secondary_cta_href: string | null;
-};
-
 export type SocialLink = {
   id: number;
   kind: string;
@@ -55,29 +44,6 @@ export type AboutSection = {
   position: number;
 };
 
-export type ContentBlock = {
-  id: number;
-  slug: string;
-  value: string;
-  language_id: number;
-};
-
-export type NavbarRow = {
-  id: number;
-  slug: string | null;
-  value: string;
-  language_id: number;
-  position: number;
-};
-
-export type NotFoundRow = {
-  id: number;
-  slug: string;
-  value: string;
-  language_id: number;
-  position: number;
-};
-
 export type ThemeSettingRow = {
   key: string;
   value_light: string;
@@ -86,15 +52,6 @@ export type ThemeSettingRow = {
   group_name: string;
   description: string | null;
   position: number;
-};
-
-export type MediaItem = {
-  name: string;
-  path: string;
-  url: string;
-  size: number | null;
-  updated_at: string | null;
-  content_type: string | null;
 };
 
 export type MediaFolder = {

@@ -228,7 +228,7 @@ export async function updateProjectNarrativeAction(formData: FormData) {
   bounce(`${PATH}/${id}`, "saved");
 }
 
-export async function triggerSyncAction() {
+export async function triggerSyncAction(): Promise<never> {
   await requireAdmin();
   const cronSecret = process.env.CRON_SECRET;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;

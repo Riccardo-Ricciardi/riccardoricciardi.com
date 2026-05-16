@@ -1,13 +1,9 @@
-"use client";
-
-import { useMemo } from "react";
 import Image from "next/image";
 import type { Skill } from "@/utils/skills/fetch";
 import { SkillCard } from "@/components/site/skills/skill-card";
 
 interface SkillsBoardProps {
   skills: Skill[];
-  allLabel: string;
   locale?: string;
 }
 
@@ -58,18 +54,15 @@ function tierFor(percentage: number): TierId {
   return "familiar";
 }
 
-export function SkillsBoard({ skills, allLabel: _allLabel, locale = "it" }: SkillsBoardProps) {
-  const grouped = useMemo(() => {
-    const map = new Map<TierId, Skill[]>([
-      ["core", []],
-      ["proficient", []],
-      ["familiar", []],
-    ]);
-    for (const s of skills) {
-      map.get(tierFor(s.percentage))?.push(s);
-    }
-    return map;
-  }, [skills]);
+export function SkillsBoard({ skills, locale = "it" }: SkillsBoardProps) {
+  const grouped = new Map<TierId, Skill[]>([
+    ["core", []],
+    ["proficient", []],
+    ["familiar", []],
+  ]);
+  for (const s of skills) {
+    grouped.get(tierFor(s.percentage))?.push(s);
+  }
 
   if (skills.length === 0) {
     return <p className="text-muted-foreground">—</p>;

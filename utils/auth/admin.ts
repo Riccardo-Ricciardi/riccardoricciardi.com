@@ -1,12 +1,15 @@
 import { redirect } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/server";
 
-export const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "info@riccardoricciardi.com")
+export const ADMIN_EMAILS: string[] = (
+  process.env.ADMIN_EMAILS ?? "info@riccardoricciardi.com"
+)
   .split(",")
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
 
-export async function getAdminUser() {
+export async function getAdminUser(): Promise<User | null> {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
   if (error || !data?.user) return null;
@@ -15,7 +18,7 @@ export async function getAdminUser() {
   return data.user;
 }
 
-export async function requireAdmin() {
+export async function requireAdmin(): Promise<User> {
   const user = await getAdminUser();
   if (!user) redirect("/admin/login");
   return user;

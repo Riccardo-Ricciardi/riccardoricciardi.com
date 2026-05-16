@@ -2,24 +2,40 @@ import { createAdminClient } from "@/utils/supabase/admin";
 
 const BUCKET = "image";
 
+// SVG intentionally excluded: image/svg+xml is XSS-capable when served from
+// the same origin (script tags execute). Use raster + AVIF/WebP instead.
 const ALLOWED_MIME = [
   "image/png",
   "image/jpeg",
   "image/webp",
   "image/avif",
-  "image/svg+xml",
   "image/gif",
 ];
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 
-function sanitizeName(input: string): string {
+function sanitizeSegment(input: string): string {
   return input
     .normalize("NFKD")
     .replace(/[^\w.-]+/g, "-")
+    .replace(/\.{2,}/g, "-") // collapse '..' / longer dot runs
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "")
     .toLowerCase();
+}
+
+function sanitizeFolder(input: string): string {
+  // Allow single-level nesting like "projects/<uuid>" but reject traversal.
+  return input
+    .split("/")
+    .map((s) => sanitizeSegment(s))
+    .filter(Boolean)
+    .slice(0, 4) // cap depth
+    .join("/");
+}
+
+function sanitizeName(input: string): string {
+  return sanitizeSegment(input);
 }
 
 function inferExtension(mime: string, fallback = "png"): string {
@@ -28,7 +44,6 @@ function inferExtension(mime: string, fallback = "png"): string {
     "image/jpeg": "jpg",
     "image/webp": "webp",
     "image/avif": "avif",
-    "image/svg+xml": "svg",
     "image/gif": "gif",
   };
   return map[mime] ?? fallback;
@@ -53,7 +68,7 @@ export async function uploadImage(
     throw new Error(`File too large (max ${MAX_BYTES / (1024 * 1024)} MB)`);
   }
 
-  const folder = sanitizeName(options.folder ?? "uploads");
+  const folder = sanitizeFolder(options.folder ?? "uploads") || "uploads";
   const ext = inferExtension(file.type);
   const stamp = Date.now();
   const baseName = options.basename
@@ -77,8 +92,14 @@ export async function uploadImage(
   return { url: pub.publicUrl, path };
 }
 
+function isSafeStoragePath(p: string): boolean {
+  if (!p || p.startsWith("/") || p.startsWith("\\")) return false;
+  if (p.includes("..")) return false;
+  return /^[A-Za-z0-9._\-/]+$/.test(p);
+}
+
 export async function deleteImage(path: string): Promise<void> {
-  if (!path) return;
+  if (!path || !isSafeStoragePath(path)) return;
   const supabase = createAdminClient();
   await supabase.storage.from(BUCKET).remove([path]);
 }
@@ -88,5 +109,6 @@ export function pathFromPublicUrl(url: string): string | null {
   const marker = `/storage/v1/object/public/${BUCKET}/`;
   const idx = url.indexOf(marker);
   if (idx === -1) return null;
-  return url.slice(idx + marker.length);
+  const path = url.slice(idx + marker.length);
+  return isSafeStoragePath(path) ? path : null;
 }

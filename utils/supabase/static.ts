@@ -1,12 +1,15 @@
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getSupabaseEnv } from "@/utils/supabase/client";
+import type { Database } from "@/utils/supabase/database.types";
 
-let cached: ReturnType<typeof createSupabaseClient> | null = null;
+export type StaticSupabaseClient = SupabaseClient<Database, "public">;
 
-export function createStaticClient() {
+let cached: StaticSupabaseClient | null = null;
+
+export function createStaticClient(): StaticSupabaseClient {
   if (cached) return cached;
   const { url, anonKey } = getSupabaseEnv();
-  cached = createSupabaseClient(url, anonKey, {
+  cached = createSupabaseClient<Database>(url, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
     global: { fetch: (input, init) => fetch(input, init) },
   });

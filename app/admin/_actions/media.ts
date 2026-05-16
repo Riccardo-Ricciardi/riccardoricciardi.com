@@ -9,6 +9,15 @@ import type { MediaFile, MediaFolder } from "@/components/admin/types";
 const PATH = "/admin/media";
 const BUCKET = "image";
 
+// Reject absolute paths, traversal, leading slashes; only allow safe characters.
+function isSafeStoragePath(p: string): boolean {
+  if (!p) return false;
+  if (p.startsWith("/") || p.startsWith("\\")) return false;
+  if (p.includes("..")) return false;
+  // Storage paths are user-supplied identifiers; restrict charset.
+  return /^[A-Za-z0-9._\-/]+$/.test(p);
+}
+
 export async function uploadMediaAction(formData: FormData) {
   await requireAdmin();
   const files = formData.getAll("file");
@@ -32,7 +41,7 @@ export async function uploadMediaAction(formData: FormData) {
 export async function deleteMediaAction(formData: FormData) {
   await requireAdmin();
   const path = String(formData.get("delete") ?? formData.get("path") ?? "");
-  if (!path) bounce(PATH);
+  if (!path || !isSafeStoragePath(path)) bounce(PATH, undefined, "invalid_path");
   await deleteImage(path);
   bounce(PATH, "deleted");
 }
@@ -69,7 +78,10 @@ async function listFolder(
   return { folders, files };
 }
 
-export async function fetchMedia(prefix: string = "") {
+export async function fetchMedia(
+  prefix: string = ""
+): Promise<{ folders: MediaFolder[]; files: MediaFile[] }> {
   await requireAdmin();
-  return listFolder(prefix);
+  const clean = prefix === "" || isSafeStoragePath(prefix) ? prefix : "";
+  return listFolder(clean);
 }

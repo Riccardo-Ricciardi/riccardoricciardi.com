@@ -38,20 +38,23 @@ export const getProjects = cache(
 
     const supabase = createStaticClient();
 
-    const baseColumns =
-      "id, repo, name, description, url, homepage, stars, forks, language, topics, og_image, screenshot_url, position";
-    const narrativeColumns = ", problem, solution, outcome";
-
-    let { data, error } = await supabase
+    const projectsWithNarrative = await supabase
       .from("projects")
-      .select(baseColumns + narrativeColumns)
+      .select(
+        "id, repo, name, description, url, homepage, stars, forks, language, topics, og_image, screenshot_url, position, problem, solution, outcome"
+      )
       .eq("visible", true)
       .order("position", { ascending: true });
+
+    let data: Partial<Project>[] | null = projectsWithNarrative.data;
+    let error = projectsWithNarrative.error;
 
     if (error?.message?.includes("does not exist")) {
       const fallback = await supabase
         .from("projects")
-        .select(baseColumns)
+        .select(
+          "id, repo, name, description, url, homepage, stars, forks, language, topics, og_image, screenshot_url, position"
+        )
         .eq("visible", true)
         .order("position", { ascending: true });
       data = fallback.data;
@@ -76,22 +79,22 @@ export const getProjects = cache(
 
     const ids = projects.map((p) => p.id);
 
-    const i18nBase = "project_id, description, languages(code)";
-    const i18nNarrative = ", problem, solution, outcome";
-
-    let i18nQuery = await supabase
+    const i18nFull = await supabase
       .from("projects_i18n")
-      .select(i18nBase + i18nNarrative)
+      .select("project_id, description, languages(code), problem, solution, outcome")
       .in("project_id", ids);
 
-    if (i18nQuery.error?.message?.includes("does not exist")) {
-      i18nQuery = await supabase
-        .from("projects_i18n")
-        .select(i18nBase)
-        .in("project_id", ids);
-    }
+    let i18nRows: ProjectI18n[] | null = i18nFull.data as ProjectI18n[] | null;
+    let i18nError = i18nFull.error;
 
-    const { data: i18nRows, error: i18nError } = i18nQuery;
+    if (i18nError?.message?.includes("does not exist")) {
+      const fallback = await supabase
+        .from("projects_i18n")
+        .select("project_id, description, languages(code)")
+        .in("project_id", ids);
+      i18nRows = fallback.data as ProjectI18n[] | null;
+      i18nError = fallback.error;
+    }
 
     if (i18nError) {
       logger.error("projects_i18n: fetch failed", { message: i18nError.message });

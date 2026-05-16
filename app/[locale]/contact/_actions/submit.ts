@@ -2,6 +2,7 @@
 
 import { createHash } from "node:crypto";
 import { headers } from "next/headers";
+import { z } from "zod";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { logger } from "@/utils/logger";
 
@@ -11,6 +12,30 @@ export type ContactFormState =
   | null;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const contactSchema = z.object({
+  name: z.string().trim().min(2).max(100),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .max(200)
+    .regex(EMAIL_RE, "invalid_email"),
+  message: z.string().trim().min(5).max(2000),
+  locale: z.string().max(5).default("en"),
+});
+
+type ContactFieldKey = "name" | "email" | "message";
+
+function fieldErrorKey(issue: z.ZodIssue): string {
+  const field = issue.path[0] as ContactFieldKey | undefined;
+  if (field === "name") return "name_too_short";
+  if (field === "email") return "invalid_email";
+  if (field === "message") {
+    return issue.code === "too_big" ? "message_too_long" : "message_too_short";
+  }
+  return "fields_required";
+}
 
 function localizedError(locale: string, key: string): string {
   const map: Record<string, Record<string, string>> = {
@@ -55,20 +80,21 @@ export async function submitContactMessageAction(
     return { ok: true, messageId: 0 };
   }
 
-  const locale = String(formData.get("locale") ?? "en").slice(0, 5);
-  const t = (k: string) => localizedError(locale, k);
+  const rawLocale = String(formData.get("locale") ?? "en").slice(0, 5);
+  const t = (k: string) => localizedError(rawLocale, k);
 
-  const name = String(formData.get("name") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  const message = String(formData.get("message") ?? "").trim();
-
-  if (!name || !email || !message) return { error: t("fields_required") };
-  if (name.length < 2 || name.length > 100) return { error: t("name_too_short") };
-  if (!EMAIL_RE.test(email) || email.length > 200) {
-    return { error: t("invalid_email") };
+  const parsed = contactSchema.safeParse({
+    name: formData.get("name") ?? "",
+    email: formData.get("email") ?? "",
+    message: formData.get("message") ?? "",
+    locale: rawLocale,
+  });
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    if (!issue) return { error: t("fields_required") };
+    return { error: t(fieldErrorKey(issue)) };
   }
-  if (message.length < 5) return { error: t("message_too_short") };
-  if (message.length > 2000) return { error: t("message_too_long") };
+  const { name, email, message, locale } = parsed.data;
 
   let ipHash: string | null = null;
   let userAgent: string | null = null;

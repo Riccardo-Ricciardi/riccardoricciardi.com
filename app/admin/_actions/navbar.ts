@@ -1,16 +1,28 @@
 "use server";
 
+import { z } from "zod";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { requireAdmin } from "@/utils/auth/admin";
 import { asStr, bounce } from "./_shared";
 
 const PATH = "/admin/navbar";
 
+const slugSchema = z
+  .string()
+  .min(1)
+  .max(40)
+  .regex(/^[a-z0-9-]+$/, "slug must be lowercase alphanumeric with dashes");
+
+const labelSchema = z.string().max(80);
+
 export async function createNavbarSlugAction(formData: FormData) {
   await requireAdmin();
   const supabase = createAdminClient();
 
-  const slug = asStr(formData.get("slug")).toLowerCase();
+  const slugRaw = asStr(formData.get("slug")).toLowerCase();
+  const slugParsed = slugSchema.safeParse(slugRaw);
+  if (!slugParsed.success) bounce(PATH, undefined, "invalid_slug");
+  const slug = slugParsed.data;
   const { data: langsData } = await supabase
     .from("languages")
     .select("id, code")
@@ -35,11 +47,12 @@ export async function createNavbarSlugAction(formData: FormData) {
 
   let any = false;
   for (const lang of langs) {
-    const value = asStr(formData.get(`label_${lang.code}`));
-    if (value) {
-      any = true;
-      inserts.push({ slug, value, language_id: lang.id, position });
-    }
+    const raw = asStr(formData.get(`label_${lang.code}`));
+    if (!raw) continue;
+    const parsed = labelSchema.safeParse(raw);
+    if (!parsed.success) bounce(PATH, undefined, "label_too_long");
+    any = true;
+    inserts.push({ slug, value: parsed.data, language_id: lang.id, position });
   }
 
   if (!any) bounce(PATH, undefined, "at_least_one_label_required");
@@ -76,8 +89,15 @@ export async function bulkUpdateNavbarAction(formData: FormData) {
     const field = m[2];
     const langId = m[3];
     const g = groups.get(oldSlug) ?? { newSlug: oldSlug, values: new Map() };
-    if (field === "slug") g.newSlug = value.trim();
-    else if (field === "value" && langId) g.values.set(Number(langId), value);
+    if (field === "slug") {
+      const next = slugSchema.safeParse(value.trim().toLowerCase());
+      if (!next.success) continue;
+      g.newSlug = next.data;
+    } else if (field === "value" && langId) {
+      const labelParsed = labelSchema.safeParse(value);
+      if (!labelParsed.success) continue;
+      g.values.set(Number(langId), labelParsed.data);
+    }
     groups.set(oldSlug, g);
   }
 

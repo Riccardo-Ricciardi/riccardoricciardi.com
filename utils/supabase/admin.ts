@@ -1,11 +1,12 @@
 import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/utils/supabase/database.types";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let cached: SupabaseClient<any, "public", "public", any> | null = null;
+export type TypedSupabaseClient = SupabaseClient<Database, "public">;
+
+let cached: TypedSupabaseClient | null = null;
 
 // Service-role admin client — bypasses RLS. Server-only.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createAdminClient(): SupabaseClient<any, "public", "public", any> {
+export function createAdminClient(): TypedSupabaseClient {
   if (cached) return cached;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -17,7 +18,7 @@ export function createAdminClient(): SupabaseClient<any, "public", "public", any
     );
   }
 
-  cached = createSupabaseClient(url, serviceRoleKey, {
+  cached = createSupabaseClient<Database>(url, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 

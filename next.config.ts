@@ -1,3 +1,4 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 
 const supabaseHostname = (() => {
@@ -10,6 +11,15 @@ const supabaseHostname = (() => {
   }
   return "yfzqurdmbllthonjdzpb.supabase.co";
 })();
+
+const isProd = process.env.NODE_ENV === "production";
+
+// 'unsafe-eval' is only needed by Turbopack/HMR in dev. Drop it in production.
+// 'unsafe-inline' remains for Next.js bootstrap inline scripts; tightening to a
+// nonce/strict-dynamic policy is tracked as a follow-up.
+const scriptSrc = isProd
+  ? "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com"
+  : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com";
 
 const securityHeaders = [
   {
@@ -24,11 +34,13 @@ const securityHeaders = [
     value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
   },
   { key: "X-DNS-Prefetch-Control", value: "on" },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "Cross-Origin-Resource-Policy", value: "same-site" },
   {
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
+      scriptSrc,
       "style-src 'self' 'unsafe-inline'",
       `img-src 'self' data: blob: https://${supabaseHostname} https://images.unsplash.com https://media.canva.com https://avatars.githubusercontent.com https://opengraph.githubassets.com https://raw.githubusercontent.com`,
       "font-src 'self' data:",
@@ -47,6 +59,21 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
+  experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "country-flag-icons",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-alert-dialog",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-tooltip",
+      "@radix-ui/react-select",
+    ],
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },

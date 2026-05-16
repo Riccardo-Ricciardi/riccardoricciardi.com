@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
+import { timingSafeEqual } from "node:crypto";
 import { logger } from "@/utils/logger";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+
+function safeEqual(a: string, b: string): boolean {
+  const ab = Buffer.from(a, "utf8");
+  const bb = Buffer.from(b, "utf8");
+  if (ab.length !== bb.length) return false;
+  return timingSafeEqual(ab, bb);
+}
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization") ?? "";
@@ -13,7 +21,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "not_configured" }, { status: 500 });
   }
 
-  if (authHeader !== `Bearer ${cronSecret}`) {
+  if (!authHeader.startsWith("Bearer ") || !safeEqual(authHeader.slice(7), cronSecret)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
@@ -52,6 +60,6 @@ export async function GET(req: Request) {
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown";
     logger.error("cron/sync-github: fetch threw", { message });
-    return NextResponse.json({ error: "fetch_failed", message }, { status: 500 });
+    return NextResponse.json({ error: "fetch_failed" }, { status: 500 });
   }
 }
