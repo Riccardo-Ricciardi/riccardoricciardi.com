@@ -7,30 +7,14 @@ interface VariantProps {
   locale?: string;
 }
 
-type TierId = "core" | "proficient" | "familiar";
-
-const TIER_LABEL: Record<TierId, { it: string; en: string }> = {
-  core: { it: "Core", en: "Core" },
-  proficient: { it: "Pratico", en: "Proficient" },
-  familiar: { it: "Familiare", en: "Familiar" },
-};
-
 const BASE_URL = getSupabaseImageUrl();
 
-function tierFor(percentage: number): TierId {
-  if (percentage >= 85) return "core";
-  if (percentage >= 60) return "proficient";
-  return "familiar";
-}
-
-export function SkillsVariantA({ skills, locale = "it" }: VariantProps) {
-  const lang = locale === "it" ? "it" : "en";
+export function SkillsVariantA({ skills }: VariantProps) {
   const sorted = [...skills].sort((a, b) => b.percentage - a.percentage);
 
   return (
     <ul className="grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {sorted.map((skill, i) => {
-        const tier = tierFor(skill.percentage);
         const lightSrc = skill.icon_url ?? `${BASE_URL}/${skill.name}.png`;
         const darkSrc =
           skill.icon_dark_url ?? `${BASE_URL}/${skill.name}-dark.png`;
@@ -65,12 +49,12 @@ export function SkillsVariantA({ skills, locale = "it" }: VariantProps) {
                 />
               )}
             </div>
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <div className="flex min-w-0 flex-1 items-baseline justify-between gap-2">
               <span className="truncate text-sm font-medium tracking-tight text-foreground">
                 {skill.name}
               </span>
-              <span className="text-eyebrow tabular-nums text-muted-foreground">
-                {TIER_LABEL[tier][lang]}
+              <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
+                {skill.percentage}%
               </span>
             </div>
           </li>

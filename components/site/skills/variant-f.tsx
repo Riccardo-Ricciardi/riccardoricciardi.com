@@ -5,20 +5,6 @@ interface VariantProps {
   locale?: string;
 }
 
-type TierId = "core" | "proficient" | "familiar";
-
-const TIER_LABEL: Record<TierId, { it: string; en: string }> = {
-  core: { it: "Core", en: "Core" },
-  proficient: { it: "Pratico", en: "Proficient" },
-  familiar: { it: "Familiare", en: "Familiar" },
-};
-
-function tierFor(percentage: number): TierId {
-  if (percentage >= 85) return "core";
-  if (percentage >= 60) return "proficient";
-  return "familiar";
-}
-
 function brandHue(name: string): number {
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
@@ -43,7 +29,7 @@ function weightFor(percentage: number): number {
 
 export function SkillsVariantF({ skills, locale = "it" }: VariantProps) {
   const lang = locale === "it" ? "it" : "en";
-  const shuffled = [...skills].sort((a, b) => {
+  const ordered = [...skills].sort((a, b) => {
     const diff = b.percentage - a.percentage;
     if (Math.abs(diff) > 15) return diff;
     return a.name.localeCompare(b.name);
@@ -55,38 +41,31 @@ export function SkillsVariantF({ skills, locale = "it" }: VariantProps) {
         className="flex flex-wrap items-baseline justify-center gap-x-5 gap-y-3 px-2 py-6 leading-[1.05] sm:gap-x-7 sm:py-10"
         aria-label={lang === "it" ? "Nuvola di competenze" : "Skills cloud"}
       >
-        {shuffled.map((skill) => {
-          const tier = tierFor(skill.percentage);
+        {ordered.map((skill) => {
           const hue = brandHue(skill.name);
-          const color =
-            tier === "core"
-              ? "var(--foreground)"
-              : tier === "proficient"
-                ? `oklch(0.55 0.14 ${hue})`
-                : "var(--muted-foreground)";
+          const opacity = 0.45 + (skill.percentage / 100) * 0.55;
           return (
             <span
               key={skill.id}
-              className="inline-block whitespace-nowrap tracking-tight transition-colors duration-150 ease-out hover:!text-accent-blue"
+              className="group inline-flex items-baseline gap-1 whitespace-nowrap tracking-tight transition-colors duration-150 ease-out hover:!text-accent-blue"
               style={{
                 fontSize: sizeFor(skill.percentage),
                 fontWeight: weightFor(skill.percentage),
-                color,
-                fontStyle: tier === "familiar" ? "italic" : "normal",
+                color: `oklch(0.5 0.12 ${hue} / ${opacity})`,
               }}
-              title={`${skill.name} · ${TIER_LABEL[tier][lang]}`}
+              title={`${skill.name} · ${skill.percentage}%`}
             >
-              {skill.name}
+              <span>{skill.name}</span>
+              <sup
+                className="font-mono text-[0.4em] tabular-nums opacity-70"
+                aria-hidden="true"
+              >
+                {skill.percentage}
+              </sup>
             </span>
           );
         })}
       </div>
-
-      <p className="text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-        {lang === "it"
-          ? "Dimensione = profondità · grassetto = core · corsivo = familiare"
-          : "Size = depth · bold = core · italic = familiar"}
-      </p>
     </div>
   );
 }
