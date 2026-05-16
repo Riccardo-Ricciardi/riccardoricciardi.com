@@ -1,5 +1,6 @@
 "use server";
 
+import { z } from "zod";
 import {
   createBooking,
   getEventTypeBySlug,
@@ -12,7 +13,62 @@ import {
 import { logger } from "@/utils/logger";
 import { getCalEventSlug, getCalUsername } from "@/utils/env";
 
+export type BookingFieldKey = "name" | "email" | "notes";
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const bookingSchema = z.object({
+  start: z.string().min(1, "start_required"),
+  name: z
+    .string()
+    .trim()
+    .min(2, "name_too_short")
+    .max(100, "name_too_long"),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .max(200, "email_too_long")
+    .regex(EMAIL_RE, "invalid_email"),
+  notes: z.string().trim().max(1000, "notes_too_long").optional(),
+  timeZone: z.string().min(1).default("Europe/Rome"),
+  locale: z.string().max(5).default("en"),
+  eventTypeSlug: z.string().min(1, "event_required"),
+});
+
+function localizedBookingError(locale: string, key: string): string {
+  const map: Record<string, Record<string, string>> = {
+    en: {
+      not_configured: "Bookings aren't available right now.",
+      no_username: "Bookings aren't available right now.",
+      event_not_found: "That meeting type isn't available.",
+      booking_failed: "Couldn't book that slot. Please pick another time.",
+      start_required: "Please pick a time slot.",
+      event_required: "Please pick a meeting type.",
+      name_too_short: "Please enter your name (at least 2 characters).",
+      name_too_long: "Name is too long.",
+      invalid_email: "Please enter a valid email.",
+      email_too_long: "Email is too long.",
+      notes_too_long: "Notes are too long (max 1000 characters).",
+      fields_required: "Please fill in all the required fields.",
+    },
+    it: {
+      not_configured: "Le prenotazioni non sono disponibili al momento.",
+      no_username: "Le prenotazioni non sono disponibili al momento.",
+      event_not_found: "Questo tipo di chiamata non è disponibile.",
+      booking_failed: "Non riesco a prenotare questo orario. Scegline un altro.",
+      start_required: "Scegli un orario.",
+      event_required: "Scegli il tipo di chiamata.",
+      name_too_short: "Inserisci il tuo nome (almeno 2 caratteri).",
+      name_too_long: "Nome troppo lungo.",
+      invalid_email: "Email non valida.",
+      email_too_long: "Email troppo lunga.",
+      notes_too_long: "Note troppo lunghe (max 1000 caratteri).",
+      fields_required: "Compila tutti i campi richiesti.",
+    },
+  };
+  return map[locale]?.[key] ?? map.en[key] ?? key;
+}
 
 function username(): string {
   return getCalUsername().trim();
@@ -94,45 +150,85 @@ export async function fetchSlotsAction(input: {
 
 export type BookingState =
   | {
-      ok: true;
+      status: "ok";
       bookingId: number | string;
       meetingUrl: string | null;
     }
-  | { ok: false; error: string }
+  | {
+      status: "error";
+      formError?: string;
+      fieldErrors: Partial<Record<BookingFieldKey, string>>;
+    }
   | null;
 
 export async function createBookingAction(
   _prev: BookingState,
   formData: FormData
 ): Promise<BookingState> {
-  if (!isCalConfigured()) return { ok: false, error: "not_configured" };
+  const rawLocale = String(formData.get("locale") ?? "en").slice(0, 5);
+  const t = (k: string) => localizedBookingError(rawLocale, k);
+
+  if (!isCalConfigured()) {
+    return {
+      status: "error",
+      formError: t("not_configured"),
+      fieldErrors: {},
+    };
+  }
 
   const user = username();
-  if (!user) return { ok: false, error: "no_username" };
+  if (!user) {
+    return {
+      status: "error",
+      formError: t("no_username"),
+      fieldErrors: {},
+    };
+  }
 
-  const start = String(formData.get("start") ?? "").trim();
-  const name = String(formData.get("name") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  const timeZone =
-    String(formData.get("timeZone") ?? "").trim() || "Europe/Rome";
-  const notes = String(formData.get("notes") ?? "").trim();
-  const locale = String(formData.get("locale") ?? "en").slice(0, 5);
-  const slug =
-    String(formData.get("eventTypeSlug") ?? "").trim() || defaultEventSlug();
+  const parsed = bookingSchema.safeParse({
+    start: String(formData.get("start") ?? "").trim(),
+    name: String(formData.get("name") ?? ""),
+    email: String(formData.get("email") ?? ""),
+    notes: String(formData.get("notes") ?? ""),
+    timeZone: String(formData.get("timeZone") ?? "Europe/Rome").trim(),
+    locale: rawLocale,
+    eventTypeSlug:
+      String(formData.get("eventTypeSlug") ?? "").trim() ||
+      defaultEventSlug(),
+  });
 
-  if (!start || !name || !email) {
-    return { ok: false, error: "fields_required" };
+  if (!parsed.success) {
+    const flat = parsed.error.flatten();
+    const fieldErrors: Partial<Record<BookingFieldKey, string>> = {};
+    const fields: BookingFieldKey[] = ["name", "email", "notes"];
+    for (const field of fields) {
+      const first = flat.fieldErrors[field]?.[0];
+      if (first) fieldErrors[field] = t(first);
+    }
+    const startErr = flat.fieldErrors.start?.[0];
+    const eventErr = flat.fieldErrors.eventTypeSlug?.[0];
+    const formError = startErr
+      ? t(startErr)
+      : eventErr
+        ? t(eventErr)
+        : Object.keys(fieldErrors).length === 0
+          ? t("fields_required")
+          : undefined;
+    return { status: "error", formError, fieldErrors };
   }
-  if (name.length < 2 || name.length > 100) {
-    return { ok: false, error: "name_invalid" };
-  }
-  if (!EMAIL_RE.test(email) || email.length > 200) {
-    return { ok: false, error: "email_invalid" };
-  }
+
+  const { start, name, email, notes, timeZone, locale, eventTypeSlug } =
+    parsed.data;
 
   try {
-    const type = await getEventTypeBySlug(user, slug);
-    if (!type) return { ok: false, error: "event_not_found" };
+    const type = await getEventTypeBySlug(user, eventTypeSlug);
+    if (!type) {
+      return {
+        status: "error",
+        formError: t("event_not_found"),
+        fieldErrors: {},
+      };
+    }
 
     const result = await createBooking({
       start,
@@ -140,12 +236,12 @@ export async function createBookingAction(
       name,
       email,
       timeZone,
-      notes: notes || undefined,
+      notes: notes && notes.length > 0 ? notes : undefined,
       language: locale === "it" ? "it" : "en",
     });
 
     return {
-      ok: true,
+      status: "ok",
       bookingId: result.id,
       meetingUrl: result.meetingUrl ?? null,
     };
@@ -153,6 +249,10 @@ export async function createBookingAction(
     logger.error("cal: booking failed", {
       message: err instanceof Error ? err.message : "unknown",
     });
-    return { ok: false, error: "booking_failed" };
+    return {
+      status: "error",
+      formError: t("booking_failed"),
+      fieldErrors: {},
+    };
   }
 }

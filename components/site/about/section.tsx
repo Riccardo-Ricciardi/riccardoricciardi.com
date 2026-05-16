@@ -1,18 +1,41 @@
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, FileText } from "lucide-react";
 import { getAboutSections } from "@/utils/about/fetch";
 import { getSiteIdentity } from "@/utils/identity/fetch";
 import type { SupportedLanguage } from "@/utils/config/app";
-import { SectionHeading } from "@/components/site/atoms/section-heading";
+import { Heading } from "@/components/site/atoms/heading";
 import { Eyebrow } from "@/components/site/atoms/eyebrow";
+import { EmptyState } from "@/components/site/atoms/empty-state";
+
+interface AboutCta {
+  label: string;
+  href: string;
+}
 
 interface AboutProps {
   heading: string;
   eyebrow?: string;
   subtitle?: string;
   locale: SupportedLanguage;
+  emptyTitle: string;
+  emptyBody: string;
+  emptyCta: AboutCta;
+  primaryCta: AboutCta;
+  secondaryCta: AboutCta;
 }
 
-export async function About({ heading, eyebrow, subtitle, locale }: AboutProps) {
+export async function About({
+  heading,
+  eyebrow,
+  subtitle,
+  locale,
+  emptyTitle,
+  emptyBody,
+  emptyCta,
+  primaryCta,
+  secondaryCta,
+}: AboutProps) {
   const [sections, identity] = await Promise.all([
     getAboutSections(locale),
     getSiteIdentity(),
@@ -23,7 +46,8 @@ export async function About({ heading, eyebrow, subtitle, locale }: AboutProps) 
       aria-labelledby="about-heading"
       className="container-page section-divider-b section-y"
     >
-      <SectionHeading
+      <Heading
+        level="h1"
         eyebrow={eyebrow}
         title={heading}
         subtitle={subtitle}
@@ -37,7 +61,7 @@ export async function About({ heading, eyebrow, subtitle, locale }: AboutProps) 
             <div className="relative aspect-[4/5] w-full max-w-sm overflow-hidden rounded-surface border border-dashed-soft">
               <Image
                 src={identity.profile_photo_url}
-                alt={identity.name}
+                alt={`${identity.name} portrait`}
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover"
@@ -60,27 +84,41 @@ export async function About({ heading, eyebrow, subtitle, locale }: AboutProps) 
 
         <div className="flex flex-col gap-8 md:gap-10">
           {sections.length === 0 ? (
-            <p className="text-body-lg text-muted-foreground">
-              {locale === "it"
-                ? "Sto ancora scrivendo questa pagina."
-                : "Still writing this page."}
-            </p>
+            <EmptyState
+              icon={FileText}
+              title={emptyTitle}
+              description={emptyBody}
+              action={emptyCta}
+              className="self-start"
+            />
           ) : (
-            sections.map((section, i) => (
-              <article key={section.id} className="flex flex-col gap-3">
-                <div className="flex items-baseline gap-3">
-                  <Eyebrow as="span" className="tabular-nums">
-                    {String(i + 1).padStart(2, "0")}
-                  </Eyebrow>
-                  {section.heading && (
-                    <h3 className="text-h3">{section.heading}</h3>
-                  )}
-                </div>
-                <div className="text-body-lg ml-9 whitespace-pre-line text-foreground/85">
-                  {section.body}
-                </div>
-              </article>
-            ))
+            <>
+              {sections.map((section, i) => (
+                <article key={section.id} className="flex flex-col gap-3">
+                  <div className="flex items-baseline gap-3">
+                    <Eyebrow as="span" className="tabular-nums">
+                      {String(i + 1).padStart(2, "0")}
+                    </Eyebrow>
+                    {section.heading && (
+                      <h3 className="text-h3">{section.heading}</h3>
+                    )}
+                  </div>
+                  <div className="text-body-lg ml-9 whitespace-pre-line text-foreground/85">
+                    {section.body}
+                  </div>
+                </article>
+              ))}
+
+              <footer className="mt-4 flex flex-col gap-3 border-t border-dashed-soft pt-8 sm:flex-row sm:items-center">
+                <Link href={primaryCta.href} className="btn-base btn-primary">
+                  {primaryCta.label}
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+                <Link href={secondaryCta.href} className="btn-base btn-ghost">
+                  {secondaryCta.label}
+                </Link>
+              </footer>
+            </>
           )}
         </div>
       </div>

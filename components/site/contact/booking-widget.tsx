@@ -27,6 +27,11 @@ import {
 } from "@/app/[locale]/contact/_actions/booking";
 import type { CalEventType, CalSlot, CalSlots } from "@/utils/cal/client";
 import { cn } from "@/utils/cn";
+import {
+  FieldShell,
+  FieldInput,
+  FieldTextarea,
+} from "@/components/site/atoms/field";
 
 interface BookingWidgetProps {
   locale: string;
@@ -221,7 +226,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
     }
   }, [slotByDay, selectedDate]);
 
-  if (bookingResult && bookingResult.ok && selectedSlot) {
+  if (bookingResult && bookingResult.status === "ok" && selectedSlot) {
     return (
       <SuccessCard
         labels={labels}
@@ -244,10 +249,10 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
             <Calendar className="h-5 w-5" aria-hidden="true" />
           </span>
           <div className="min-w-0">
-            <h3 className="text-xl font-semibold tracking-tight md:text-2xl">
+            <h3 className="text-h3">
               {labels.heading}
             </h3>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="text-body-sm mt-1 text-muted-foreground">
               {labels.description}
             </p>
           </div>
@@ -275,10 +280,8 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
                     aria-pressed={active}
                     aria-label={`${t.lengthInMinutes} ${labels.durationUnit} — ${t.title}`}
                     className={cn(
-                      "inline-flex items-center rounded-full border px-3 py-1.5 font-mono text-xs font-medium tabular-nums transition-all",
-                      active
-                        ? "border-accent-blue bg-accent-blue text-white"
-                        : "border-dashed-soft bg-background text-foreground hover:border-accent-blue hover:text-accent-blue"
+                      "pill-base pill-mono pill-interactive tabular-nums",
+                      active && "pill-accent"
                     )}
                   >
                     {t.lengthInMinutes}
@@ -340,12 +343,18 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
                       cell.getDate() < today.getDate())));
               const isSelected = selectedDate ? sameDay(cell, selectedDate) : false;
               const disabled = isPast || count === 0;
+              const dayLabel = cell.toLocaleDateString(
+                locale === "it" ? "it-IT" : "en-US",
+                { weekday: "long", day: "numeric", month: "long" }
+              );
               return (
                 <button
                   key={idx}
                   type="button"
                   disabled={disabled}
                   onClick={() => setSelectedDate(cell)}
+                  aria-label={dayLabel}
+                  aria-pressed={isSelected}
                   className={cn(
                     "relative aspect-square rounded-md text-sm transition-all",
                     disabled
@@ -355,7 +364,7 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
                         : "border border-dashed-soft hover:border-accent-blue hover:text-accent-blue"
                   )}
                 >
-                  <span className="tabular-nums">{cell.getDate()}</span>
+                  <span className="tabular-nums" aria-hidden="true">{cell.getDate()}</span>
                   {count > 0 && !isSelected && (
                     <span
                       aria-hidden="true"
@@ -446,10 +455,10 @@ export function BookingWidget({ locale, labels }: BookingWidgetProps) {
           onResult={(res) => {
             startTransition(() => {
               setBookingResult(res);
-              if (res && res.ok) {
+              if (res && res.status === "ok") {
                 toast.success(labels.successTitle);
-              } else if (res && !res.ok) {
-                toast.error(labels.errorTitle);
+              } else if (res && res.status === "error") {
+                toast.error(res.formError ?? labels.errorTitle);
               }
             });
           }}
@@ -506,6 +515,10 @@ function ConfirmDialog({
     null
   );
   const handledRef = useRef<string>("");
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const notesRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (!state) return;
@@ -513,7 +526,31 @@ function ConfirmDialog({
     if (stamp === handledRef.current) return;
     handledRef.current = stamp;
     onResult(state);
+    if (state.status === "error") {
+      if (state.fieldErrors.name) nameRef.current?.focus();
+      else if (state.fieldErrors.email) emailRef.current?.focus();
+      else if (state.fieldErrors.notes) notesRef.current?.focus();
+    }
   }, [state, onResult]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onCancel();
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    nameRef.current?.focus();
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [onCancel]);
+
+  const fieldErrors =
+    state && state.status === "error" ? state.fieldErrors : {};
+  const formError =
+    state && state.status === "error" ? state.formError : undefined;
 
   const whenLabel = new Date(slot.start).toLocaleString(
     locale === "it" ? "it-IT" : "en-US",
@@ -528,6 +565,7 @@ function ConfirmDialog({
 
   return (
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-label={labels.confirmTitle}
@@ -548,7 +586,11 @@ function ConfirmDialog({
             {timezone}
           </p>
         </header>
-        <form action={formAction} className="flex flex-col gap-3 p-5">
+        <form
+          action={formAction}
+          className="flex flex-col gap-3 p-5"
+          noValidate
+        >
           <input type="hidden" name="start" value={slot.start} />
           <input type="hidden" name="timeZone" value={timezone} />
           <input type="hidden" name="locale" value={locale} />
@@ -558,44 +600,60 @@ function ConfirmDialog({
             value={eventTypeSlug}
           />
 
-
-          <Field
-            id="b-name"
-            name="name"
-            label={labels.name}
-            placeholder={labels.namePlaceholder}
-            required
-            autoComplete="name"
-          />
-          <Field
+          <FieldShell id="b-name" label={labels.name} error={fieldErrors.name}>
+            <FieldInput
+              ref={nameRef}
+              id="b-name"
+              name="name"
+              placeholder={labels.namePlaceholder}
+              required
+              autoComplete="name"
+              maxLength={100}
+              invalid={Boolean(fieldErrors.name)}
+              aria-describedby={fieldErrors.name ? "b-name-error" : undefined}
+            />
+          </FieldShell>
+          <FieldShell
             id="b-email"
-            name="email"
             label={labels.email}
-            type="email"
-            placeholder={labels.emailPlaceholder}
-            required
-            autoComplete="email"
-          />
-          <label htmlFor="b-notes" className="flex flex-col gap-1.5">
-            <span className="text-eyebrow">
-              {labels.notes}
-            </span>
-            <textarea
+            error={fieldErrors.email}
+          >
+            <FieldInput
+              ref={emailRef}
+              id="b-email"
+              name="email"
+              type="email"
+              placeholder={labels.emailPlaceholder}
+              required
+              autoComplete="email"
+              maxLength={200}
+              invalid={Boolean(fieldErrors.email)}
+              aria-describedby={fieldErrors.email ? "b-email-error" : undefined}
+            />
+          </FieldShell>
+          <FieldShell
+            id="b-notes"
+            label={labels.notes}
+            error={fieldErrors.notes}
+          >
+            <FieldTextarea
+              ref={notesRef}
               id="b-notes"
               name="notes"
               rows={3}
               maxLength={1000}
               placeholder={labels.notesPlaceholder}
-              className="min-h-20 w-full resize-y rounded-lg border border-dashed-soft bg-background px-3 py-2.5 text-sm leading-relaxed focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft"
+              invalid={Boolean(fieldErrors.notes)}
+              aria-describedby={fieldErrors.notes ? "b-notes-error" : undefined}
             />
-          </label>
+          </FieldShell>
 
-          {state && !state.ok && (
+          {formError && (
             <p
               role="alert"
               className="rounded-md border border-rose-500/30 bg-rose-500/5 px-3 py-2 text-xs text-rose-700 dark:text-rose-300"
             >
-              {labels.errorTitle}
+              {formError}
             </p>
           )}
 
@@ -603,7 +661,7 @@ function ConfirmDialog({
             <button
               type="button"
               onClick={onCancel}
-              className="inline-flex h-11 items-center justify-center rounded-lg border border-dashed-soft bg-background px-4 text-sm font-medium text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground"
+              className="btn-base btn-ghost"
             >
               {labels.cancel}
             </button>
@@ -612,41 +670,6 @@ function ConfirmDialog({
         </form>
       </div>
     </div>
-  );
-}
-
-function Field({
-  id,
-  name,
-  type = "text",
-  label,
-  placeholder,
-  required,
-  autoComplete,
-}: {
-  id: string;
-  name: string;
-  type?: string;
-  label: string;
-  placeholder?: string;
-  required?: boolean;
-  autoComplete?: string;
-}) {
-  return (
-    <label htmlFor={id} className="flex flex-col gap-1.5">
-      <span className="text-eyebrow">
-        {label}
-      </span>
-      <input
-        id={id}
-        name={name}
-        type={type}
-        required={required}
-        autoComplete={autoComplete}
-        placeholder={placeholder}
-        className="h-11 w-full rounded-lg border border-dashed-soft bg-background px-3 text-sm focus-visible:border-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft"
-      />
-    </label>
   );
 }
 
@@ -663,7 +686,7 @@ function SubmitBtn({
       type="submit"
       disabled={pending}
       aria-busy={pending}
-      className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-accent-blue px-4 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-blue-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue-soft disabled:cursor-not-allowed disabled:opacity-60"
+      className="btn-base btn-primary"
     >
       {pending ? (
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -726,7 +749,7 @@ function SuccessCard({
         <button
           type="button"
           onClick={onReset}
-          className="mt-2 inline-flex h-10 items-center gap-1.5 rounded-lg border border-dashed-soft px-3.5 text-sm font-medium text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground"
+          className="btn-base btn-sm btn-ghost mt-2"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           {labels.cancel}

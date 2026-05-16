@@ -1,11 +1,15 @@
 import Image from "next/image";
+import { Sparkles } from "lucide-react";
 import type { Skill } from "@/utils/skills/fetch";
 import { SkillCard } from "@/components/site/skills/skill-card";
+import { EmptyState } from "@/components/site/atoms/empty-state";
 import { getSupabaseImageUrl } from "@/utils/env";
 
 interface SkillsBoardProps {
   skills: Skill[];
   locale?: string;
+  emptyTitle?: string;
+  emptyBody?: string;
 }
 
 type TierId = "core" | "proficient" | "familiar";
@@ -55,7 +59,33 @@ function tierFor(percentage: number): TierId {
   return "familiar";
 }
 
-export function SkillsBoard({ skills, locale = "it" }: SkillsBoardProps) {
+export function SkillsBoard({
+  skills,
+  locale = "it",
+  emptyTitle,
+  emptyBody,
+}: SkillsBoardProps) {
+  const lang = locale === "it" ? "it" : "en";
+
+  if (skills.length === 0) {
+    return (
+      <EmptyState
+        icon={Sparkles}
+        title={
+          emptyTitle ??
+          (lang === "it" ? "Stack in arrivo." : "Stack coming soon.")
+        }
+        description={
+          emptyBody ??
+          (lang === "it"
+            ? "Sto curando la lista degli strumenti che uso davvero."
+            : "I'm curating the list of tools I actually use.")
+        }
+        className="self-start"
+      />
+    );
+  }
+
   const grouped = new Map<TierId, Skill[]>([
     ["core", []],
     ["proficient", []],
@@ -64,12 +94,6 @@ export function SkillsBoard({ skills, locale = "it" }: SkillsBoardProps) {
   for (const s of skills) {
     grouped.get(tierFor(s.percentage))?.push(s);
   }
-
-  if (skills.length === 0) {
-    return <p className="text-muted-foreground">—</p>;
-  }
-
-  const lang = locale === "it" ? "it" : "en";
 
   return (
     <div className="flex flex-col gap-14">
@@ -146,7 +170,7 @@ function FamiliarChip({ skill }: { skill: Skill }) {
   const lightSrc = skill.icon_url ?? `${BASE_URL}/${skill.name}.png`;
   const darkSrc = skill.icon_dark_url ?? `${BASE_URL}/${skill.name}-dark.png`;
   return (
-    <li className="inline-flex items-center gap-2 rounded-full border border-dashed-soft bg-card px-3 py-1.5 text-xs text-foreground transition-colors hover:border-accent-blue">
+    <li className="pill-base pill-interactive">
       <span className="relative h-4 w-4 shrink-0">
         <Image
           src={lightSrc}

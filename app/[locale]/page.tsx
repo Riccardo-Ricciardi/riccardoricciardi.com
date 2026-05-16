@@ -48,6 +48,18 @@ export default async function Page({ params }: PageProps) {
   const heroSecondary = content(blocks, "hero_secondary_cta", "View projects");
   const skillsHeading = content(blocks, "skills_heading", "My skills");
   const skillsEyebrow = content(blocks, "skills_eyebrow", "Stack");
+  const skillsEmptyTitle = content(
+    blocks,
+    "skills_empty_title",
+    locale === "it" ? "Stack in arrivo." : "Stack coming soon."
+  );
+  const skillsEmptyBody = content(
+    blocks,
+    "skills_empty_body",
+    locale === "it"
+      ? "Sto curando la lista degli strumenti che uso davvero."
+      : "I'm curating the list of tools I actually use."
+  );
   const projectsHeading = content(blocks, "projects_heading", "My projects");
   const projectsEyebrow = content(blocks, "projects_eyebrow", "Recent work");
   const projectsSubtitle = content(
@@ -56,6 +68,23 @@ export default async function Page({ params }: PageProps) {
     "A selection of recent work, synced from GitHub."
   );
   const allLabel = content(blocks, "common_all", "All");
+  const narrativeLabels = {
+    problem: content(
+      blocks,
+      "projects_narrative_problem",
+      locale === "it" ? "Problema" : "Problem"
+    ),
+    solution: content(
+      blocks,
+      "projects_narrative_solution",
+      locale === "it" ? "Soluzione" : "Solution"
+    ),
+    outcome: content(
+      blocks,
+      "projects_narrative_outcome",
+      locale === "it" ? "Risultato" : "Result"
+    ),
+  };
 
   const servicesEyebrow = content(blocks, "services_eyebrow", "Services");
   const servicesHeading = content(
@@ -123,6 +152,8 @@ export default async function Page({ params }: PageProps) {
           heading={skillsHeading}
           eyebrow={skillsEyebrow}
           locale={locale}
+          emptyTitle={skillsEmptyTitle}
+          emptyBody={skillsEmptyBody}
         />
       </Suspense>
       <Suspense fallback={<GlobalLoader />}>
@@ -132,6 +163,7 @@ export default async function Page({ params }: PageProps) {
           subtitle={projectsSubtitle}
           locale={locale}
           allLabel={allLabel}
+          narrativeLabels={narrativeLabels}
         />
       </Suspense>
     </>

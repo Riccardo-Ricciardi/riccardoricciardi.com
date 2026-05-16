@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { MouseParticles } from "@/components/mouse-particles";
 
 interface HeroProps {
@@ -42,20 +41,17 @@ export function Hero({
             {subtitle}
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="bg-accent-blue text-white hover:bg-[var(--accent-blue-hover)]"
-            >
-              <Link href={primaryCta.href}>
-                {primaryCta.label}
-                <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
-              </Link>
-            </Button>
+            <Link href={primaryCta.href} className="btn-base btn-lg btn-primary">
+              {primaryCta.label}
+              <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
+            </Link>
             {secondaryCta && (
-              <Button asChild size="lg" variant="outline">
-                <Link href={secondaryCta.href}>{secondaryCta.label}</Link>
-              </Button>
+              <Link
+                href={secondaryCta.href}
+                className="btn-base btn-lg btn-ghost"
+              >
+                {secondaryCta.label}
+              </Link>
             )}
           </div>
         </div>

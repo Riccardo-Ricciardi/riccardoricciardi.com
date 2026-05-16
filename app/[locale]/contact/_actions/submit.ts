@@ -7,53 +7,67 @@ import { createAdminClient } from "@/utils/supabase/admin";
 import { getContactIpSalt, getResendConfig } from "@/utils/env";
 import { logger } from "@/utils/logger";
 
+export type ContactFieldKey = "name" | "email" | "message";
+
 export type ContactFormState =
-  | { ok: true; messageId: number }
-  | { error: string }
+  | { status: "ok"; messageId: number }
+  | {
+      status: "error";
+      formError?: string;
+      fieldErrors: Partial<Record<ContactFieldKey, string>>;
+    }
   | null;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+type IssueKey =
+  | "name_too_short"
+  | "name_too_long"
+  | "invalid_email"
+  | "email_too_long"
+  | "message_too_short"
+  | "message_too_long";
+
 const contactSchema = z.object({
-  name: z.string().trim().min(2).max(100),
+  name: z
+    .string()
+    .trim()
+    .min(2, "name_too_short")
+    .max(100, "name_too_long"),
   email: z
     .string()
     .trim()
     .toLowerCase()
-    .max(200)
+    .max(200, "email_too_long")
     .regex(EMAIL_RE, "invalid_email"),
-  message: z.string().trim().min(5).max(2000),
+  message: z
+    .string()
+    .trim()
+    .min(5, "message_too_short")
+    .max(2000, "message_too_long"),
   locale: z.string().max(5).default("en"),
 });
-
-type ContactFieldKey = "name" | "email" | "message";
-
-function fieldErrorKey(issue: z.ZodIssue): string {
-  const field = issue.path[0] as ContactFieldKey | undefined;
-  if (field === "name") return "name_too_short";
-  if (field === "email") return "invalid_email";
-  if (field === "message") {
-    return issue.code === "too_big" ? "message_too_long" : "message_too_short";
-  }
-  return "fields_required";
-}
 
 function localizedError(locale: string, key: string): string {
   const map: Record<string, Record<string, string>> = {
     en: {
       fields_required: "All fields are required.",
-      name_too_short: "Please enter your name.",
+      name_too_short: "Please enter your name (at least 2 characters).",
+      name_too_long: "Name is too long (max 100 characters).",
       invalid_email: "Please enter a valid email.",
-      message_too_short: "Message is too short.",
+      email_too_long: "Email is too long.",
+      message_too_short: "Message is too short (at least 5 characters).",
       message_too_long: "Message is too long (max 2000 characters).",
       rate_limited: "Too many messages. Try again later.",
       server_error: "Something went wrong. Please try again.",
     },
     it: {
       fields_required: "Compila tutti i campi.",
-      name_too_short: "Inserisci il tuo nome.",
+      name_too_short: "Inserisci il tuo nome (almeno 2 caratteri).",
+      name_too_long: "Nome troppo lungo (max 100 caratteri).",
       invalid_email: "Email non valida.",
-      message_too_short: "Messaggio troppo breve.",
+      email_too_long: "Email troppo lunga.",
+      message_too_short: "Messaggio troppo breve (almeno 5 caratteri).",
       message_too_long: "Messaggio troppo lungo (max 2000 caratteri).",
       rate_limited: "Troppi messaggi. Riprova più tardi.",
       server_error: "Qualcosa è andato storto. Riprova.",
@@ -78,7 +92,7 @@ export async function submitContactMessageAction(
 ): Promise<ContactFormState> {
   const honeypot = String(formData.get("website") ?? "").trim();
   if (honeypot) {
-    return { ok: true, messageId: 0 };
+    return { status: "ok", messageId: 0 };
   }
 
   const rawLocale = String(formData.get("locale") ?? "en").slice(0, 5);
@@ -90,10 +104,23 @@ export async function submitContactMessageAction(
     message: formData.get("message") ?? "",
     locale: rawLocale,
   });
+
   if (!parsed.success) {
-    const issue = parsed.error.issues[0];
-    if (!issue) return { error: t("fields_required") };
-    return { error: t(fieldErrorKey(issue)) };
+    const flat = parsed.error.flatten();
+    const fieldErrors: Partial<Record<ContactFieldKey, string>> = {};
+    const fields: ContactFieldKey[] = ["name", "email", "message"];
+    for (const field of fields) {
+      const first = flat.fieldErrors[field]?.[0] as IssueKey | undefined;
+      if (first) fieldErrors[field] = t(first);
+    }
+    if (Object.keys(fieldErrors).length === 0) {
+      return {
+        status: "error",
+        formError: t("fields_required"),
+        fieldErrors: {},
+      };
+    }
+    return { status: "error", fieldErrors };
   }
   const { name, email, message, locale } = parsed.data;
 
@@ -115,7 +142,11 @@ export async function submitContactMessageAction(
         .eq("ip_hash", ipHash)
         .gte("created_at", since);
       if ((count ?? 0) >= 5) {
-        return { error: t("rate_limited") };
+        return {
+          status: "error",
+          formError: t("rate_limited"),
+          fieldErrors: {},
+        };
       }
     } catch (err) {
       logger.warn("contact: rate-limit lookup failed", {
@@ -143,14 +174,22 @@ export async function submitContactMessageAction(
       logger.error("contact: insert failed", {
         message: error?.message ?? "no data",
       });
-      return { error: t("server_error") };
+      return {
+        status: "error",
+        formError: t("server_error"),
+        fieldErrors: {},
+      };
     }
     insertedId = (data as { id: number }).id;
   } catch (err) {
     logger.error("contact: server error", {
       message: err instanceof Error ? err.message : "unknown",
     });
-    return { error: t("server_error") };
+    return {
+      status: "error",
+      formError: t("server_error"),
+      fieldErrors: {},
+    };
   }
 
   await sendNotificationEmail({ name, email, message, locale }).catch((err) => {
@@ -159,7 +198,7 @@ export async function submitContactMessageAction(
     });
   });
 
-  return { ok: true, messageId: insertedId };
+  return { status: "ok", messageId: insertedId };
 }
 
 async function sendNotificationEmail(params: {

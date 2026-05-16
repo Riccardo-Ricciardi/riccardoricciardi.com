@@ -52,74 +52,99 @@ export async function generateMetadata({
   };
 }
 
-function bookingLabels(locale: string): BookingLabels {
+function bookingLabels(
+  locale: string,
+  blocks: Map<string, string>
+): BookingLabels {
   const isIt = locale === "it";
-  return isIt
-    ? {
-        heading: "Prenota una chiamata",
-        description:
-          "30 minuti in video, gratuiti. Scegli giorno e ora che ti vanno.",
-        loading: "Carico gli slot…",
-        noSlots: "Nessuno slot disponibile in questo giorno.",
-        noSlotsHint:
-          "Non vedi orari disponibili? Scrivimi direttamente qui sopra.",
-        pickDay: "Scegli un giorno",
-        pickSlot: "Scegli un orario",
-        pickEventType: "Tipo di chiamata",
-        weekdays: ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"],
-        monthFormat: "long",
-        confirmTitle: "Conferma prenotazione",
-        confirmSubtitle: "Inserisci i tuoi dati e prenoto subito.",
-        name: "Nome",
-        email: "Email",
-        notes: "Note",
-        notesPlaceholder: "Cosa vorresti discutere?",
-        namePlaceholder: "Come ti chiami?",
-        emailPlaceholder: "tua@email.com",
-        submit: "Conferma",
-        submitting: "Prenoto…",
-        cancel: "Annulla",
-        successTitle: "Prenotazione confermata",
-        successBodyTemplate:
-          "Ti aspetto {when}. Riceverai un'email di conferma a breve.",
-        errorTitle: "Qualcosa è andato storto, riprova.",
-        prevMonth: "Mese precedente",
-        nextMonth: "Mese successivo",
-        durationUnit: "min",
-        timezoneLabel: "Fuso",
-      }
-    : {
-        heading: "Book a call",
-        description: "30-minute video call, free. Pick the day and time that works.",
-        loading: "Loading slots…",
-        noSlots: "No slots available on this day.",
-        noSlotsHint:
-          "Don't see a time that works? Send me a message above instead.",
-        pickDay: "Pick a day",
-        pickSlot: "Pick a time",
-        pickEventType: "Call type",
-        weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-        monthFormat: "long",
-        confirmTitle: "Confirm booking",
-        confirmSubtitle: "Enter your details and I'll book the slot.",
-        name: "Name",
-        email: "Email",
-        notes: "Notes",
-        notesPlaceholder: "What would you like to discuss?",
-        namePlaceholder: "Your name",
-        emailPlaceholder: "you@email.com",
-        submit: "Confirm",
-        submitting: "Booking…",
-        cancel: "Cancel",
-        successTitle: "Booking confirmed",
-        successBodyTemplate:
-          "See you {when}. A confirmation email is on its way.",
-        errorTitle: "Something went wrong, please try again.",
-        prevMonth: "Previous month",
-        nextMonth: "Next month",
-        durationUnit: "min",
-        timezoneLabel: "TZ",
-      };
+  const c = (slug: string, fallback: string) => content(blocks, slug, fallback);
+  const weekdaysRaw = c(
+    "booking_weekdays",
+    isIt
+      ? "Lun,Mar,Mer,Gio,Ven,Sab,Dom"
+      : "Mon,Tue,Wed,Thu,Fri,Sat,Sun"
+  );
+  return {
+    heading: c("booking_heading", isIt ? "Prenota una chiamata" : "Book a call"),
+    description: c(
+      "booking_description",
+      isIt
+        ? "30 minuti in video, gratuiti. Scegli giorno e ora che ti vanno."
+        : "30-minute video call, free. Pick the day and time that works."
+    ),
+    loading: c("booking_loading", isIt ? "Carico gli slot…" : "Loading slots…"),
+    noSlots: c(
+      "booking_no_slots",
+      isIt
+        ? "Nessuno slot disponibile in questo giorno."
+        : "No slots available on this day."
+    ),
+    noSlotsHint: c(
+      "booking_no_slots_hint",
+      isIt
+        ? "Non vedi orari disponibili? Scrivimi direttamente qui sopra."
+        : "Don't see a time that works? Send me a message above instead."
+    ),
+    pickDay: c("booking_pick_day", isIt ? "Scegli un giorno" : "Pick a day"),
+    pickSlot: c("booking_pick_slot", isIt ? "Scegli un orario" : "Pick a time"),
+    pickEventType: c(
+      "booking_pick_event",
+      isIt ? "Tipo di chiamata" : "Call type"
+    ),
+    weekdays: weekdaysRaw.split(",").map((s) => s.trim()),
+    monthFormat: "long",
+    confirmTitle: c(
+      "booking_confirm_title",
+      isIt ? "Conferma prenotazione" : "Confirm booking"
+    ),
+    confirmSubtitle: c(
+      "booking_confirm_subtitle",
+      isIt
+        ? "Inserisci i tuoi dati e prenoto subito."
+        : "Enter your details and I'll book the slot."
+    ),
+    name: c("booking_name", isIt ? "Nome" : "Name"),
+    email: c("booking_email", "Email"),
+    notes: c("booking_notes", isIt ? "Note" : "Notes"),
+    notesPlaceholder: c(
+      "booking_notes_placeholder",
+      isIt ? "Cosa vorresti discutere?" : "What would you like to discuss?"
+    ),
+    namePlaceholder: c(
+      "booking_name_placeholder",
+      isIt ? "Come ti chiami?" : "Your name"
+    ),
+    emailPlaceholder: c(
+      "booking_email_placeholder",
+      isIt ? "tua@email.com" : "you@email.com"
+    ),
+    submit: c("booking_submit", isIt ? "Conferma" : "Confirm"),
+    submitting: c("booking_submitting", isIt ? "Prenoto…" : "Booking…"),
+    cancel: c("booking_cancel", isIt ? "Annulla" : "Cancel"),
+    successTitle: c(
+      "booking_success_title",
+      isIt ? "Prenotazione confermata" : "Booking confirmed"
+    ),
+    successBodyTemplate: c(
+      "booking_success_body",
+      isIt
+        ? "Ti aspetto {when}. Riceverai un'email di conferma a breve."
+        : "See you {when}. A confirmation email is on its way."
+    ),
+    errorTitle: c(
+      "booking_error",
+      isIt
+        ? "Qualcosa è andato storto, riprova."
+        : "Something went wrong, please try again."
+    ),
+    prevMonth: c(
+      "booking_prev_month",
+      isIt ? "Mese precedente" : "Previous month"
+    ),
+    nextMonth: c("booking_next_month", isIt ? "Mese successivo" : "Next month"),
+    durationUnit: c("booking_duration_unit", "min"),
+    timezoneLabel: c("booking_timezone_label", isIt ? "Fuso" : "TZ"),
+  };
 }
 
 export default async function ContactPage({ params }: PageProps) {
@@ -142,31 +167,72 @@ export default async function ContactPage({ params }: PageProps) {
     "contact_trust",
     "Reply within 24h · Treated with confidence"
   );
-  const formLabels = isIt
-    ? {
-        name: "Nome",
-        email: "Email",
-        message: "Messaggio",
-        submit: "Invia messaggio",
-        sending: "Invio…",
-        successTitle: "Messaggio inviato",
-        successBody: "Ti risponderò appena possibile.",
-        namePlaceholder: "Come ti chiami?",
-        emailPlaceholder: "tua@email.com",
-        messagePlaceholder: "Raccontami il progetto o l'idea…",
-      }
-    : {
-        name: "Name",
-        email: "Email",
-        message: "Message",
-        submit: "Send message",
-        sending: "Sending…",
-        successTitle: "Message sent",
-        successBody: "I'll get back to you as soon as possible.",
-        namePlaceholder: "Your name",
-        emailPlaceholder: "you@email.com",
-        messagePlaceholder: "Tell me about your project or idea…",
-      };
+  const formHeading = content(
+    blocks,
+    "contact_form_section_label",
+    isIt ? "Modulo di contatto" : "Contact form"
+  );
+  const formLabels = {
+    name: content(blocks, "contact_form_name", isIt ? "Nome" : "Name"),
+    email: content(blocks, "contact_form_email", "Email"),
+    message: content(
+      blocks,
+      "contact_form_message",
+      isIt ? "Messaggio" : "Message"
+    ),
+    submit: content(
+      blocks,
+      "contact_form_submit",
+      isIt ? "Invia messaggio" : "Send message"
+    ),
+    sending: content(blocks, "contact_form_sending", isIt ? "Invio…" : "Sending…"),
+    successTitle: content(
+      blocks,
+      "contact_form_success_title",
+      isIt ? "Messaggio inviato" : "Message sent"
+    ),
+    successBody: content(
+      blocks,
+      "contact_form_success_body",
+      isIt
+        ? "Ti risponderò appena possibile."
+        : "I'll get back to you as soon as possible."
+    ),
+    namePlaceholder: content(
+      blocks,
+      "contact_form_name_placeholder",
+      isIt ? "Come ti chiami?" : "Your name"
+    ),
+    emailPlaceholder: content(
+      blocks,
+      "contact_form_email_placeholder",
+      isIt ? "tua@email.com" : "you@email.com"
+    ),
+    messagePlaceholder: content(
+      blocks,
+      "contact_form_message_placeholder",
+      isIt
+        ? "Raccontami il progetto o l'idea…"
+        : "Tell me about your project or idea…"
+    ),
+  };
+  const bookingSectionLabel = content(
+    blocks,
+    "booking_section_label",
+    isIt ? "Prenota una chiamata" : "Book a call"
+  );
+  const bookingAlternativeEyebrow = content(
+    blocks,
+    "booking_alternative_eyebrow",
+    isIt ? "Alternativa" : "Alternative"
+  );
+  const bookingAlternativeTitle = content(
+    blocks,
+    "booking_alternative_title",
+    isIt
+      ? "Preferisci scegliere un orario?"
+      : "Prefer to pick a time slot?"
+  );
 
   return (
     <>
@@ -185,7 +251,7 @@ export default async function ContactPage({ params }: PageProps) {
         }
       >
         <h2 id="contact-form-heading" className="sr-only">
-          {isIt ? "Modulo di contatto" : "Contact form"}
+          {formHeading}
         </h2>
         <div className="mx-auto max-w-2xl">
           <ContactForm locale={locale} labels={formLabels} />
@@ -194,20 +260,16 @@ export default async function ContactPage({ params }: PageProps) {
 
       {calEnabled && (
         <section
-          aria-label={isIt ? "Prenota una chiamata" : "Book a call"}
+          aria-label={bookingSectionLabel}
           className="container-page pb-20 pt-10 md:pb-28 md:pt-12"
         >
           <div className="mx-auto max-w-2xl">
             <details className="group [&_summary::-webkit-details-marker]:hidden">
               <summary className="card-base card-interactive flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 transition-colors">
                 <span className="flex flex-col gap-0.5">
-                  <span className="text-eyebrow">
-                    {isIt ? "Alternativa" : "Alternative"}
-                  </span>
+                  <span className="text-eyebrow">{bookingAlternativeEyebrow}</span>
                   <span className="text-h4 text-left">
-                    {isIt
-                      ? "Preferisci scegliere un orario?"
-                      : "Prefer to pick a time slot?"}
+                    {bookingAlternativeTitle}
                   </span>
                 </span>
                 <span
@@ -218,7 +280,10 @@ export default async function ContactPage({ params }: PageProps) {
                 </span>
               </summary>
               <div className="mt-4">
-                <BookingWidget locale={locale} labels={bookingLabels(locale)} />
+                <BookingWidget
+                  locale={locale}
+                  labels={bookingLabels(locale, blocks)}
+                />
               </div>
             </details>
           </div>

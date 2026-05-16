@@ -11,6 +11,7 @@ import {
 } from "@/components/site/atoms/field";
 import {
   submitContactMessageAction,
+  type ContactFieldKey,
   type ContactFormState,
 } from "@/app/[locale]/contact/_actions/submit";
 
@@ -32,37 +33,50 @@ interface ContactFormProps {
   };
 }
 
+const FIELD_ORDER: ContactFieldKey[] = ["name", "email", "message"];
+
 export function ContactForm({ locale, labels }: ContactFormProps) {
   const [state, formAction] = useActionState<ContactFormState, FormData>(
     submitContactMessageAction,
     null
   );
   const formRef = useRef<HTMLFormElement>(null);
-  const handledRef = useRef<number>(0);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+  const handledRef = useRef<string>("");
 
   useEffect(() => {
     if (!state) return;
-    const stamp =
-      "ok" in state ? state.messageId : `err:${(state as { error: string }).error}`;
-    if (typeof stamp === "string" && stamp === String(handledRef.current)) return;
-    if (typeof stamp === "number" && stamp === handledRef.current) return;
-    handledRef.current = typeof stamp === "number" ? stamp : Date.now();
+    const stamp = JSON.stringify(state);
+    if (stamp === handledRef.current) return;
+    handledRef.current = stamp;
 
-    if ("ok" in state) {
+    if (state.status === "ok") {
       toast.success(labels.successTitle, { description: labels.successBody });
       formRef.current?.reset();
-    } else if ("error" in state) {
-      toast.error(state.error);
+      return;
+    }
+
+    if (state.status === "error") {
+      if (state.formError) {
+        toast.error(state.formError);
+      }
+      const firstInvalid = FIELD_ORDER.find((f) => state.fieldErrors[f]);
+      if (firstInvalid === "name") nameRef.current?.focus();
+      else if (firstInvalid === "email") emailRef.current?.focus();
+      else if (firstInvalid === "message") messageRef.current?.focus();
     }
   }, [state, labels.successTitle, labels.successBody]);
+
+  const fieldErrors =
+    state && state.status === "error" ? state.fieldErrors : {};
 
   return (
     <div className="card-base card-pad-lg rounded-surface">
       {(labels.title || labels.description) && (
         <header className="mb-6">
-          {labels.title && (
-            <h3 className="text-h3">{labels.title}</h3>
-          )}
+          {labels.title && <h3 className="text-h3">{labels.title}</h3>}
           {labels.description && (
             <p className="text-body-sm mt-1.5 text-muted-foreground">
               {labels.description}
@@ -71,7 +85,12 @@ export function ContactForm({ locale, labels }: ContactFormProps) {
         </header>
       )}
 
-      <form ref={formRef} action={formAction} className="flex flex-col gap-5">
+      <form
+        ref={formRef}
+        action={formAction}
+        className="flex flex-col gap-5"
+        noValidate
+      >
         <input type="hidden" name="locale" value={locale} />
         <input
           type="text"
@@ -83,18 +102,32 @@ export function ContactForm({ locale, labels }: ContactFormProps) {
         />
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <FieldShell id="contact-name" label={labels.name}>
+          <FieldShell
+            id="contact-name"
+            label={labels.name}
+            error={fieldErrors.name}
+          >
             <FieldInput
+              ref={nameRef}
               id="contact-name"
               name="name"
               required
               autoComplete="name"
               maxLength={100}
               placeholder={labels.namePlaceholder}
+              invalid={Boolean(fieldErrors.name)}
+              aria-describedby={
+                fieldErrors.name ? "contact-name-error" : undefined
+              }
             />
           </FieldShell>
-          <FieldShell id="contact-email" label={labels.email}>
+          <FieldShell
+            id="contact-email"
+            label={labels.email}
+            error={fieldErrors.email}
+          >
             <FieldInput
+              ref={emailRef}
               id="contact-email"
               name="email"
               type="email"
@@ -102,18 +135,31 @@ export function ContactForm({ locale, labels }: ContactFormProps) {
               autoComplete="email"
               maxLength={200}
               placeholder={labels.emailPlaceholder}
+              invalid={Boolean(fieldErrors.email)}
+              aria-describedby={
+                fieldErrors.email ? "contact-email-error" : undefined
+              }
             />
           </FieldShell>
         </div>
 
-        <FieldShell id="contact-message" label={labels.message}>
+        <FieldShell
+          id="contact-message"
+          label={labels.message}
+          error={fieldErrors.message}
+        >
           <FieldTextarea
+            ref={messageRef}
             id="contact-message"
             name="message"
             required
             rows={5}
             maxLength={2000}
             placeholder={labels.messagePlaceholder}
+            invalid={Boolean(fieldErrors.message)}
+            aria-describedby={
+              fieldErrors.message ? "contact-message-error" : undefined
+            }
           />
         </FieldShell>
 

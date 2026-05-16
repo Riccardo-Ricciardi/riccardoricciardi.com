@@ -79,10 +79,8 @@ function FilterChip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "rounded-full border px-3 py-1 font-mono text-[11px] uppercase tracking-wider transition-colors",
-        active
-          ? "border-accent-blue bg-accent-blue text-white"
-          : "border-dashed-soft text-muted-foreground hover:border-accent-blue hover:text-foreground"
+        "pill-base pill-mono pill-interactive",
+        active && "pill-accent"
       )}
     >
       {label}

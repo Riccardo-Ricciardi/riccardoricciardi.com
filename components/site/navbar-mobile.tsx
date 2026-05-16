@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import type { NavbarItem } from "@/utils/i18n/types";
 
@@ -18,11 +18,21 @@ interface NavbarMobileProps {
   items: NavbarItem[];
   locale: string;
   ariaLabel: string;
+  closeLabel: string;
+  menuTitle: string;
 }
 
-export function NavbarMobile({ items, locale, ariaLabel }: NavbarMobileProps) {
+export function NavbarMobile({
+  items,
+  locale,
+  ariaLabel,
+  closeLabel,
+  menuTitle,
+}: NavbarMobileProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const openBtnRef = useRef<HTMLButtonElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -31,20 +41,24 @@ export function NavbarMobile({ items, locale, ariaLabel }: NavbarMobileProps) {
     };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
+    closeBtnRef.current?.focus();
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
+      openBtnRef.current?.focus();
     };
   }, [open]);
 
   return (
     <>
       <button
+        ref={openBtnRef}
         type="button"
         onClick={() => setOpen(true)}
         aria-label={ariaLabel}
         aria-expanded={open}
         aria-haspopup="dialog"
+        aria-controls="mobile-nav-dialog"
         className="grid h-9 w-9 place-items-center rounded-md text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <Menu className="h-5 w-5" aria-hidden="true" />
@@ -52,17 +66,19 @@ export function NavbarMobile({ items, locale, ariaLabel }: NavbarMobileProps) {
 
       {open && (
         <div
+          id="mobile-nav-dialog"
           role="dialog"
           aria-modal="true"
           aria-label={ariaLabel}
           className="fixed inset-0 z-[60] flex flex-col bg-background/95 backdrop-blur-xl animate-in fade-in"
         >
           <div className="flex items-center justify-between border-b border-dashed-soft px-4 py-3">
-            <p className="text-eyebrow">Menu</p>
+            <p className="text-eyebrow">{menuTitle}</p>
             <button
+              ref={closeBtnRef}
               type="button"
               onClick={() => setOpen(false)}
-              aria-label="Close menu"
+              aria-label={closeLabel}
               className="grid h-10 w-10 place-items-center rounded-md text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <X className="h-5 w-5" aria-hidden="true" />

@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { cookies, headers } from "next/headers";
 import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/site/navbar";
 import { Footer } from "@/components/site/footer";
 import { SkipLink } from "@/components/skip-link";
 import { HtmlLangUpdater } from "@/components/html-lang-updater";
 import { MouseParticles } from "@/components/mouse-particles";
+import { Eyebrow } from "@/components/site/atoms/eyebrow";
 import { getDictionary } from "@/utils/i18n/dictionary";
 import { isSupportedLanguage } from "@/utils/config/app";
 import {
@@ -36,6 +36,8 @@ const COPY = {
     aria: {
       nav: "Main navigation",
       menu: "Open menu",
+      menuClose: "Close menu",
+      menuTitle: "Menu",
       language: "Change language",
       theme: "Toggle theme",
       home: "Riccardo Ricciardi - Home",
@@ -50,6 +52,8 @@ const COPY = {
     aria: {
       nav: "Navigazione principale",
       menu: "Apri menu",
+      menuClose: "Chiudi menu",
+      menuTitle: "Menu",
       language: "Cambia lingua",
       theme: "Cambia tema",
       home: "Riccardo Ricciardi - Home",
@@ -96,27 +100,22 @@ export default async function NotFound() {
           >
             <MouseParticles count={40} linkDistance={100} repelRadius={120} />
           </div>
-          <div className="container-page py-20 md:py-28">
-            <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
-              <p className="font-mono text-sm font-medium uppercase tracking-widest text-muted-foreground">
-                {copy.eyebrow}
-              </p>
-              <h1 className="mt-4 text-balance text-6xl font-semibold tracking-tight leading-[1.05] md:text-8xl">
+          <div className="container-page section-y">
+            <div className="content-narrow flex flex-col items-center text-center">
+              <Eyebrow>{copy.eyebrow}</Eyebrow>
+              <h1 className="text-display mt-4 text-balance">
                 {copy.title}
               </h1>
-              <p className="mt-6 max-w-md text-balance text-lg text-muted-foreground">
+              <p className="text-body-lg mt-6 max-w-md text-balance text-muted-foreground">
                 {copy.description}
               </p>
-              <Button
-                asChild
-                size="lg"
-                className="mt-8 bg-accent-blue text-white hover:bg-[var(--accent-blue-hover)]"
+              <Link
+                href={`/${locale}`}
+                className="btn-base btn-lg btn-primary mt-8"
               >
-                <Link href={`/${locale}`}>
-                  <ArrowLeft className="mr-1 h-4 w-4" aria-hidden="true" />
-                  {copy.cta}
-                </Link>
-              </Button>
+                <ArrowLeft className="mr-1 h-4 w-4" aria-hidden="true" />
+                {copy.cta}
+              </Link>
             </div>
           </div>
         </section>

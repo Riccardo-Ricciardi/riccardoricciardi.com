@@ -9,6 +9,11 @@ interface ProjectsProps {
   subtitle?: string;
   locale: SupportedLanguage;
   allLabel: string;
+  narrativeLabels: {
+    problem: string;
+    solution: string;
+    outcome: string;
+  };
 }
 
 export async function Projects({
@@ -17,17 +22,11 @@ export async function Projects({
   subtitle,
   locale,
   allLabel,
+  narrativeLabels,
 }: ProjectsProps) {
   const projects = await getProjects(locale);
 
   if (projects.length === 0) return null;
-
-  const isIt = locale === "it";
-  const narrativeLabels = {
-    problem: isIt ? "Problema" : "Problem",
-    solution: isIt ? "Soluzione" : "Solution",
-    outcome: isIt ? "Risultato" : "Result",
-  };
 
   return (
     <section

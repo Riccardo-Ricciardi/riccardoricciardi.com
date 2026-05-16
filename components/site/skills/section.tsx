@@ -7,6 +7,8 @@ interface SkillsProps {
   eyebrow?: string;
   subtitle?: string;
   locale?: string;
+  emptyTitle?: string;
+  emptyBody?: string;
 }
 
 export async function Skills({
@@ -14,6 +16,8 @@ export async function Skills({
   eyebrow,
   subtitle,
   locale,
+  emptyTitle,
+  emptyBody,
 }: SkillsProps) {
   const skills = await getSkills();
 
@@ -31,7 +35,12 @@ export async function Skills({
         className="mb-10 md:mb-14"
       />
 
-      <SkillsBoard skills={skills} locale={locale} />
+      <SkillsBoard
+        skills={skills}
+        locale={locale}
+        emptyTitle={emptyTitle}
+        emptyBody={emptyBody}
+      />
     </section>
   );
 }

@@ -111,6 +111,8 @@ export default async function LocaleLayout({
     ? {
         nav: "Navigazione principale",
         menu: "Apri menu",
+        menuClose: "Chiudi menu",
+        menuTitle: "Menu",
         language: "Cambia lingua",
         theme: "Cambia tema",
         home: `${APP_CONFIG.siteName} - Home`,
@@ -119,6 +121,8 @@ export default async function LocaleLayout({
     : {
         nav: "Main navigation",
         menu: "Open menu",
+        menuClose: "Close menu",
+        menuTitle: "Menu",
         language: "Change language",
         theme: "Toggle theme",
         home: `${APP_CONFIG.siteName} - Home`,
@@ -128,6 +132,8 @@ export default async function LocaleLayout({
   const ariaLabels = {
     nav: content(blocks, "aria_nav", ariaFallback.nav),
     menu: content(blocks, "aria_menu", ariaFallback.menu),
+    menuClose: content(blocks, "aria_menu_close", ariaFallback.menuClose),
+    menuTitle: content(blocks, "aria_menu_title", ariaFallback.menuTitle),
     language: content(blocks, "aria_language", ariaFallback.language),
     theme: content(blocks, "aria_theme", ariaFallback.theme),
     home: content(blocks, "aria_home", ariaFallback.home),

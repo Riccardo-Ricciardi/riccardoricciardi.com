@@ -28,7 +28,7 @@ export function ProjectCard({ project, priority = false, labels }: ProjectCardPr
   );
 
   return (
-    <article className="group card-base card-flush flex flex-col overflow-hidden transition-all hover:-translate-y-0.5 hover:border-accent-blue">
+    <article className="group card-base card-interactive card-flush flex flex-col overflow-hidden">
       <a
         href={href}
         target="_blank"
@@ -40,6 +40,7 @@ export function ProjectCard({ project, priority = false, labels }: ProjectCardPr
           <Image
             src={imgSrc}
             alt=""
+            aria-hidden="true"
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"

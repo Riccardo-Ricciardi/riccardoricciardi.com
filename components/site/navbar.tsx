@@ -22,6 +22,8 @@ interface NavbarProps {
   ariaLabels: {
     nav: string;
     menu: string;
+    menuClose: string;
+    menuTitle: string;
     language: string;
     theme: string;
     home: string;
@@ -49,7 +51,8 @@ export function Navbar({
         >
           <Image
             src={LOGO_URL}
-            alt={ariaLabels.home}
+            alt=""
+            aria-hidden="true"
             width={36}
             height={36}
             priority
@@ -82,6 +85,8 @@ export function Navbar({
             items={items}
             locale={locale}
             ariaLabel={ariaLabels.menu}
+            closeLabel={ariaLabels.menuClose}
+            menuTitle={ariaLabels.menuTitle}
           />
         </div>
       </div>
