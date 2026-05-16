@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { ADMIN_NAV } from "@/components/admin/nav-config";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 const STORAGE_KEY = "admin:sidebar:collapsed";
 

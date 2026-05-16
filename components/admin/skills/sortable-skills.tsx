@@ -24,9 +24,10 @@ import { GripVertical, Upload } from "lucide-react";
 import type { Skill } from "@/components/admin/types";
 import { SubmitButton } from "@/components/admin/actions/submit-button";
 import { DeleteButton } from "@/components/admin/actions/delete-button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
+import { getSupabaseImageUrl } from "@/utils/env";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL ?? "";
+const BASE_URL = getSupabaseImageUrl();
 
 interface Props {
   initial: Skill[];

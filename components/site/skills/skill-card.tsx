@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { SkillMeter } from "@/components/site/atoms/skill-meter";
+import { getSupabaseImageUrl } from "@/utils/env";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL ?? "";
+const BASE_URL = getSupabaseImageUrl();
 
 interface SkillCardProps {
   id: number;

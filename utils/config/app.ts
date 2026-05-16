@@ -1,3 +1,9 @@
+import {
+  getDefaultLanguageEnv,
+  getLanguagesEnv,
+  getSiteUrl,
+} from "@/utils/env";
+
 /**
  * Build-time language snapshot. Edge contexts (middleware/proxy, OG image
  * generators, static helpers) cannot await a DB fetch — they read from this
@@ -5,15 +11,13 @@
  * DB-backed helpers in @/utils/i18n/languages, which include any language
  * added at runtime via /admin/languages.
  */
-const ENV_LANGUAGES = (process.env.NEXT_PUBLIC_LANGUAGES ?? "en,it")
+const ENV_LANGUAGES = getLanguagesEnv()
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
 
 const ENV_DEFAULT_LANGUAGE =
-  process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE?.trim() ||
-  ENV_LANGUAGES[0] ||
-  "en";
+  getDefaultLanguageEnv()?.trim() || ENV_LANGUAGES[0] || "en";
 
 export const APP_CONFIG = {
   languages: ENV_LANGUAGES as readonly string[],
@@ -21,8 +25,7 @@ export const APP_CONFIG = {
   mobileBreakpointPx: 900,
   translationTables: ["navbar", "theme", "not_found"] as const,
   siteName: "Riccardo Ricciardi",
-  siteUrl:
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://riccardoricciardi.com",
+  siteUrl: getSiteUrl(),
   author: {
     name: "Riccardo Ricciardi",
     email: "info@riccardoricciardi.com",

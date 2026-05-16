@@ -11,6 +11,17 @@ import { requireAdmin } from "@/utils/auth/admin";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { SectionHeader } from "@/components/admin/primitives/section-header";
 import { Stat } from "@/components/admin/primitives/stat";
+import type { Database } from "@/utils/supabase/database.types";
+
+type ProjectRow = Pick<
+  Database["public"]["Tables"]["projects"]["Row"],
+  "id" | "visible" | "synced_at"
+>;
+type LanguageRow = Pick<Database["public"]["Tables"]["languages"]["Row"], "code">;
+type ContentBlockRow = Pick<
+  Database["public"]["Tables"]["content_blocks"]["Row"],
+  "updated_at"
+>;
 
 export const dynamic = "force-dynamic";
 
@@ -63,17 +74,11 @@ export default async function AdminDashboard() {
     ]);
 
   const skillsCount = skillsRes.count ?? 0;
-  const projectRows = (projectsRes.data ?? []) as Array<{
-    id: string;
-    visible: boolean | null;
-    synced_at: string | null;
-  }>;
+  const projectRows: ProjectRow[] = projectsRes.data ?? [];
   const projectsTotal = projectRows.length;
   const projectsVisible = projectRows.filter((p) => p.visible).length;
-  const langs = (langsRes.data ?? []) as Array<{ code: string }>;
-  const contentRows = (contentRes.data ?? []) as Array<{
-    updated_at: string | null;
-  }>;
+  const langs: LanguageRow[] = langsRes.data ?? [];
+  const contentRows: ContentBlockRow[] = contentRes.data ?? [];
   const lastEdit = contentRows.reduce<string | null>(
     (acc, b) => (b.updated_at && (!acc || b.updated_at > acc) ? b.updated_at : acc),
     null

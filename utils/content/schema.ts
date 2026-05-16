@@ -109,6 +109,19 @@ export const CONTENT_SCHEMA: ContentSection[] = [
       { slug: "contact_email_label", label: "Email card label" },
     ],
   },
+  {
+    key: "aria",
+    title: "Accessibility labels",
+    description: "Screen-reader labels for navigation, menus and theme/language switchers",
+    fields: [
+      { slug: "aria_nav", label: "Main navigation" },
+      { slug: "aria_menu", label: "Open menu" },
+      { slug: "aria_language", label: "Language switcher" },
+      { slug: "aria_theme", label: "Theme switcher" },
+      { slug: "aria_home", label: "Home link" },
+      { slug: "aria_skip", label: "Skip to main content link" },
+    ],
+  },
 ];
 
 export const KNOWN_SLUGS = new Set(

@@ -1,9 +1,10 @@
 import { logger } from "@/utils/logger";
+import { getCalApiKey } from "@/utils/env";
 
 const API_BASE = "https://api.cal.com/v2";
 
 function getKey(): string | null {
-  return process.env.CAL_API_KEY?.trim() || null;
+  return getCalApiKey();
 }
 
 export function isCalConfigured(): boolean {

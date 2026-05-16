@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { Skill } from "@/utils/skills/fetch";
 import { SkillCard } from "@/components/site/skills/skill-card";
+import { getSupabaseImageUrl } from "@/utils/env";
 
 interface SkillsBoardProps {
   skills: Skill[];
@@ -46,7 +47,7 @@ const TIERS: TierMeta[] = [
   },
 ];
 
-const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL ?? "";
+const BASE_URL = getSupabaseImageUrl();
 
 function tierFor(percentage: number): TierId {
   if (percentage >= 85) return "core";

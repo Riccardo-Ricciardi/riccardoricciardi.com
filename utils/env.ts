@@ -21,12 +21,25 @@ function getOptional(name: string): string | null {
   return raw;
 }
 
+function literalRequired(raw: string | undefined, name: string): string {
+  if (!raw || raw.trim() === "") {
+    throw new Error(`Required environment variable missing: ${name}`);
+  }
+  return raw;
+}
+
 export function getSupabaseUrl(): string {
-  return getRequired("NEXT_PUBLIC_SUPABASE_URL");
+  return literalRequired(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    "NEXT_PUBLIC_SUPABASE_URL"
+  );
 }
 
 export function getSupabaseAnonKey(): string {
-  return getRequired("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  return literalRequired(
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+  );
 }
 
 export function getSupabaseServiceRoleKey(): string {
@@ -43,7 +56,8 @@ export function getCronSecretOptional(): string | null {
 
 export function getSiteUrl(): string {
   return (
-    getOptional("NEXT_PUBLIC_SITE_URL") ?? "https://riccardoricciardi.com"
+    literalOptional(process.env.NEXT_PUBLIC_SITE_URL) ??
+    "https://riccardoricciardi.com"
   );
 }
 
@@ -62,10 +76,7 @@ export function getResendConfig(): {
   return {
     apiKey: getOptional("RESEND_API_KEY"),
     from: getOptional("RESEND_FROM"),
-    to:
-      getOptional("RESEND_TO") ??
-      process.env.ADMIN_EMAILS?.split(",")[0]?.trim() ??
-      null,
+    to: getOptional("RESEND_TO") ?? getAdminEmails()[0] ?? null,
   };
 }
 
@@ -74,17 +85,75 @@ export function getCalApiKey(): string | null {
 }
 
 export function getCalUsername(): string {
-  return getOptional("NEXT_PUBLIC_CAL_USERNAME") ?? "";
+  return literalOptional(process.env.NEXT_PUBLIC_CAL_USERNAME) ?? "";
 }
 
 export function getCalEventSlug(): string {
-  return getOptional("NEXT_PUBLIC_CAL_EVENT_SLUG") ?? "30min";
+  return literalOptional(process.env.NEXT_PUBLIC_CAL_EVENT_SLUG) ?? "30min";
 }
 
 export function getContactIpSalt(): string {
-  return getOptional("CONTACT_IP_SALT") ?? "rrc";
+  const value = getOptional("CONTACT_IP_SALT");
+  if (value && value.length >= 16) return value;
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "CONTACT_IP_SALT is required in production and must be at least 16 characters"
+    );
+  }
+
+  return value ?? "dev-only-insecure-salt-do-not-use-in-prod";
+}
+
+/**
+ * NEXT_PUBLIC_* accessors use literal `process.env.X` reads (not dynamic
+ * indexing) so Next inlines them at build time for both server and client.
+ */
+function literalOptional(raw: string | undefined): string | null {
+  if (!raw || raw.trim() === "") return null;
+  return raw;
 }
 
 export function getSupabaseImageUrl(): string {
-  return getOptional("NEXT_PUBLIC_SUPABASE_IMAGE_URL") ?? "";
+  return literalOptional(process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL) ?? "";
+}
+
+export function getSupabaseImageUrlOptional(): string | null {
+  return literalOptional(process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL);
+}
+
+export function getSupabaseUrlOptional(): string | null {
+  return literalOptional(process.env.NEXT_PUBLIC_SUPABASE_URL);
+}
+
+export function getSupabaseAnonKeyOptional(): string | null {
+  return literalOptional(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+}
+
+export function getSiteUrlOptional(): string | null {
+  return literalOptional(process.env.NEXT_PUBLIC_SITE_URL);
+}
+
+export function getResendApiKey(): string | null {
+  return getOptional("RESEND_API_KEY");
+}
+
+export function getResendFrom(): string | null {
+  return getOptional("RESEND_FROM");
+}
+
+export function getResendTo(): string | null {
+  return getOptional("RESEND_TO") ?? getAdminEmails()[0] ?? null;
+}
+
+export function getLanguagesEnv(): string {
+  return literalOptional(process.env.NEXT_PUBLIC_LANGUAGES) ?? "en,it";
+}
+
+export function getDefaultLanguageEnv(): string | null {
+  return literalOptional(process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE);
+}
+
+export function isProduction(): boolean {
+  return process.env.NODE_ENV === "production";
 }

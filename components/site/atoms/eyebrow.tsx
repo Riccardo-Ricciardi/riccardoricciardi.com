@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 type EyebrowTag = "p" | "span" | "div" | "dt" | "dd" | "li" | "small";
 

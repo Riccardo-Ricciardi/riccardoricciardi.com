@@ -1,13 +1,9 @@
 import { redirect } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/server";
+import { getAdminEmails } from "@/utils/env";
 
-export const ADMIN_EMAILS: string[] = (
-  process.env.ADMIN_EMAILS ?? "info@riccardoricciardi.com"
-)
-  .split(",")
-  .map((e) => e.trim().toLowerCase())
-  .filter(Boolean);
+export const ADMIN_EMAILS: string[] = getAdminEmails();
 
 export async function getAdminUser(): Promise<User | null> {
   const supabase = await createClient();

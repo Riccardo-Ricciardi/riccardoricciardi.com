@@ -1,3 +1,5 @@
+import { isProduction } from "@/utils/env";
+
 type LogLevel = "info" | "warn" | "error";
 
 interface LogContext {
@@ -16,7 +18,7 @@ function format(level: LogLevel, message: string, context?: LogContext): string 
 
 export const logger = {
   info: (message: string, context?: LogContext) => {
-    if (process.env.NODE_ENV !== "production") {
+    if (!isProduction()) {
       // eslint-disable-next-line no-console
       console.info(format("info", message, context));
     }

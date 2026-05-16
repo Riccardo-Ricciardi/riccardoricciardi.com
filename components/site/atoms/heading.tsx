@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 import { Eyebrow } from "@/components/site/atoms/eyebrow";
 
 type Level = "display" | "h1" | "h2" | "h3" | "h4";

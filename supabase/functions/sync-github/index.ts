@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-explicit-any
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 interface GitHubRepo {
@@ -13,8 +12,65 @@ interface GitHubRepo {
   pushed_at: string;
 }
 
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+interface ProjectRow {
+  id: string;
+  repo: string;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function asString(value: unknown): string | null {
+  return typeof value === "string" ? value : null;
+}
+
+function asNumber(value: unknown): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
+}
+
+function asStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((v): v is string => typeof v === "string");
+}
+
+function parseGitHubRepo(value: unknown): GitHubRepo | null {
+  if (!isRecord(value)) return null;
+  const name = asString(value.name);
+  const htmlUrl = asString(value.html_url);
+  const pushedAt = asString(value.pushed_at);
+  if (!name || !htmlUrl || !pushedAt) return null;
+  return {
+    name,
+    description: asString(value.description),
+    html_url: htmlUrl,
+    homepage: asString(value.homepage),
+    stargazers_count: asNumber(value.stargazers_count),
+    forks_count: asNumber(value.forks_count),
+    language: asString(value.language),
+    topics: asStringArray(value.topics),
+    pushed_at: pushedAt,
+  };
+}
+
+function parseProjectRow(value: unknown): ProjectRow | null {
+  if (!isRecord(value)) return null;
+  const id = asString(value.id);
+  const repo = asString(value.repo);
+  if (!id || !repo) return null;
+  return { id, repo };
+}
+
+function requireEnv(name: string): string {
+  const value = Deno.env.get(name);
+  if (!value || value.trim() === "") {
+    throw new Error(`Required environment variable missing: ${name}`);
+  }
+  return value;
+}
+
+const SUPABASE_URL = requireEnv("SUPABASE_URL");
+const SUPABASE_SERVICE_ROLE_KEY = requireEnv("SUPABASE_SERVICE_ROLE_KEY");
 const GITHUB_TOKEN = Deno.env.get("GITHUB_TOKEN") ?? "";
 
 // owner/repo segments: alphanumerics, dashes, underscores, dots only.
@@ -53,7 +109,13 @@ async function fetchRepo(repo: string): Promise<GitHubRepo | null> {
     console.error(`github ${repo}: ${res.status} ${res.statusText}`);
     return null;
   }
-  return (await res.json()) as GitHubRepo;
+  const raw: unknown = await res.json();
+  const parsed = parseGitHubRepo(raw);
+  if (!parsed) {
+    console.error(`github ${repo}: unexpected response shape`);
+    return null;
+  }
+  return parsed;
 }
 
 Deno.serve(async (req: Request) => {
@@ -84,10 +146,16 @@ Deno.serve(async (req: Request) => {
 
   const results: Array<{ repo: string; ok: boolean; error?: string }> = [];
 
-  for (const row of rows ?? []) {
-    const meta = await fetchRepo(row.repo as string);
+  for (const raw of rows ?? []) {
+    const row = parseProjectRow(raw);
+    if (!row) {
+      results.push({ repo: "unknown", ok: false, error: "invalid_row" });
+      continue;
+    }
+
+    const meta = await fetchRepo(row.repo);
     if (!meta) {
-      results.push({ repo: row.repo as string, ok: false, error: "fetch_failed" });
+      results.push({ repo: row.repo, ok: false, error: "fetch_failed" });
       continue;
     }
 
@@ -108,12 +176,12 @@ Deno.serve(async (req: Request) => {
         pushed_at: meta.pushed_at,
         synced_at: new Date().toISOString(),
       })
-      .eq("id", row.id as string);
+      .eq("id", row.id);
 
     if (updErr) {
-      results.push({ repo: row.repo as string, ok: false, error: updErr.message });
+      results.push({ repo: row.repo, ok: false, error: updErr.message });
     } else {
-      results.push({ repo: row.repo as string, ok: true });
+      results.push({ repo: row.repo, ok: true });
     }
   }
 

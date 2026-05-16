@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 interface DeleteButtonProps {
   action: (formData: FormData) => void | Promise<void>;

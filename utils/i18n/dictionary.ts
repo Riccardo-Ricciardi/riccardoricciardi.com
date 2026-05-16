@@ -7,6 +7,7 @@ import {
   type TranslationTable,
 } from "@/utils/config/app";
 import type { Dictionary, NavbarItem } from "@/utils/i18n/types";
+import type { Database } from "@/utils/supabase/database.types";
 import { logger } from "@/utils/logger";
 
 const FALLBACK: Dictionary = {
@@ -15,7 +16,8 @@ const FALLBACK: Dictionary = {
   not_found: ["Page not found", "Back to home"],
 };
 
-type RawRow = { value: string; position: number; slug?: string | null };
+type TranslationRow =
+  Database["public"]["Tables"][TranslationTable]["Row"];
 
 export const getDictionary = cache(
   async (locale: SupportedLanguage): Promise<Dictionary> => {
@@ -23,13 +25,11 @@ export const getDictionary = cache(
 
     const supabase = createStaticClient();
 
-    const { data: languageRaw, error: langError } = await supabase
+    const { data: language, error: langError } = await supabase
       .from("languages")
       .select("id")
       .eq("code", locale)
       .maybeSingle();
-
-    const language = languageRaw as { id: number } | null;
 
     if (langError || !language) {
       logger.warn("dictionary: language not found", { locale });
@@ -38,13 +38,11 @@ export const getDictionary = cache(
 
     const entries = await Promise.all(
       APP_CONFIG.translationTables.map(async (table: TranslationTable) => {
-        const query = supabase
+        const { data, error } = await supabase
           .from(table)
           .select("*")
           .eq("language_id", language.id)
           .order("position", { ascending: true });
-
-        const { data, error } = await query;
 
         if (error) {
           logger.error("dictionary: translation fetch failed", {
@@ -55,7 +53,7 @@ export const getDictionary = cache(
           return [table, []] as const;
         }
 
-        const rows = (data ?? []) as unknown as RawRow[];
+        const rows: TranslationRow[] = data ?? [];
 
         if (table === "navbar") {
           const items: NavbarItem[] = rows.map((r, i) => {

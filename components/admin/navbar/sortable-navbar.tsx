@@ -21,7 +21,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 import { SubmitButton } from "@/components/admin/actions/submit-button";
 import { DeleteButton } from "@/components/admin/actions/delete-button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 export type NavGroup = {
   slug: string;

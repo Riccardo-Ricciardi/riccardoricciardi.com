@@ -10,10 +10,10 @@ import { NavLinks } from "@/components/site/nav-links";
 import { ScrolledHeader } from "@/components/site/scrolled-header";
 import type { Dictionary } from "@/utils/i18n/types";
 import type { SupportedLanguage } from "@/utils/config/app";
+import { getSupabaseImageUrlOptional } from "@/utils/env";
 
 const LOGO_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL?.concat("/Logo.png") ??
-  "/logo.png";
+  getSupabaseImageUrlOptional()?.concat("/Logo.png") ?? "/logo.png";
 
 interface NavbarProps {
   locale: SupportedLanguage;

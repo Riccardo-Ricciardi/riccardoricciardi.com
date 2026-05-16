@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { createAdminClient } from "@/utils/supabase/admin";
+import { getContactIpSalt, getResendConfig } from "@/utils/env";
 import { logger } from "@/utils/logger";
 
 export type ContactFormState =
@@ -66,7 +67,7 @@ function clientIpHash(ipHeader: string | null): string | null {
   const ip = ipHeader.split(",")[0]?.trim() ?? "";
   if (!ip) return null;
   return createHash("sha256")
-    .update(`${ip}:${process.env.CONTACT_IP_SALT ?? "rrc"}`)
+    .update(`${ip}:${getContactIpSalt()}`)
     .digest("hex")
     .slice(0, 32);
 }
@@ -167,12 +168,7 @@ async function sendNotificationEmail(params: {
   message: string;
   locale: string;
 }): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM;
-  const to =
-    process.env.RESEND_TO ??
-    process.env.ADMIN_EMAILS?.split(",")[0]?.trim() ??
-    null;
+  const { apiKey, from, to } = getResendConfig();
 
   if (!apiKey || !from || !to) return;
 

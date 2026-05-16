@@ -26,7 +26,7 @@ import {
   type BookingState,
 } from "@/app/[locale]/contact/_actions/booking";
 import type { CalEventType, CalSlot, CalSlots } from "@/utils/cal/client";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 interface BookingWidgetProps {
   locale: string;

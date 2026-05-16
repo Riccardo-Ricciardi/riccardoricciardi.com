@@ -42,9 +42,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-.aider.chat.history.md
-.aider.input.history
-.aider.tags.cache.v4/cache.db
+
+# aider
+.aider*
+.aider.tags.cache.v4/
 
 # graphify
 /graphify-out/

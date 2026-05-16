@@ -13,6 +13,7 @@ import {
 } from "@/utils/i18n/languages";
 import { content, getContentBlocks } from "@/utils/content/fetch";
 import { isCalConfigured } from "@/utils/cal/client";
+import { getCalUsername } from "@/utils/env";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
@@ -127,8 +128,7 @@ export default async function ContactPage({ params }: PageProps) {
 
   const isIt = locale === "it";
   const blocks = await getContentBlocks(locale);
-  const calEnabled =
-    isCalConfigured() && !!process.env.NEXT_PUBLIC_CAL_USERNAME;
+  const calEnabled = isCalConfigured() && getCalUsername().length > 0;
 
   const heading = content(blocks, "contact_heading", "Got a project? Let's talk.");
   const eyebrow = content(blocks, "contact_eyebrow", "/contact");

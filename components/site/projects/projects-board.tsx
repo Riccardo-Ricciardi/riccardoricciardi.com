@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Project } from "@/utils/projects/fetch";
 import { ProjectCard, type NarrativeLabels } from "@/components/site/projects/project-card";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 interface ProjectsBoardProps {
   projects: Project[];

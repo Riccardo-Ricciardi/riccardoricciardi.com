@@ -17,6 +17,15 @@ export default async function LoginPage({ searchParams }: PageProps) {
 
   const { error } = await searchParams;
 
+  let errorMessage: string | null = null;
+  if (error) {
+    try {
+      errorMessage = decodeURIComponent(error);
+    } catch {
+      errorMessage = "Sign in failed. Please try again.";
+    }
+  }
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       <div
@@ -72,12 +81,12 @@ export default async function LoginPage({ searchParams }: PageProps) {
             />
           </label>
 
-          {error && (
+          {errorMessage && (
             <p
               role="alert"
               className="rounded-md border border-rose-500/30 bg-rose-500/5 px-3 py-2 text-xs text-rose-700 dark:text-rose-300"
             >
-              {decodeURIComponent(error)}
+              {errorMessage}
             </p>
           )}
 

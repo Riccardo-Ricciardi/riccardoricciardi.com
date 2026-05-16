@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
 import { logger } from "@/utils/logger";
+import {
+  getCronSecretOptional,
+  getSupabaseUrlOptional,
+} from "@/utils/env";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -14,7 +18,7 @@ function safeEqual(a: string, b: string): boolean {
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization") ?? "";
-  const cronSecret = process.env.CRON_SECRET;
+  const cronSecret = getCronSecretOptional();
 
   if (!cronSecret) {
     logger.error("cron/sync-github: CRON_SECRET not configured");
@@ -25,7 +29,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = getSupabaseUrlOptional();
   if (!supabaseUrl) {
     return NextResponse.json({ error: "supabase_not_configured" }, { status: 500 });
   }

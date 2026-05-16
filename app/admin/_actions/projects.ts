@@ -7,6 +7,7 @@ import {
   deleteImage,
   pathFromPublicUrl,
 } from "@/utils/storage/upload";
+import { getCronSecretOptional, getSiteUrlOptional } from "@/utils/env";
 import { asBool, asInt, asStr, bounce } from "./_shared";
 
 const PATH = "/admin/projects";
@@ -230,8 +231,8 @@ export async function updateProjectNarrativeAction(formData: FormData) {
 
 export async function triggerSyncAction(): Promise<never> {
   await requireAdmin();
-  const cronSecret = process.env.CRON_SECRET;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const cronSecret = getCronSecretOptional();
+  const siteUrl = getSiteUrlOptional();
   if (!cronSecret || !siteUrl) bounce(PATH);
 
   await fetch(`${siteUrl}/api/cron/sync-github`, {

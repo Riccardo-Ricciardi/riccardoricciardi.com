@@ -22,7 +22,7 @@ import { Eye, EyeOff, GripVertical } from "lucide-react";
 import type { SocialLink } from "@/components/admin/types";
 import { SubmitButton } from "@/components/admin/actions/submit-button";
 import { DeleteButton } from "@/components/admin/actions/delete-button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 interface Props {
   initial: SocialLink[];

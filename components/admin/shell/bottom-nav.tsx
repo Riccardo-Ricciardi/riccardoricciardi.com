@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { MoreHorizontal, X } from "lucide-react";
 import { MOBILE_TABS, ADMIN_NAV } from "@/components/admin/nav-config";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 interface BottomNavProps {
   liveSiteUrl: string;

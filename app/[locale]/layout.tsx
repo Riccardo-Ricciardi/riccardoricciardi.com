@@ -13,6 +13,7 @@ import {
   isKnownLocale,
 } from "@/utils/i18n/languages";
 import { getDictionary } from "@/utils/i18n/dictionary";
+import { content, getContentBlocks } from "@/utils/content/fetch";
 
 export async function generateStaticParams() {
   const codes = await getLanguageCodes();
@@ -95,33 +96,43 @@ export default async function LocaleLayout({
   const { locale } = await params;
   if (!(await isKnownLocale(locale))) notFound();
 
-  const [dictionary, languageRows] = await Promise.all([
+  const [dictionary, languageRows, blocks] = await Promise.all([
     getDictionary(locale),
     getLanguages(),
+    getContentBlocks(locale),
   ]);
   const languageOptions = languageRows.map((l) => ({
     code: l.code,
     name: l.name,
   }));
 
-  const ariaLabels =
-    locale === "it"
-      ? {
-          nav: "Navigazione principale",
-          menu: "Apri menu",
-          language: "Cambia lingua",
-          theme: "Cambia tema",
-          home: "Riccardo Ricciardi - Home",
-          skip: "Vai al contenuto principale",
-        }
-      : {
-          nav: "Main navigation",
-          menu: "Open menu",
-          language: "Change language",
-          theme: "Toggle theme",
-          home: "Riccardo Ricciardi - Home",
-          skip: "Skip to main content",
-        };
+  const isItalian = locale === "it";
+  const ariaFallback = isItalian
+    ? {
+        nav: "Navigazione principale",
+        menu: "Apri menu",
+        language: "Cambia lingua",
+        theme: "Cambia tema",
+        home: `${APP_CONFIG.siteName} - Home`,
+        skip: "Vai al contenuto principale",
+      }
+    : {
+        nav: "Main navigation",
+        menu: "Open menu",
+        language: "Change language",
+        theme: "Toggle theme",
+        home: `${APP_CONFIG.siteName} - Home`,
+        skip: "Skip to main content",
+      };
+
+  const ariaLabels = {
+    nav: content(blocks, "aria_nav", ariaFallback.nav),
+    menu: content(blocks, "aria_menu", ariaFallback.menu),
+    language: content(blocks, "aria_language", ariaFallback.language),
+    theme: content(blocks, "aria_theme", ariaFallback.theme),
+    home: content(blocks, "aria_home", ariaFallback.home),
+    skip: content(blocks, "aria_skip", ariaFallback.skip),
+  };
 
   return (
     <>

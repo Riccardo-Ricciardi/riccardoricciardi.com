@@ -10,15 +10,16 @@ import {
   type CalSlots,
 } from "@/utils/cal/client";
 import { logger } from "@/utils/logger";
+import { getCalEventSlug, getCalUsername } from "@/utils/env";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function username(): string {
-  return process.env.NEXT_PUBLIC_CAL_USERNAME?.trim() || "";
+  return getCalUsername().trim();
 }
 
 function defaultEventSlug(): string {
-  return process.env.NEXT_PUBLIC_CAL_EVENT_SLUG?.trim() || "30min";
+  return getCalEventSlug().trim() || "30min";
 }
 
 export type EventTypesResult =

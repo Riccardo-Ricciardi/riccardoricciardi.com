@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 import { Eyebrow } from "@/components/site/atoms/eyebrow";
 
 interface SectionHeadingProps {

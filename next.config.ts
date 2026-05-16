@@ -1,22 +1,35 @@
 import path from "node:path";
 import type { NextConfig } from "next";
+import { getSupabaseUrlOptional, isProduction } from "./utils/env";
 
 const supabaseHostname = (() => {
   try {
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname;
-    }
+    const url = getSupabaseUrlOptional();
+    if (url) return new URL(url).hostname;
   } catch {
     /* noop */
   }
   return "yfzqurdmbllthonjdzpb.supabase.co";
 })();
 
-const isProd = process.env.NODE_ENV === "production";
+const isProd = isProduction();
 
 // 'unsafe-eval' is only needed by Turbopack/HMR in dev. Drop it in production.
-// 'unsafe-inline' remains for Next.js bootstrap inline scripts; tightening to a
-// nonce/strict-dynamic policy is tracked as a follow-up.
+//
+// TODO(security): replace 'unsafe-inline' with a nonce + 'strict-dynamic' CSP.
+// Blockers for this project:
+//   1. Next.js App Router injects inline bootstrap + RSC flight-data scripts
+//      (e.g. self.__next_f.push) that must all receive the per-request nonce.
+//      In Next 16 this requires moving the CSP header out of next.config.ts
+//      into proxy.ts (middleware) so the nonce can be generated per request
+//      and forwarded via a request header that the root layout reads via
+//      `headers()` to thread into every <Script nonce={...}> tag.
+//   2. Vercel Analytics (va.vercel-scripts.com) and any future third-party
+//      script must either accept the nonce or be covered by 'strict-dynamic'.
+//   3. Static export / ISR pages cannot use a per-request nonce — the policy
+//      must remain hash-based or 'unsafe-inline' for prerendered HTML.
+// Tracking this as a separate hardening pass once the prerender/dynamic split
+// is stable.
 const scriptSrc = isProd
   ? "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com"
   : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com";
