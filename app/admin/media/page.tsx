@@ -76,7 +76,7 @@ export default async function MediaAdminPage({ searchParams }: PageProps) {
             multiple
             accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml,image/gif"
             required
-            className="block w-full cursor-pointer rounded-md border admin-divider bg-background px-2 py-2 text-xs file:mr-3 file:rounded-md file:border-0 file:bg-accent file:px-3 file:py-2 file:text-xs file:font-medium hover:file:bg-accent/80"
+            className="admin-file rounded-md border admin-divider bg-background px-2 py-2"
           />
         </label>
         <div className="flex items-end">

@@ -103,10 +103,10 @@ function SkillCard({ skill, index, priority }: SkillCardProps) {
       <div className="mt-auto flex flex-col gap-2">
         <span
           aria-hidden="true"
-          className="relative h-px w-full overflow-hidden bg-border"
+          className="relative h-2 w-full overflow-hidden rounded-full bg-muted"
         >
           <span
-            className="absolute inset-y-0 left-0 bg-foreground transition-[width,background-color] duration-300 ease-out group-hover:bg-accent-blue"
+            className="absolute inset-y-0 left-0 rounded-full bg-accent-blue transition-[width] duration-300 ease-out"
             style={{ width: `${skill.percentage}%` }}
           />
         </span>

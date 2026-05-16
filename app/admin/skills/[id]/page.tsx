@@ -135,7 +135,7 @@ function IconSlot({
           name="file"
           accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml"
           required
-          className="block w-full cursor-pointer text-xs file:mr-3 file:rounded-md file:border-0 file:bg-accent file:px-3 file:py-2 file:text-xs file:font-medium hover:file:bg-accent/80"
+          className="admin-file"
         />
         <SubmitButton pendingLabel="Uploading…">
           <Upload className="h-3.5 w-3.5" aria-hidden="true" />

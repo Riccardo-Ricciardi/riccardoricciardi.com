@@ -105,7 +105,7 @@ function ValueInput({
             value={colorHex}
             onChange={(e) => setVal(e.target.value)}
             aria-label={`${label} color picker`}
-            className="h-9 w-12 cursor-pointer rounded-md border admin-divider bg-transparent"
+            className="admin-color-swatch h-9 w-12"
           />
           <input
             name={name}
