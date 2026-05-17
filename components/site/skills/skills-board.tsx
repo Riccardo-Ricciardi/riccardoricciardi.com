@@ -122,6 +122,7 @@ function SkillRow({ skill }: { skill: Skill }) {
           aria-hidden="true"
           fill
           sizes="24px"
+          unoptimized
           className={
             skill.dark ? "object-contain dark:hidden" : "object-contain"
           }
@@ -133,6 +134,7 @@ function SkillRow({ skill }: { skill: Skill }) {
             aria-hidden="true"
             fill
             sizes="24px"
+            unoptimized
             className="hidden object-contain dark:block"
           />
         )}

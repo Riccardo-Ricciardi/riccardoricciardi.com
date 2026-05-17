@@ -18,7 +18,18 @@ export function UsesList({ items }: UsesListProps) {
     grouped.set(item.category, arr);
   }
 
-  const categories = Array.from(grouped.keys());
+  const CATEGORY_ORDER = [
+    "Hardware",
+    "Editor",
+    "Tooling",
+    "Hosting",
+    "AI Services",
+  ];
+  const categories = Array.from(grouped.keys()).sort((a, b) => {
+    const ai = CATEGORY_ORDER.indexOf(a);
+    const bi = CATEGORY_ORDER.indexOf(b);
+    return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+  });
 
   return (
     <div className="flex flex-col gap-12 md:gap-16">
