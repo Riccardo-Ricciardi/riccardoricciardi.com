@@ -55,7 +55,7 @@ const securityHeaders = [
       "default-src 'self'",
       scriptSrc,
       "style-src 'self' 'unsafe-inline'",
-      `img-src 'self' data: blob: https://${supabaseHostname} https://images.unsplash.com https://media.canva.com https://avatars.githubusercontent.com https://opengraph.githubassets.com https://raw.githubusercontent.com`,
+      `img-src 'self' data: blob: https://${supabaseHostname} https://images.unsplash.com https://media.canva.com https://avatars.githubusercontent.com https://opengraph.githubassets.com https://raw.githubusercontent.com https://cdn.jsdelivr.net https://cdn.simpleicons.org`,
       "font-src 'self' data:",
       `connect-src 'self' https://${supabaseHostname} https://api.github.com https://vitals.vercel-insights.com https://va.vercel-scripts.com`,
       "frame-src 'none'",
@@ -95,8 +95,13 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "avatars.githubusercontent.com" },
       { protocol: "https", hostname: "opengraph.githubassets.com" },
       { protocol: "https", hostname: "raw.githubusercontent.com" },
+      { protocol: "https", hostname: "cdn.jsdelivr.net" },
+      { protocol: "https", hostname: "cdn.simpleicons.org" },
     ],
     formats: ["image/avif", "image/webp"],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   async headers() {
     return [
