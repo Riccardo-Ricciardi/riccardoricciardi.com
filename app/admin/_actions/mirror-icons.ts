@@ -19,12 +19,21 @@ function slugify(input: string): string {
 
 async function fetchSvg(url: string): Promise<string> {
   const res = await fetch(url, {
-    headers: { "User-Agent": "icon-mirror riccardoricciardi.com" },
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (compatible; riccardoricciardi.com icon mirror)",
+      Accept: "image/svg+xml,*/*;q=0.8",
+    },
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${url}`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(
+      `fetch ${url} -> HTTP ${res.status} ${res.statusText} ${body.slice(0, 120)}`
+    );
+  }
   const text = await res.text();
-  if (!text.includes("<svg")) throw new Error(`Not an SVG: ${url}`);
+  if (!text.includes("<svg")) throw new Error(`fetched body is not SVG: ${url}`);
   return text;
 }
 
@@ -41,14 +50,19 @@ async function mirrorOne(
   const filename = variant === "dark" ? `${slug}-dark.svg` : `${slug}.svg`;
   const path = `${FOLDER}/${filename}`;
   const svg = await fetchSvg(sourceUrl);
+  const blob = new Blob([svg], { type: "image/svg+xml" });
   const { error } = await supabase.storage
     .from(BUCKET)
-    .upload(path, svg, {
-      contentType: "image/svg+xml; charset=utf-8",
+    .upload(path, blob, {
+      contentType: "image/svg+xml",
       upsert: true,
       cacheControl: "31536000",
     });
-  if (error) throw new Error(`Upload ${path}: ${error.message}`);
+  if (error) {
+    throw new Error(
+      `upload ${path}: ${error.message} (cause=${(error as { cause?: string }).cause ?? "n/a"})`
+    );
+  }
   return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
