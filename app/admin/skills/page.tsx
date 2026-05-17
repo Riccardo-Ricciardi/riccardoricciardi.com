@@ -1,8 +1,9 @@
-import { Sparkles } from "lucide-react";
+import { Download, Sparkles } from "lucide-react";
 import { requireAdmin } from "@/utils/auth/admin";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { SectionHeader } from "@/components/admin/primitives/section-header";
 import { EmptyState } from "@/components/admin/primitives/empty-state";
+import { SubmitButton } from "@/components/admin/actions/submit-button";
 import { SortableSkills } from "@/components/admin/skills/sortable-skills";
 import { AddSkillForm } from "@/components/admin/skills/add-skill-form";
 import { SortableCategories } from "@/components/admin/skills/sortable-categories";
@@ -16,6 +17,7 @@ import {
   createSkillCategoryAction,
   deleteSkillCategoryAction,
 } from "@/app/admin/_actions/skill-categories";
+import { mirrorIconsAction } from "@/app/admin/_actions/mirror-icons";
 import type { Skill, SkillCategory } from "@/components/admin/types";
 
 export const dynamic = "force-dynamic";
@@ -51,6 +53,14 @@ export default async function SkillsAdminPage() {
         eyebrow="Catalog"
         title="Skills"
         description="Group skills into categories, reorder both, edit labels and proficiency, then save in one go."
+        actions={
+          <form action={mirrorIconsAction}>
+            <SubmitButton pendingLabel="Mirroring…">
+              <Download className="h-3.5 w-3.5" aria-hidden="true" />
+              Mirror icons to Supabase
+            </SubmitButton>
+          </form>
+        }
       />
 
       <section className="flex flex-col gap-4">
