@@ -13,6 +13,9 @@ function slugify(input: string): string {
   return input
     .toLowerCase()
     .normalize("NFKD")
+    .replace(/\+\+/g, "pp")
+    .replace(/\.js$/, "js")
+    .replace(/#/g, "sharp")
     .replace(/[^\w]+/g, "-")
     .replace(/^-|-$/g, "");
 }

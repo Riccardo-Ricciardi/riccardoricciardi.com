@@ -37,6 +37,9 @@ function slugify(s) {
   return s
     .toLowerCase()
     .normalize("NFKD")
+    .replace(/\+\+/g, "pp")
+    .replace(/\.js$/, "js")
+    .replace(/#/g, "sharp")
     .replace(/[^\w]+/g, "-")
     .replace(/^-|-$/g, "");
 }
@@ -58,8 +61,9 @@ async function uploadIcon(name, variant, sourceUrl) {
   const filename = variant === "dark" ? `${slug}-dark.svg` : `${slug}.svg`;
   const path = `${FOLDER}/${filename}`;
   const svg = await fetchSvg(sourceUrl);
-  const { error } = await supabase.storage.from(BUCKET).upload(path, svg, {
-    contentType: "image/svg+xml; charset=utf-8",
+  const blob = new Blob([svg], { type: "image/svg+xml" });
+  const { error } = await supabase.storage.from(BUCKET).upload(path, blob, {
+    contentType: "image/svg+xml",
     upsert: true,
     cacheControl: "31536000",
   });
@@ -68,10 +72,11 @@ async function uploadIcon(name, variant, sourceUrl) {
   return data.publicUrl;
 }
 
-async function processTable(table, key) {
-  const { data, error } = await supabase
-    .from(table)
-    .select(`${key}, name, icon_url, icon_dark_url`);
+async function processTable(table, key, { hasDark = true } = {}) {
+  const cols = hasDark
+    ? `${key}, name, icon_url, icon_dark_url`
+    : `${key}, name, icon_url`;
+  const { data, error } = await supabase.from(table).select(cols);
   if (error) throw new Error(`Select ${table}: ${error.message}`);
 
   for (const row of data ?? []) {
@@ -81,7 +86,7 @@ async function processTable(table, key) {
         const url = await uploadIcon(row.name, "light", row.icon_url);
         if (url && url !== row.icon_url) updates.icon_url = url;
       }
-      if (row.icon_dark_url) {
+      if (hasDark && row.icon_dark_url) {
         const url = await uploadIcon(row.name, "dark", row.icon_dark_url);
         if (url && url !== row.icon_dark_url) updates.icon_dark_url = url;
       }
@@ -102,7 +107,7 @@ async function processTable(table, key) {
 }
 
 console.log("Skills:");
-await processTable("skills", "id");
+await processTable("skills", "id", { hasDark: true });
 console.log("Uses items:");
-await processTable("uses_items", "id");
+await processTable("uses_items", "id", { hasDark: false });
 console.log("Done.");
