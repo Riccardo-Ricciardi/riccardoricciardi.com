@@ -1,11 +1,20 @@
 import Image from "next/image";
-import { Sparkles } from "lucide-react";
-import type { Skill } from "@/utils/skills/fetch";
+import {
+  Sparkles,
+  Layout,
+  Database,
+  Wrench,
+  Palette,
+  Box,
+  Cpu,
+  type LucideIcon,
+} from "lucide-react";
+import type { Skill, SkillGroup } from "@/utils/skills/fetch";
 import { EmptyState } from "@/components/site/atoms/empty-state";
 import { getSupabaseImageUrl } from "@/utils/env";
 
 interface SkillsBoardProps {
-  skills: Skill[];
+  groups: SkillGroup[];
   locale?: string;
   emptyTitle?: string;
   emptyBody?: string;
@@ -13,15 +22,25 @@ interface SkillsBoardProps {
 
 const BASE_URL = getSupabaseImageUrl();
 
+const ICON_MAP: Record<string, LucideIcon> = {
+  Layout,
+  Database,
+  Wrench,
+  Palette,
+  Box,
+  Cpu,
+  Sparkles,
+};
+
 export function SkillsBoard({
-  skills,
+  groups,
   locale = "it",
   emptyTitle,
   emptyBody,
 }: SkillsBoardProps) {
   const lang = locale === "it" ? "it" : "en";
 
-  if (skills.length === 0) {
+  if (groups.length === 0) {
     return (
       <EmptyState
         icon={Sparkles}
@@ -40,79 +59,103 @@ export function SkillsBoard({
     );
   }
 
-  const sorted = [...skills].sort((a, b) => b.percentage - a.percentage);
-
   return (
-    <ul className="grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-      {sorted.map((skill, i) => (
-        <SkillCard key={skill.id} skill={skill} index={i} priority={i < 8} />
+    <ul className="grid list-none grid-cols-1 gap-4 p-0 md:grid-cols-2 xl:grid-cols-3">
+      {groups.map((group) => (
+        <CategoryCard key={group.category.slug} group={group} lang={lang} />
       ))}
     </ul>
   );
 }
 
-interface SkillCardProps {
-  skill: Skill;
-  index: number;
-  priority: boolean;
+function CategoryCard({
+  group,
+  lang,
+}: {
+  group: SkillGroup;
+  lang: "it" | "en";
+}) {
+  const Icon =
+    (group.category.icon && ICON_MAP[group.category.icon]) || Sparkles;
+  const label = lang === "it" ? group.category.label_it : group.category.label_en;
+  const count = group.skills.length;
+  const countLabel =
+    lang === "it"
+      ? `${count} ${count === 1 ? "competenza" : "competenze"}`
+      : `${count} ${count === 1 ? "skill" : "skills"}`;
+
+  return (
+    <li className="card-base flex flex-col gap-5 overflow-hidden p-6">
+      <header className="flex items-center justify-between gap-3 border-b admin-divider pb-4">
+        <div className="flex items-center gap-3">
+          <span className="grid h-9 w-9 place-items-center rounded-md border admin-divider bg-background/60 text-accent-blue">
+            <Icon className="h-4 w-4" aria-hidden="true" />
+          </span>
+          <h3 className="text-base font-semibold tracking-tight text-foreground">
+            {label}
+          </h3>
+        </div>
+        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          {countLabel}
+        </span>
+      </header>
+
+      <ul className="flex list-none flex-col gap-3 p-0">
+        {group.skills.map((skill) => (
+          <SkillRow key={skill.id} skill={skill} />
+        ))}
+      </ul>
+    </li>
+  );
 }
 
-function SkillCard({ skill, index, priority }: SkillCardProps) {
+function SkillRow({ skill }: { skill: Skill }) {
   const lightSrc = skill.icon_url ?? `${BASE_URL}/${skill.name}.png`;
   const darkSrc = skill.icon_dark_url ?? `${BASE_URL}/${skill.name}-dark.png`;
 
   return (
-    <li className="group card-base card-interactive relative flex flex-col gap-4 overflow-hidden p-5 transition-[border-color,transform,box-shadow] duration-150 ease-out hover:-translate-y-0.5 hover:border-foreground/40">
-      <span
-        aria-hidden="true"
-        className="absolute right-4 top-4 font-mono text-[10px] tabular-nums text-muted-foreground/60 transition-colors duration-150 ease-out group-hover:text-muted-foreground"
-      >
-        {String(index + 1).padStart(2, "0")}
-      </span>
-
-      <div className="flex items-center gap-3">
-        <div className="relative h-10 w-10 shrink-0">
+    <li className="group flex items-center gap-3">
+      <div className="relative h-6 w-6 shrink-0">
+        <Image
+          src={lightSrc}
+          alt=""
+          aria-hidden="true"
+          fill
+          sizes="24px"
+          className={
+            skill.dark ? "object-contain dark:hidden" : "object-contain"
+          }
+        />
+        {skill.dark && (
           <Image
-            src={lightSrc}
+            src={darkSrc}
             alt=""
             aria-hidden="true"
             fill
-            sizes="40px"
-            className={
-              skill.dark ? "object-contain dark:hidden" : "object-contain"
-            }
-            priority={priority}
+            sizes="24px"
+            className="hidden object-contain dark:block"
           />
-          {skill.dark && (
-            <Image
-              src={darkSrc}
-              alt=""
-              aria-hidden="true"
-              fill
-              sizes="40px"
-              className="hidden object-contain dark:block"
-              priority={priority}
-            />
-          )}
-        </div>
-        <span className="min-w-0 flex-1 truncate text-base font-semibold tracking-tight text-foreground transition-colors duration-150 ease-out group-hover:text-accent-blue">
-          {skill.name}
-        </span>
+        )}
       </div>
 
-      <div className="mt-auto flex flex-col gap-2">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="truncate text-sm font-medium text-foreground">
+            {skill.name}
+          </span>
+          <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
+            {skill.percentage}
+            <span className="opacity-60">%</span>
+          </span>
+        </div>
         <span
           aria-hidden="true"
-          className="relative h-2 w-full overflow-hidden rounded-full bg-muted"
+          className="relative h-1.5 w-full overflow-hidden rounded-full bg-muted"
         >
           <span
             className="absolute inset-y-0 left-0 rounded-full bg-accent-blue transition-[width] duration-300 ease-out"
             style={{ width: `${skill.percentage}%` }}
           />
-        </span>
-        <span className="flex items-baseline justify-end font-mono text-[11px] tabular-nums text-muted-foreground">
-          {skill.percentage}
-          <span className="opacity-60">%</span>
         </span>
       </div>
     </li>

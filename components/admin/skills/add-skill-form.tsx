@@ -3,12 +3,14 @@
 import { useRef } from "react";
 import { Plus } from "lucide-react";
 import { SubmitButton } from "@/components/admin/actions/submit-button";
+import type { SkillCategory } from "@/components/admin/types";
 
 interface Props {
   action: (formData: FormData) => Promise<void>;
+  categories: SkillCategory[];
 }
 
-export function AddSkillForm({ action }: Props) {
+export function AddSkillForm({ action, categories }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
@@ -18,7 +20,7 @@ export function AddSkillForm({ action }: Props) {
         await action(fd);
         formRef.current?.reset();
       }}
-      className="admin-card grid grid-cols-2 gap-2 p-3 sm:grid-cols-[minmax(0,1fr)_8rem_6rem_auto] sm:gap-3"
+      className="admin-card grid grid-cols-2 gap-2 p-3 sm:grid-cols-[minmax(0,1fr)_8rem_10rem_auto] sm:gap-3"
     >
       <label className="flex flex-col gap-1.5">
         <span className="admin-eyebrow">Name</span>
@@ -47,7 +49,14 @@ export function AddSkillForm({ action }: Props) {
       </label>
       <label className="flex flex-col gap-1.5">
         <span className="admin-eyebrow">Category</span>
-        <input name="category" placeholder="optional" className="admin-input" />
+        <select name="category" defaultValue="" className="admin-input">
+          <option value="">— none —</option>
+          {categories.map((c) => (
+            <option key={c.slug} value={c.slug}>
+              {c.label_en}
+            </option>
+          ))}
+        </select>
       </label>
       <div className="col-span-2 flex items-end sm:col-span-1">
         <SubmitButton className="w-full" pendingLabel="Adding…">

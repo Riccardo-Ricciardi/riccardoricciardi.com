@@ -343,6 +343,36 @@ export type Database = {
         }
         Relationships: []
       }
+      skill_categories: {
+        Row: {
+          created_at: string
+          icon: string | null
+          label_en: string
+          label_it: string
+          position: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          label_en: string
+          label_it: string
+          position?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          label_en?: string
+          label_it?: string
+          position?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       skills: {
         Row: {
           category: string | null

@@ -21,7 +21,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Upload } from "lucide-react";
-import type { Skill } from "@/components/admin/types";
+import type { Skill, SkillCategory } from "@/components/admin/types";
 import { SubmitButton } from "@/components/admin/actions/submit-button";
 import { DeleteButton } from "@/components/admin/actions/delete-button";
 import { cn } from "@/utils/cn";
@@ -31,11 +31,17 @@ const BASE_URL = getSupabaseImageUrl();
 
 interface Props {
   initial: Skill[];
+  categories: SkillCategory[];
   bulkAction: (formData: FormData) => Promise<void>;
   deleteAction: (formData: FormData) => Promise<void>;
 }
 
-export function SortableSkills({ initial, bulkAction, deleteAction }: Props) {
+export function SortableSkills({
+  initial,
+  categories,
+  bulkAction,
+  deleteAction,
+}: Props) {
   const [rows, setRows] = useState<Skill[]>(initial);
 
   useEffect(() => {
@@ -66,29 +72,38 @@ export function SortableSkills({ initial, bulkAction, deleteAction }: Props) {
     <form action={bulkAction} className="flex flex-col gap-3">
       <input type="hidden" name="order" value={order} />
       <div className="admin-table-wrap">
-      <div className="admin-card overflow-hidden">
-        <div className="hidden border-b admin-divider px-3 py-2 text-[10px] uppercase tracking-wider text-muted-foreground sm:grid sm:grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_7rem_5.5rem_3rem] sm:items-center sm:gap-3">
-          <span></span>
-          <span>Icon</span>
-          <span>Name</span>
-          <span>Level</span>
-          <span>Dark</span>
-          <span></span>
+        <div className="admin-card overflow-hidden">
+          <div className="hidden border-b admin-divider px-3 py-2 text-[10px] uppercase tracking-wider text-muted-foreground sm:grid sm:grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_8rem_7rem_5.5rem_3rem] sm:items-center sm:gap-3">
+            <span></span>
+            <span>Icon</span>
+            <span>Name</span>
+            <span>Category</span>
+            <span>Level</span>
+            <span>Dark</span>
+            <span></span>
+          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={onDragEnd}
+          >
+            <SortableContext
+              items={rows.map((r) => r.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <ul className="list-none divide-y admin-divider p-0">
+                {rows.map((row) => (
+                  <SortableRow
+                    key={row.id}
+                    row={row}
+                    categories={categories}
+                    deleteAction={deleteAction}
+                  />
+                ))}
+              </ul>
+            </SortableContext>
+          </DndContext>
         </div>
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-          <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
-            <ul className="list-none divide-y admin-divider p-0">
-              {rows.map((row) => (
-                <SortableRow
-                  key={row.id}
-                  row={row}
-                  deleteAction={deleteAction}
-                />
-              ))}
-            </ul>
-          </SortableContext>
-        </DndContext>
-      </div>
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
@@ -102,9 +117,11 @@ export function SortableSkills({ initial, bulkAction, deleteAction }: Props) {
 
 function SortableRow({
   row,
+  categories,
   deleteAction,
 }: {
   row: Skill;
+  categories: SkillCategory[];
   deleteAction: (formData: FormData) => Promise<void>;
 }) {
   const {
@@ -128,7 +145,7 @@ function SortableRow({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "grid grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_5rem_2rem] items-center gap-2 px-3 py-3 transition-colors sm:grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_7rem_5.5rem_3rem] sm:gap-3",
+        "grid grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_5rem_2rem] items-center gap-2 px-3 py-3 transition-colors sm:grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_8rem_7rem_5.5rem_3rem] sm:gap-3",
         isDragging && "z-10 bg-accent/40"
       )}
     >
@@ -171,11 +188,22 @@ function SortableRow({
           aria-label="Skill name"
           className="admin-input"
         />
-        <input
-          type="hidden"
+      </div>
+
+      <div className="hidden sm:block">
+        <select
           name={`skill[${row.id}][category]`}
           defaultValue={row.category ?? ""}
-        />
+          aria-label="Category"
+          className="admin-input"
+        >
+          <option value="">— none —</option>
+          {categories.map((c) => (
+            <option key={c.slug} value={c.slug}>
+              {c.label_en}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="relative">

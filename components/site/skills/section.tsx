@@ -1,4 +1,4 @@
-import { getSkills } from "@/utils/skills/fetch";
+import { getSkillGroups } from "@/utils/skills/fetch";
 import { SectionHeading } from "@/components/site/atoms/section-heading";
 import { SkillsBoard } from "@/components/site/skills/skills-board";
 
@@ -19,7 +19,7 @@ export async function Skills({
   emptyTitle,
   emptyBody,
 }: SkillsProps) {
-  const skills = await getSkills();
+  const groups = await getSkillGroups();
 
   return (
     <section
@@ -36,7 +36,7 @@ export async function Skills({
       />
 
       <SkillsBoard
-        skills={skills}
+        groups={groups}
         locale={locale}
         emptyTitle={emptyTitle}
         emptyBody={emptyBody}

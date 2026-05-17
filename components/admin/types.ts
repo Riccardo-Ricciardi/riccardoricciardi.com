@@ -9,6 +9,14 @@ export type Skill = {
   icon_dark_url: string | null;
 };
 
+export type SkillCategory = {
+  slug: string;
+  label_it: string;
+  label_en: string;
+  icon: string | null;
+  position: number;
+};
+
 export type Project = {
   id: string;
   repo: string;
