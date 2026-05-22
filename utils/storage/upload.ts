@@ -28,8 +28,10 @@ function sanitizeFolder(input: string): string {
   // Allow single-level nesting like "projects/<uuid>" but reject traversal.
   return input
     .split("/")
-    .map((s) => sanitizeSegment(s))
-    .filter(Boolean)
+    .flatMap((s) => {
+      const seg = sanitizeSegment(s);
+      return seg ? [seg] : [];
+    })
     .slice(0, 4) // cap depth
     .join("/");
 }

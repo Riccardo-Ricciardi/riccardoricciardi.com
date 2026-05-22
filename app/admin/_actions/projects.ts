@@ -82,15 +82,20 @@ export async function bulkUpdateProjectsAction(formData: FormData) {
     updates.set(id, u);
   }
 
-  for (const id of rowIds) {
-    const u = updates.get(id) ?? {};
-    if (!("visible" in u)) u.visible = false;
-    await supabase.from("projects").update(u).eq("id", id);
-  }
+  await Promise.all(
+    Array.from(rowIds).map((id) => {
+      const u = updates.get(id) ?? {};
+      if (!("visible" in u)) u.visible = false;
+      return supabase.from("projects").update(u).eq("id", id);
+    }),
+  );
 
   const order = String(formData.get("order") ?? "");
   if (order) {
-    const ids = order.split(",").map((s) => s.trim()).filter(Boolean);
+    const ids = order.split(",").flatMap((s) => {
+      const t = s.trim();
+      return t ? [t] : [];
+    });
     await Promise.all(
       ids.map((id, index) =>
         supabase.from("projects").update({ position: index }).eq("id", id)

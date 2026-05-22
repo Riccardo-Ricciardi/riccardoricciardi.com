@@ -2,12 +2,31 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { ADMIN_NAV } from "@/components/admin/nav-config";
 import { cn } from "@/utils/cn";
 
 const STORAGE_KEY = "admin:sidebar:collapsed";
+
+function subscribeCollapsed(onChange: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("storage", onChange);
+  return () => window.removeEventListener("storage", onChange);
+}
+
+function getCollapsedSnapshot(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function getCollapsedServerSnapshot(): boolean {
+  return false;
+}
 
 interface SidebarProps {
   liveSiteUrl: string;
@@ -17,23 +36,24 @@ interface SidebarProps {
 
 export function Sidebar({ liveSiteUrl, email, logoutSlot }: SidebarProps) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  const collapsed = useSyncExternalStore(
+    subscribeCollapsed,
+    getCollapsedSnapshot,
+    getCollapsedServerSnapshot,
+  );
 
-  useEffect(() => {
+  const setCollapsed = useCallback((next: boolean) => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === "1") setCollapsed(true);
+      window.localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
+      window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY }));
     } catch {}
   }, []);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, collapsed ? "1" : "0");
-    } catch {}
     if (typeof document !== "undefined") {
       document.documentElement.style.setProperty(
         "--admin-sidebar-w",
-        collapsed ? "4rem" : "15rem"
+        collapsed ? "4rem" : "15rem",
       );
     }
   }, [collapsed]);
@@ -52,21 +72,21 @@ export function Sidebar({ liveSiteUrl, email, logoutSlot }: SidebarProps) {
           aria-label="Admin dashboard"
           className="flex items-center gap-2.5 truncate text-sm font-semibold tracking-tight focus-visible:outline-none"
         >
-          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-accent-blue text-[11px] font-bold text-white">
+          <span className="grid size-7 shrink-0 place-items-center rounded-md bg-accent-blue text-[11px] font-bold text-white">
             R.
           </span>
           {!collapsed && <span className="truncate">Riccardo · Admin</span>}
         </Link>
         <button
           type="button"
-          onClick={() => setCollapsed((v) => !v)}
+          onClick={() => setCollapsed(!collapsed)}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          className="grid size-7 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
           {collapsed ? (
-            <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+            <ChevronRight className="size-3.5" aria-hidden="true" />
           ) : (
-            <ChevronLeft className="h-3.5 w-3.5" aria-hidden="true" />
+            <ChevronLeft className="size-3.5" aria-hidden="true" />
           )}
         </button>
       </div>
@@ -107,7 +127,7 @@ export function Sidebar({ liveSiteUrl, email, logoutSlot }: SidebarProps) {
                         )}
                         <Icon
                           className={cn(
-                            "h-4 w-4 shrink-0",
+                            "size-4 shrink-0",
                             active ? "text-foreground" : "text-muted-foreground"
                           )}
                           aria-hidden="true"
@@ -136,7 +156,7 @@ export function Sidebar({ liveSiteUrl, email, logoutSlot }: SidebarProps) {
             collapsed && "justify-center"
           )}
         >
-          <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          <ExternalLink className="size-3.5 shrink-0" aria-hidden="true" />
           {!collapsed && <span className="truncate">View live site</span>}
         </a>
         {!collapsed && (

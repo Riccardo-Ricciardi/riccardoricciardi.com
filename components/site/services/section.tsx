@@ -1,4 +1,3 @@
-import { Layers, Workflow, Plug } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { SectionHeading } from "@/components/site/atoms/section-heading";
 
@@ -33,13 +32,13 @@ export function Services({ eyebrow, heading, subtitle, items }: ServicesProps) {
       />
 
       <ul className="grid list-none gap-4 p-0 md:grid-cols-3">
-        {items.map((item, i) => {
+        {items.map((item) => {
           const Icon = item.icon;
           return (
-            <li key={i}>
+            <li key={item.title}>
               <article className="card-base card-pad-lg flex h-full flex-col gap-4">
-                <span className="grid h-12 w-12 place-items-center rounded-control border border-dashed-soft text-accent-blue">
-                  <Icon className="h-5 w-5" aria-hidden="true" />
+                <span className="grid size-12 place-items-center rounded-control border border-dashed-soft text-accent-blue">
+                  <Icon className="size-5" aria-hidden="true" />
                 </span>
                 <div className="flex flex-col gap-2">
                   <h3 className="text-h4">{item.title}</h3>
@@ -55,5 +54,3 @@ export function Services({ eyebrow, heading, subtitle, items }: ServicesProps) {
     </section>
   );
 }
-
-export const SERVICE_ICONS: readonly LucideIcon[] = [Layers, Workflow, Plug];

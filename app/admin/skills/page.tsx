@@ -56,7 +56,7 @@ export default async function SkillsAdminPage() {
         actions={
           <form action={mirrorIconsAction}>
             <SubmitButton pendingLabel="Mirroring…">
-              <Download className="h-3.5 w-3.5" aria-hidden="true" />
+              <Download className="size-3.5" aria-hidden="true" />
               Mirror icons to Supabase
             </SubmitButton>
           </form>
@@ -69,6 +69,7 @@ export default async function SkillsAdminPage() {
           Drag to reorder. Public cards appear in this order. Deleting a category leaves its skills uncategorized.
         </p>
         <SortableCategories
+          key={categories.map((c) => `${c.slug}:${c.position}`).join("|")}
           initial={categories}
           bulkAction={bulkUpdateSkillCategoriesAction}
           createAction={createSkillCategoryAction}
@@ -88,6 +89,7 @@ export default async function SkillsAdminPage() {
           />
         ) : (
           <SortableSkills
+            key={skills.map((s) => `${s.id}:${s.position}`).join("|")}
             initial={skills}
             categories={categories}
             bulkAction={bulkUpdateSkillsAction}

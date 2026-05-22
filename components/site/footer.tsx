@@ -40,7 +40,7 @@ export async function Footer({ locale }: FooterProps) {
       : `Built by ${identity.name}`;
 
   return (
-    <footer className="section-divider-t mt-auto" role="contentinfo">
+    <footer className="section-divider-t mt-auto">
       <div className="container-page text-caption flex flex-row items-center justify-between gap-4 py-6 text-muted-foreground sm:text-sm">
         <p className="truncate">
           © {year} {built}.
@@ -57,10 +57,10 @@ export async function Footer({ locale }: FooterProps) {
                     href={href}
                     target={external ? "_blank" : undefined}
                     rel={external ? "noopener noreferrer" : undefined}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     aria-label={link.label ?? link.kind}
                   >
-                    <Icon className="h-4 w-4" aria-hidden="true" />
+                    <Icon className="size-4" aria-hidden="true" />
                   </a>
                 </li>
               );

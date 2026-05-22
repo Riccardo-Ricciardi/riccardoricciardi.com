@@ -144,46 +144,40 @@ Deno.serve(async (req: Request) => {
     });
   }
 
-  const results: Array<{ repo: string; ok: boolean; error?: string }> = [];
+  const results = await Promise.all(
+    (rows ?? []).map(
+      async (raw): Promise<{ repo: string; ok: boolean; error?: string }> => {
+        const row = parseProjectRow(raw);
+        if (!row) return { repo: "unknown", ok: false, error: "invalid_row" };
 
-  for (const raw of rows ?? []) {
-    const row = parseProjectRow(raw);
-    if (!row) {
-      results.push({ repo: "unknown", ok: false, error: "invalid_row" });
-      continue;
-    }
+        const meta = await fetchRepo(row.repo);
+        if (!meta) return { repo: row.repo, ok: false, error: "fetch_failed" };
 
-    const meta = await fetchRepo(row.repo);
-    if (!meta) {
-      results.push({ repo: row.repo, ok: false, error: "fetch_failed" });
-      continue;
-    }
+        const ogImage = `https://opengraph.githubassets.com/1/${row.repo}`;
 
-    const ogImage = `https://opengraph.githubassets.com/1/${row.repo}`;
+        const { error: updErr } = await supabase
+          .from("projects")
+          .update({
+            name: meta.name,
+            description: meta.description,
+            url: meta.html_url,
+            homepage: meta.homepage,
+            stars: meta.stargazers_count,
+            forks: meta.forks_count,
+            language: meta.language,
+            topics: meta.topics ?? [],
+            og_image: ogImage,
+            pushed_at: meta.pushed_at,
+            synced_at: new Date().toISOString(),
+          })
+          .eq("id", row.id);
 
-    const { error: updErr } = await supabase
-      .from("projects")
-      .update({
-        name: meta.name,
-        description: meta.description,
-        url: meta.html_url,
-        homepage: meta.homepage,
-        stars: meta.stargazers_count,
-        forks: meta.forks_count,
-        language: meta.language,
-        topics: meta.topics ?? [],
-        og_image: ogImage,
-        pushed_at: meta.pushed_at,
-        synced_at: new Date().toISOString(),
-      })
-      .eq("id", row.id);
-
-    if (updErr) {
-      results.push({ repo: row.repo, ok: false, error: updErr.message });
-    } else {
-      results.push({ repo: row.repo, ok: true });
-    }
-  }
+        return updErr
+          ? { repo: row.repo, ok: false, error: updErr.message }
+          : { repo: row.repo, ok: true };
+      },
+    ),
+  );
 
   return new Response(JSON.stringify({ count: results.length, results }), {
     headers: { "content-type": "application/json" },

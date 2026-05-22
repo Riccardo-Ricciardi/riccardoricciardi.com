@@ -36,14 +36,14 @@ export function CopyButton({
       aria-label={copied ? "Copied" : label}
       className={cn(
         "admin-button admin-button-ghost h-8 px-2.5 text-xs",
-        iconOnly && "h-8 w-8 min-h-8 min-w-8 px-0",
+        iconOnly && "size-8 min-h-8 min-w-8 px-0",
         className
       )}
     >
       {copied ? (
-        <Check className="h-3.5 w-3.5 text-emerald-500" aria-hidden="true" />
+        <Check className="size-3.5 text-emerald-500" aria-hidden="true" />
       ) : (
-        <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+        <Copy className="size-3.5" aria-hidden="true" />
       )}
       {!iconOnly && <span>{copied ? "Copied" : label}</span>}
     </button>

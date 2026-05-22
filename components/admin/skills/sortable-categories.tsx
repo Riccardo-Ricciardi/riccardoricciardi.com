@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -48,10 +48,6 @@ export function SortableCategories({
   deleteAction,
 }: Props) {
   const [rows, setRows] = useState<SkillCategory[]>(initial);
-
-  useEffect(() => {
-    setRows(initial);
-  }, [initial]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -158,9 +154,9 @@ function CategoryRow({
         aria-label={`Drag ${row.label_en}`}
         {...attributes}
         {...listeners}
-        className="grid h-9 w-9 cursor-grab place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
+        className="grid size-9 cursor-grab place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
       >
-        <GripVertical className="h-4 w-4" aria-hidden="true" />
+        <GripVertical className="size-4" aria-hidden="true" />
       </button>
 
       <input
@@ -185,10 +181,10 @@ function CategoryRow({
         aria-label="Icon"
         className="admin-input hidden sm:block"
       >
-        <option value="">— none —</option>
-        {ICON_OPTIONS.map((i) => (
-          <option key={i} value={i}>
-            {i}
+        <option value="">(none)</option>
+        {ICON_OPTIONS.map((icon) => (
+          <option key={icon} value={icon}>
+            {icon}
           </option>
         ))}
       </select>
@@ -224,17 +220,17 @@ function AddCategoryForm({
       <label className="flex flex-col gap-1.5">
         <span className="admin-eyebrow">Icon</span>
         <select name="icon" defaultValue="" className="admin-input">
-          <option value="">— none —</option>
-          {ICON_OPTIONS.map((i) => (
-            <option key={i} value={i}>
-              {i}
+          <option value="">(none)</option>
+          {ICON_OPTIONS.map((iconName) => (
+            <option key={iconName} value={iconName}>
+              {iconName}
             </option>
           ))}
         </select>
       </label>
       <div className="col-span-2 flex items-end sm:col-span-1">
         <SubmitButton className="w-full" pendingLabel="Adding…">
-          <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+          <Plus className="size-3.5" aria-hidden="true" />
           Add category
         </SubmitButton>
       </div>

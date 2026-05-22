@@ -112,7 +112,7 @@ export async function About({
               <footer className="mt-4 flex flex-col gap-3 border-t border-dashed-soft pt-8 sm:flex-row sm:items-center">
                 <Link href={primaryCta.href} className="btn-base btn-primary">
                   {primaryCta.label}
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
                 <Link href={secondaryCta.href} className="btn-base btn-ghost">
                   {secondaryCta.label}

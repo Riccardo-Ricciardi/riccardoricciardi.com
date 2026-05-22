@@ -38,7 +38,7 @@ export function AddNavbarForm({ languages, action }: Props) {
         ))}
       </div>
       <SubmitButton className="w-full sm:w-auto sm:self-end" pendingLabel="Adding…">
-        <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+        <Plus className="size-3.5" aria-hidden="true" />
         Add nav item
       </SubmitButton>
     </form>

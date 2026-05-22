@@ -33,13 +33,13 @@ export function AddProjectForm({
           type="checkbox"
           name="visible"
           defaultChecked
-          className="h-4 w-4 accent-[var(--accent-blue)]"
+          className="size-4 accent-[var(--accent-blue)]"
         />
         <span className="admin-eyebrow !text-foreground">Show on site</span>
       </label>
       <div className="flex items-end">
         <SubmitButton className="w-full" pendingLabel="Adding…">
-          <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+          <Plus className="size-3.5" aria-hidden="true" />
           Add project
         </SubmitButton>
       </div>

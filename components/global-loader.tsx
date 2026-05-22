@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { Bouncy } from "ldrs/react";
 import "ldrs/react/Bouncy.css";
 
@@ -8,36 +8,52 @@ interface GlobalLoaderProps {
   fullscreen?: boolean;
 }
 
-export function GlobalLoader({ fullscreen = true }: GlobalLoaderProps) {
-  const [color, setColor] = useState("#2563eb");
+function subscribeDark(onChange: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+  return () => observer.disconnect();
+}
 
-  useEffect(() => {
-    const root = document.documentElement;
-    const isDark = root.classList.contains("dark");
-    setColor(isDark ? "#60a5fa" : "#2563eb");
-  }, []);
+function getDarkSnapshot(): boolean {
+  if (typeof document === "undefined") return false;
+  return document.documentElement.classList.contains("dark");
+}
+
+function getDarkServerSnapshot(): boolean {
+  return false;
+}
+
+export function GlobalLoader({ fullscreen = true }: GlobalLoaderProps) {
+  const isDark = useSyncExternalStore(
+    subscribeDark,
+    getDarkSnapshot,
+    getDarkServerSnapshot,
+  );
+  const color = isDark ? "#60a5fa" : "#2563eb";
 
   if (!fullscreen) {
     return (
-      <div
+      <output
         className="flex w-full items-center justify-center py-16"
-        role="status"
         aria-live="polite"
         aria-label="Loading"
       >
         <Bouncy size="60" speed="2" color={color} />
-      </div>
+      </output>
     );
   }
 
   return (
-    <div
+    <output
       className="fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center bg-background"
-      role="status"
       aria-live="polite"
       aria-label="Loading"
     >
       <Bouncy size="100" speed="2" color={color} />
-    </div>
+    </output>
   );
 }

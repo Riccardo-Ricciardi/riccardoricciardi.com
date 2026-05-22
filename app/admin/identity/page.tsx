@@ -227,7 +227,7 @@ function PhotoCard({
           />
         ) : (
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
-            <User className="h-8 w-8" aria-hidden="true" />
+            <User className="size-8" aria-hidden="true" />
             <p className="text-xs">No photo uploaded</p>
           </div>
         )}
@@ -246,7 +246,7 @@ function PhotoCard({
           className="admin-file"
         />
         <SubmitButton pendingLabel="Uploading…">
-          <Upload className="h-3.5 w-3.5" aria-hidden="true" />
+          <Upload className="size-3.5" aria-hidden="true" />
           Upload photo
         </SubmitButton>
       </form>
@@ -258,7 +258,7 @@ function PhotoCard({
             className="w-full text-xs text-muted-foreground hover:text-rose-500"
             pendingLabel="Removing…"
           >
-            <Trash2 className="h-3 w-3" aria-hidden="true" />
+            <Trash2 className="size-3" aria-hidden="true" />
             Remove photo
           </SubmitButton>
         </form>

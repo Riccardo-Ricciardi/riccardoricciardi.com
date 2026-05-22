@@ -50,7 +50,7 @@ export function AddSkillForm({ action, categories }: Props) {
       <label className="flex flex-col gap-1.5">
         <span className="admin-eyebrow">Category</span>
         <select name="category" defaultValue="" className="admin-input">
-          <option value="">— none —</option>
+          <option value="">(none)</option>
           {categories.map((c) => (
             <option key={c.slug} value={c.slug}>
               {c.label_en}
@@ -60,7 +60,7 @@ export function AddSkillForm({ action, categories }: Props) {
       </label>
       <div className="col-span-2 flex items-end sm:col-span-1">
         <SubmitButton className="w-full" pendingLabel="Adding…">
-          <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+          <Plus className="size-3.5" aria-hidden="true" />
           Add skill
         </SubmitButton>
       </div>

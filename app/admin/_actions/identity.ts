@@ -80,13 +80,15 @@ export async function bulkUpdateHeroContentAction(formData: FormData) {
       .from("content_blocks")
       .upsert(upserts, { onConflict: "slug,language_id" });
   }
-  for (const d of deletes) {
-    await supabase
-      .from("content_blocks")
-      .delete()
-      .eq("slug", d.slug)
-      .eq("language_id", d.language_id);
-  }
+  await Promise.all(
+    deletes.map((d) =>
+      supabase
+        .from("content_blocks")
+        .delete()
+        .eq("slug", d.slug)
+        .eq("language_id", d.language_id),
+    ),
+  );
 
   bounce(PATH, "saved");
 }

@@ -101,7 +101,7 @@ export default async function AdminDashboard() {
             className="admin-button admin-button-ghost"
           >
             View live site
-            <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+            <ArrowUpRight className="size-3.5" aria-hidden="true" />
           </Link>
         }
       />
@@ -139,11 +139,11 @@ export default async function AdminDashboard() {
               <li key={q.href}>
                 <Link
                   href={q.href}
-                  className="admin-card group relative flex items-start gap-3 px-4 py-4 transition-colors hover:border-[color-mix(in_oklab,var(--accent-blue)_55%,var(--border))]"
+                  className="admin-card group relative flex items-start gap-3 p-4 transition-colors hover:border-[color-mix(in_oklab,var(--accent-blue)_55%,var(--border))]"
                 >
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border admin-divider bg-background/60">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-lg border admin-divider bg-background/60">
                     <Icon
-                      className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-accent-blue"
+                      className="size-4 text-muted-foreground transition-colors group-hover:text-accent-blue"
                       aria-hidden="true"
                     />
                   </span>
@@ -154,7 +154,7 @@ export default async function AdminDashboard() {
                     </p>
                   </div>
                   <ArrowUpRight
-                    className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-blue"
+                    className="mt-0.5 size-3.5 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-blue"
                     aria-hidden="true"
                   />
                 </Link>

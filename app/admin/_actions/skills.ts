@@ -57,11 +57,12 @@ export async function deleteSkillAction(formData: FormData) {
 
   await supabase.from("skills").delete().eq("id", id);
 
-  for (const url of [row?.icon_url, row?.icon_dark_url]) {
-    if (!url) continue;
-    const p = pathFromPublicUrl(url);
-    if (p) await deleteImage(p);
-  }
+  await Promise.all(
+    [row?.icon_url, row?.icon_dark_url]
+      .map((url) => (url ? pathFromPublicUrl(url) : null))
+      .filter((p): p is string => Boolean(p))
+      .map((p) => deleteImage(p)),
+  );
 
   bounce(PATH, "deleted");
 }
@@ -119,12 +120,14 @@ export async function bulkUpdateSkillsAction(formData: FormData) {
     updates.set(id, u);
   }
 
-  for (const id of rowIds) {
-    const u = updates.get(id) ?? {};
-    if (!("dark" in u)) u.dark = false;
-    if (Object.keys(u).length === 0) continue;
-    await supabase.from("skills").update(u).eq("id", id);
-  }
+  await Promise.all(
+    Array.from(rowIds).map((id) => {
+      const u = updates.get(id) ?? {};
+      if (!("dark" in u)) u.dark = false;
+      if (Object.keys(u).length === 0) return Promise.resolve();
+      return supabase.from("skills").update(u).eq("id", id);
+    }),
+  );
 
   const order = String(formData.get("order") ?? "");
   if (order) {

@@ -48,7 +48,7 @@ export function BottomNav({ liveSiteUrl, email, logoutSlot }: BottomNavProps) {
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <Icon className="h-5 w-5" aria-hidden="true" />
+                  <Icon className="size-5" aria-hidden="true" />
                   <span>{tab.label}</span>
                 </Link>
               </li>
@@ -67,7 +67,7 @@ export function BottomNav({ liveSiteUrl, email, logoutSlot }: BottomNavProps) {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
+              <MoreHorizontal className="size-5" aria-hidden="true" />
               <span>More</span>
             </button>
           </li>
@@ -75,8 +75,8 @@ export function BottomNav({ liveSiteUrl, email, logoutSlot }: BottomNavProps) {
       </nav>
 
       {moreOpen && (
-        <div
-          role="dialog"
+        <dialog
+          open
           aria-modal="true"
           aria-label="More admin sections"
           className="fixed inset-0 z-40 flex flex-col bg-background/95 backdrop-blur md:hidden"
@@ -90,9 +90,9 @@ export function BottomNav({ liveSiteUrl, email, logoutSlot }: BottomNavProps) {
               type="button"
               onClick={() => setMoreOpen(false)}
               aria-label="Close menu"
-              className="admin-button admin-button-ghost h-10 w-10 px-0"
+              className="admin-button admin-button-ghost size-10 px-0"
             >
-              <X className="h-4 w-4" aria-hidden="true" />
+              <X className="size-4" aria-hidden="true" />
             </button>
           </header>
           <div className="flex-1 overflow-y-auto px-3 py-4 pb-24">
@@ -119,7 +119,7 @@ export function BottomNav({ liveSiteUrl, email, logoutSlot }: BottomNavProps) {
                               : "text-foreground hover:bg-accent/60"
                           )}
                         >
-                          <Icon className="h-4 w-4" aria-hidden="true" />
+                          <Icon className="size-4" aria-hidden="true" />
                           <span>{item.label}</span>
                         </Link>
                       </li>
@@ -142,7 +142,7 @@ export function BottomNav({ liveSiteUrl, email, logoutSlot }: BottomNavProps) {
               <div className="px-3 pt-2">{logoutSlot}</div>
             </section>
           </div>
-        </div>
+        </dialog>
       )}
     </>
   );

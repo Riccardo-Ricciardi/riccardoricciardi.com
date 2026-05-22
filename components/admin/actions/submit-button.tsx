@@ -33,7 +33,7 @@ export function SubmitButton({
       aria-busy={pending}
       {...props}
     >
-      {pending && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />}
+      {pending && <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />}
       {pending ? pendingLabel : children}
     </button>
   );

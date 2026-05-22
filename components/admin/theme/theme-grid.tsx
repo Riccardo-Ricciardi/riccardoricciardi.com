@@ -97,7 +97,7 @@ function ValueInput({
         <span className="flex items-center gap-2">
           <span
             aria-hidden="true"
-            className="h-9 w-9 shrink-0 rounded-md border admin-divider"
+            className="size-9 shrink-0 rounded-md border admin-divider"
             style={{ background: val || "transparent" }}
           />
           <input

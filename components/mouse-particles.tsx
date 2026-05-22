@@ -155,10 +155,11 @@ export function MouseParticles({
   }, [count, linkDistance, repelRadius]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={`pointer-events-none h-full w-full ${className}`}
-      aria-hidden="true"
-    />
+    <div aria-hidden="true" className="pointer-events-none contents">
+      <canvas
+        ref={canvasRef}
+        className={`pointer-events-none h-full w-full ${className}`}
+      />
+    </div>
   );
 }

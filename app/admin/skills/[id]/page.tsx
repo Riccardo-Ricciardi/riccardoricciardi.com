@@ -47,7 +47,7 @@ export default async function SkillDetailPage({ params }: PageProps) {
         href="/admin/skills"
         className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
       >
-        <ArrowLeft className="h-3 w-3" aria-hidden="true" />
+        <ArrowLeft className="size-3" aria-hidden="true" />
         Back to skills
       </Link>
 
@@ -115,7 +115,7 @@ function IconSlot({
             width={80}
             height={80}
             sizes="80px"
-            className="h-20 w-20 object-contain"
+            className="size-20 object-contain"
             unoptimized
           />
         ) : (
@@ -138,7 +138,7 @@ function IconSlot({
           className="admin-file"
         />
         <SubmitButton pendingLabel="Uploading…">
-          <Upload className="h-3.5 w-3.5" aria-hidden="true" />
+          <Upload className="size-3.5" aria-hidden="true" />
           Upload {variant}
         </SubmitButton>
       </form>
@@ -152,7 +152,7 @@ function IconSlot({
             className="w-full text-xs text-muted-foreground hover:text-rose-500"
             pendingLabel="Removing…"
           >
-            <Trash2 className="h-3 w-3" aria-hidden="true" />
+            <Trash2 className="size-3" aria-hidden="true" />
             Remove icon
           </SubmitButton>
         </form>

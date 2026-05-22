@@ -21,12 +21,12 @@ function LogoutButton({ compact = false }: { compact?: boolean }) {
         type="submit"
         className={
           compact
-            ? "admin-button admin-button-ghost h-8 w-8 px-0"
+            ? "admin-button admin-button-ghost size-8 px-0"
             : "admin-button admin-button-ghost w-full text-xs"
         }
         aria-label="Sign out"
       >
-        <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
+        <LogOut className="size-3.5" aria-hidden="true" />
         {!compact && <span>Sign out</span>}
       </button>
     </form>

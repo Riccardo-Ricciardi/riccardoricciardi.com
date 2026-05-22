@@ -90,7 +90,7 @@ export async function listEventTypesAction(): Promise<EventTypesResult> {
   try {
     const types = await getEventTypes(user);
     const visible = types.filter((t) => t.slug && t.lengthInMinutes > 0);
-    const sorted = [...visible].sort(
+    const sorted = visible.toSorted(
       (a, b) => a.lengthInMinutes - b.lengthInMinutes
     );
     const fallback = defaultEventSlug();

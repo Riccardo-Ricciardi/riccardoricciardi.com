@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -42,8 +42,6 @@ export function SortableAbout({
   deleteAction,
 }: Props) {
   const [rows, setRows] = useState<AboutSection[]>(initial);
-
-  useEffect(() => setRows(initial), [initial]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -97,7 +95,7 @@ export function SortableAbout({
       >
         <input type="hidden" name="language_id" value={languageId} />
         <SubmitButton variant="ghost" pendingLabel="Adding…">
-          <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+          <Plus className="size-3.5" aria-hidden="true" />
           Add section
         </SubmitButton>
       </form>
@@ -134,9 +132,9 @@ function SortableRow({
         aria-label="Drag section"
         {...attributes}
         {...listeners}
-        className="mt-1 grid h-9 w-9 cursor-grab place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
+        className="mt-1 grid size-9 cursor-grab place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
       >
-        <GripVertical className="h-4 w-4" aria-hidden="true" />
+        <GripVertical className="size-4" aria-hidden="true" />
       </button>
       <div className="flex flex-col gap-2">
         <input

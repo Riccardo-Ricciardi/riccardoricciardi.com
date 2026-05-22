@@ -26,10 +26,10 @@ interface ContactProps {
 
 function splitTrust(trust?: string, fallback?: string[]): string[] {
   if (trust && trust.trim().length > 0) {
-    return trust
-      .split(/\s*·\s*|\s*\|\s*/)
-      .map((s) => s.trim())
-      .filter(Boolean);
+    return trust.split(/\s*·\s*|\s*\|\s*/).flatMap((s) => {
+      const trimmed = s.trim();
+      return trimmed ? [trimmed] : [];
+    });
   }
   return fallback ?? [];
 }
@@ -68,7 +68,7 @@ export function Contact({
                 <li key={`${item}-${idx}`}>
                   <span className="inline-flex items-center gap-2 rounded-pill border border-dashed-soft bg-background/60 px-3 py-1 text-xs font-medium text-muted-foreground">
                     <Icon
-                      className="h-3.5 w-3.5 text-accent-blue"
+                      className="size-3.5 text-accent-blue"
                       aria-hidden="true"
                     />
                     {item}

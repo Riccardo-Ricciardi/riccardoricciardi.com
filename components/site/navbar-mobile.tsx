@@ -39,13 +39,14 @@ export function NavbarMobile({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
+    const openBtn = openBtnRef.current;
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     closeBtnRef.current?.focus();
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
-      openBtnRef.current?.focus();
+      openBtn?.focus();
     };
   }, [open]);
 
@@ -59,15 +60,15 @@ export function NavbarMobile({
         aria-expanded={open}
         aria-haspopup="dialog"
         aria-controls="mobile-nav-dialog"
-        className="grid h-9 w-9 place-items-center rounded-md text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="grid size-9 place-items-center rounded-md text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <Menu className="h-5 w-5" aria-hidden="true" />
+        <Menu className="size-5" aria-hidden="true" />
       </button>
 
       {open && (
-        <div
+        <dialog
+          open
           id="mobile-nav-dialog"
-          role="dialog"
           aria-modal="true"
           aria-label={ariaLabel}
           className="fixed inset-0 z-[60] flex flex-col bg-background/95 backdrop-blur-xl animate-in fade-in"
@@ -79,9 +80,9 @@ export function NavbarMobile({
               type="button"
               onClick={() => setOpen(false)}
               aria-label={closeLabel}
-              className="grid h-10 w-10 place-items-center rounded-md text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="grid size-10 place-items-center rounded-md text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <X className="h-5 w-5" aria-hidden="true" />
+              <X className="size-5" aria-hidden="true" />
             </button>
           </div>
           <nav className="flex flex-1 flex-col px-4 py-6">
@@ -111,7 +112,7 @@ export function NavbarMobile({
               })}
             </ul>
           </nav>
-        </div>
+        </dialog>
       )}
     </>
   );

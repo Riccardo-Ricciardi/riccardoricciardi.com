@@ -78,16 +78,18 @@ export async function bulkUpdateWorkAction(formData: FormData) {
   }
 
   const now = new Date().toISOString();
-  for (const id of rowIds) {
-    const u = updates.get(id) ?? {};
-    if (!("is_current" in u)) u.is_current = false;
-    if (u.is_current) u.ended_at = null;
-    if (Object.keys(u).length === 0) continue;
-    await supabase
-      .from("work_experience")
-      .update({ ...u, updated_at: now })
-      .eq("id", id);
-  }
+  await Promise.all(
+    Array.from(rowIds).map((id) => {
+      const u = updates.get(id) ?? {};
+      if (!("is_current" in u)) u.is_current = false;
+      if (u.is_current) u.ended_at = null;
+      if (Object.keys(u).length === 0) return Promise.resolve();
+      return supabase
+        .from("work_experience")
+        .update({ ...u, updated_at: now })
+        .eq("id", id);
+    }),
+  );
 
   bounce(PATH, "saved");
 }
@@ -103,10 +105,10 @@ export async function upsertWorkI18nAction(formData: FormData) {
 
   if (!experience_id || !language_id) bounce(PATH);
 
-  const bullets = bulletsRaw
-    .split(/\r?\n/)
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const bullets = bulletsRaw.split(/\r?\n/).flatMap((s) => {
+    const t = s.trim();
+    return t ? [t] : [];
+  });
 
   if (!summary && bullets.length === 0) {
     await supabase

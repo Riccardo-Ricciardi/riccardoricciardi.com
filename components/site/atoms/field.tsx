@@ -1,5 +1,7 @@
-import { forwardRef } from "react";
 import { cn } from "@/utils/cn";
+
+export { FieldInput } from "./field-input";
+export { FieldTextarea } from "./field-textarea";
 
 interface FieldShellProps {
   id: string;
@@ -37,39 +39,3 @@ export function FieldShell({
     </div>
   );
 }
-
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  invalid?: boolean;
-}
-
-export const FieldInput = forwardRef<HTMLInputElement, InputProps>(
-  function FieldInput({ className, invalid, ...rest }, ref) {
-    return (
-      <input
-        ref={ref}
-        aria-invalid={invalid || undefined}
-        className={cn("field-input", className)}
-        {...rest}
-      />
-    );
-  }
-);
-
-interface TextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  invalid?: boolean;
-}
-
-export const FieldTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  function FieldTextarea({ className, invalid, ...rest }, ref) {
-    return (
-      <textarea
-        ref={ref}
-        aria-invalid={invalid || undefined}
-        className={cn("field-input field-textarea", className)}
-        {...rest}
-      />
-    );
-  }
-);
-

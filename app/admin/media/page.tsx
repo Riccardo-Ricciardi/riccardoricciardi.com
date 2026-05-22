@@ -42,7 +42,7 @@ export default async function MediaAdminPage({ searchParams }: PageProps) {
             "/admin/media?prefix=" + parts.slice(0, i + 1).join("/");
           const last = i === parts.length - 1;
           return (
-            <span key={i} className="flex items-center gap-1">
+            <span key={href} className="flex items-center gap-1">
               <span className="text-muted-foreground">/</span>
               <Link
                 href={href}
@@ -76,12 +76,12 @@ export default async function MediaAdminPage({ searchParams }: PageProps) {
             multiple
             accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml,image/gif"
             required
-            className="admin-file rounded-md border admin-divider bg-background px-2 py-2"
+            className="admin-file rounded-md border admin-divider bg-background p-2"
           />
         </label>
         <div className="flex items-end">
           <SubmitButton className="w-full" pendingLabel="Uploading…">
-            <Upload className="h-3.5 w-3.5" aria-hidden="true" />
+            <Upload className="size-3.5" aria-hidden="true" />
             Upload
           </SubmitButton>
         </div>
@@ -92,7 +92,7 @@ export default async function MediaAdminPage({ searchParams }: PageProps) {
           href={parentPrefix ? `/admin/media?prefix=${parentPrefix}` : "/admin/media"}
           className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ChevronLeft className="h-3 w-3" aria-hidden="true" />
+          <ChevronLeft className="size-3" aria-hidden="true" />
           Up one level
         </Link>
       )}
@@ -108,7 +108,7 @@ export default async function MediaAdminPage({ searchParams }: PageProps) {
                   className="admin-card group flex items-center gap-2 px-3 py-2.5 transition-colors hover:border-accent-blue"
                 >
                   <Folder
-                    className="h-4 w-4 text-muted-foreground group-hover:text-accent-blue"
+                    className="size-4 text-muted-foreground group-hover:text-accent-blue"
                     aria-hidden="true"
                   />
                   <span className="truncate text-sm">{f.name}</span>

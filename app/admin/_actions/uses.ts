@@ -83,15 +83,17 @@ export async function bulkUpdateUsesAction(formData: FormData) {
   }
 
   const now = new Date().toISOString();
-  for (const id of rowIds) {
-    const u = updates.get(id) ?? {};
-    if (!("visible" in u)) u.visible = false;
-    if (Object.keys(u).length === 0) continue;
-    await supabase
-      .from("uses_items")
-      .update({ ...u, updated_at: now })
-      .eq("id", id);
-  }
+  await Promise.all(
+    Array.from(rowIds).map((id) => {
+      const u = updates.get(id) ?? {};
+      if (!("visible" in u)) u.visible = false;
+      if (Object.keys(u).length === 0) return Promise.resolve();
+      return supabase
+        .from("uses_items")
+        .update({ ...u, updated_at: now })
+        .eq("id", id);
+    }),
+  );
 
   bounce(PATH, "saved");
 }

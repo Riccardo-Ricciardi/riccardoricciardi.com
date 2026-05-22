@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -43,10 +43,6 @@ export function SortableSkills({
   deleteAction,
 }: Props) {
   const [rows, setRows] = useState<Skill[]>(initial);
-
-  useEffect(() => {
-    setRows(initial);
-  }, [initial]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -156,15 +152,15 @@ function SortableRow({
         aria-label={`Drag ${row.name}`}
         {...attributes}
         {...listeners}
-        className="grid h-9 w-9 cursor-grab place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
+        className="grid size-9 cursor-grab place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
       >
-        <GripVertical className="h-4 w-4" aria-hidden="true" />
+        <GripVertical className="size-4" aria-hidden="true" />
       </button>
 
       <Link
         href={`/admin/skills/${row.id}`}
         title="Manage icon"
-        className="relative grid h-10 w-10 place-items-center rounded-md border admin-divider bg-background/50 hover:border-accent-blue"
+        className="relative grid size-10 place-items-center rounded-md border admin-divider bg-background/50 hover:border-accent-blue"
       >
         {iconSrc ? (
           <Image
@@ -173,10 +169,10 @@ function SortableRow({
             width={32}
             height={32}
             sizes="32px"
-            className="h-7 w-7 object-contain"
+            className="size-7 object-contain"
           />
         ) : (
-          <Upload className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
+          <Upload className="size-3.5 text-muted-foreground" aria-hidden="true" />
         )}
       </Link>
 
@@ -197,7 +193,7 @@ function SortableRow({
           aria-label="Category"
           className="admin-input"
         >
-          <option value="">— none —</option>
+          <option value="">(none)</option>
           {categories.map((c) => (
             <option key={c.slug} value={c.slug}>
               {c.label_en}
@@ -226,7 +222,7 @@ function SortableRow({
           type="checkbox"
           name={`skill[${row.id}][dark]`}
           defaultChecked={row.dark || !!row.icon_dark_url}
-          className="h-3.5 w-3.5 rounded accent-[var(--accent-blue)]"
+          className="size-3.5 rounded accent-[var(--accent-blue)]"
         />
         <span>dark</span>
       </label>

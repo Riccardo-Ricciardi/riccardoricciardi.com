@@ -34,8 +34,8 @@ export function EmptyState({
       )}
     >
       {Icon && (
-        <span className="grid h-12 w-12 place-items-center rounded-pill border border-dashed-soft bg-background/60 text-accent-blue">
-          <Icon className="h-5 w-5" aria-hidden="true" />
+        <span className="grid size-12 place-items-center rounded-pill border border-dashed-soft bg-background/60 text-accent-blue">
+          <Icon className="size-5" aria-hidden="true" />
         </span>
       )}
       <div className="flex flex-col items-center gap-2">
@@ -50,7 +50,7 @@ export function EmptyState({
       {action && (
         <Link href={action.href} className="btn-base btn-primary mt-1">
           {action.label}
-          <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
       )}
     </div>

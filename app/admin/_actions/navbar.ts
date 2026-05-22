@@ -101,46 +101,56 @@ export async function bulkUpdateNavbarAction(formData: FormData) {
     groups.set(oldSlug, g);
   }
 
-  for (const [oldSlug, g] of groups) {
-    const { data: existing } = await supabase
-      .from("navbar")
-      .select("id, language_id")
-      .eq("slug", oldSlug);
-    const byLang = new Map(
-      ((existing ?? []) as Array<{ id: number; language_id: number }>).map(
-        (r) => [r.language_id, r.id]
-      )
-    );
+  await Promise.all(
+    Array.from(groups).map(async ([oldSlug, g]) => {
+      const { data: existing } = await supabase
+        .from("navbar")
+        .select("id, language_id")
+        .eq("slug", oldSlug);
+      const byLang = new Map(
+        ((existing ?? []) as Array<{ id: number; language_id: number }>).map(
+          (r) => [r.language_id, r.id],
+        ),
+      );
 
-    for (const [langId, raw] of g.values) {
-      const trimmed = raw.trim();
-      const existingId = byLang.get(langId);
-      if (trimmed) {
-        if (existingId !== undefined) {
-          await supabase
-            .from("navbar")
-            .update({ slug: g.newSlug, value: trimmed })
-            .eq("id", existingId);
-        } else {
-          await supabase.from("navbar").insert({
-            slug: g.newSlug,
-            value: trimmed,
-            language_id: langId,
-            position: 0,
-          });
-        }
-      } else if (existingId !== undefined) {
-        await supabase.from("navbar").delete().eq("id", existingId);
-      }
-    }
-  }
+      await Promise.all(
+        Array.from(g.values).map(([langId, raw]) => {
+          const trimmed = raw.trim();
+          const existingId = byLang.get(langId);
+          if (trimmed) {
+            if (existingId !== undefined) {
+              return supabase
+                .from("navbar")
+                .update({ slug: g.newSlug, value: trimmed })
+                .eq("id", existingId);
+            }
+            return supabase.from("navbar").insert({
+              slug: g.newSlug,
+              value: trimmed,
+              language_id: langId,
+              position: 0,
+            });
+          }
+          if (existingId !== undefined) {
+            return supabase.from("navbar").delete().eq("id", existingId);
+          }
+          return Promise.resolve();
+        }),
+      );
+    }),
+  );
 
   const order = String(formData.get("order") ?? "");
   if (order) {
-    const slugs = order.split(",").map((s) => s.trim()).filter(Boolean);
-    for (let i = 0; i < slugs.length; i++) {
-      await supabase.from("navbar").update({ position: i }).eq("slug", slugs[i]);
-    }
+    const slugs = order.split(",").flatMap((s) => {
+      const t = s.trim();
+      return t ? [t] : [];
+    });
+    await Promise.all(
+      slugs.map((slug, i) =>
+        supabase.from("navbar").update({ position: i }).eq("slug", slug),
+      ),
+    );
   }
 
   bounce(PATH, "saved");

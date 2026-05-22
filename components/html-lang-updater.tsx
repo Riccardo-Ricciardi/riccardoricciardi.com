@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 const LOCALE_NAMES: Record<string, string> = {
   en: "English",
@@ -18,27 +18,26 @@ const LOCALE_NAMES: Record<string, string> = {
 };
 
 export function HtmlLangUpdater({ lang }: { lang: string }) {
-  const prevLang = useRef<string | null>(null);
-  const [announce, setAnnounce] = useState<string>("");
+  const prevLangRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (typeof document === "undefined") return;
     document.documentElement.lang = lang;
-    if (prevLang.current && prevLang.current !== lang) {
-      const name = LOCALE_NAMES[lang] ?? lang;
-      setAnnounce(`Language changed to ${name}`);
-    }
-    prevLang.current = lang;
+    prevLangRef.current = lang;
   }, [lang]);
 
+  const announce =
+    prevLangRef.current && prevLangRef.current !== lang
+      ? `Language changed to ${LOCALE_NAMES[lang] ?? lang}`
+      : "";
+
   return (
-    <div
-      role="status"
+    <output
+      key={lang}
       aria-live="polite"
       aria-atomic="true"
       className="sr-only"
     >
       {announce}
-    </div>
+    </output>
   );
 }

@@ -88,8 +88,8 @@ function CategoryCard({
     <li className="card-base flex flex-col gap-5 overflow-hidden p-6">
       <header className="flex items-center justify-between gap-3 border-b admin-divider pb-4">
         <div className="flex items-center gap-3">
-          <span className="grid h-9 w-9 place-items-center rounded-md border admin-divider bg-background/60 text-accent-blue">
-            <Icon className="h-4 w-4" aria-hidden="true" />
+          <span className="grid size-9 place-items-center rounded-md border admin-divider bg-background/60 text-accent-blue">
+            <Icon className="size-4" aria-hidden="true" />
           </span>
           <h3 className="text-base font-semibold tracking-tight text-foreground">
             {label}
@@ -115,7 +115,7 @@ function SkillRow({ skill }: { skill: Skill }) {
 
   return (
     <li className="group flex items-center gap-3">
-      <div className="relative h-6 w-6 shrink-0">
+      <div className="relative size-6 shrink-0">
         <Image
           src={lightSrc}
           alt=""

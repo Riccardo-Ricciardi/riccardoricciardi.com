@@ -99,7 +99,7 @@ export default async function WorkAdminPage() {
         </label>
         <div className="flex items-end">
           <SubmitButton className="w-full" pendingLabel="Adding…">
-            <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+            <Plus className="size-3.5" aria-hidden="true" />
             Add entry
           </SubmitButton>
         </div>
@@ -183,7 +183,7 @@ export default async function WorkAdminPage() {
                     type="checkbox"
                     name={`work[${row.id}][is_current]`}
                     defaultChecked={row.is_current}
-                    className="h-3.5 w-3.5 rounded accent-[var(--accent-blue)]"
+                    className="size-3.5 rounded accent-[var(--accent-blue)]"
                   />
                   <span>Current role (ignores end date)</span>
                 </label>

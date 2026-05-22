@@ -67,6 +67,7 @@ export default async function AboutAdminPage() {
               </header>
 
               <SortableAbout
+                key={langRows.map((r) => `${r.id}:${r.position}`).join("|")}
                 initial={langRows}
                 languageId={lang.id}
                 languageCode={lang.code}

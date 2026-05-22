@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { Hero } from "@/components/site/hero";
-import { Services, SERVICE_ICONS } from "@/components/site/services/section";
+import { Services } from "@/components/site/services/section";
+import { SERVICE_ICONS } from "@/components/site/services/service-icons";
 import { Skills } from "@/components/site/skills/section";
 import { Projects } from "@/components/site/projects/section";
 import { GlobalLoader } from "@/components/global-loader";

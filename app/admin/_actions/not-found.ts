@@ -94,24 +94,29 @@ export async function bulkUpdateNotFoundAction(formData: FormData) {
   let nextPos =
     ((maxRow as { position: number | null } | null)?.position ?? -1) + 1;
 
-  for (const u of updates) {
+  const ops = updates.map((u) => {
     const key = `${u.slug}::${u.language_id}`;
     const ex = existingMap.get(key);
     if (!u.value) {
-      if (ex) await supabase.from("not_found").delete().eq("id", ex.id);
-    } else if (ex) {
-      await supabase.from("not_found").update({ value: u.value }).eq("id", ex.id);
-    } else {
-      await supabase
-        .from("not_found")
-        .insert({
-          slug: u.slug,
-          value: u.value,
-          language_id: u.language_id,
-          position: nextPos++,
-        });
+      if (ex) {
+        return supabase.from("not_found").delete().eq("id", ex.id);
+      }
+      return null;
     }
-  }
+    if (ex) {
+      return supabase
+        .from("not_found")
+        .update({ value: u.value })
+        .eq("id", ex.id);
+    }
+    return supabase.from("not_found").insert({
+      slug: u.slug,
+      value: u.value,
+      language_id: u.language_id,
+      position: nextPos++,
+    });
+  });
+  await Promise.all(ops.filter((op) => op !== null));
 
   bounce(PATH, "saved");
 }

@@ -37,12 +37,12 @@ export default async function LoginPage({ searchParams }: PageProps) {
           href="/"
           className="mb-8 inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ArrowLeft className="h-3 w-3" aria-hidden="true" />
+          <ArrowLeft className="size-3" aria-hidden="true" />
           Back to site
         </Link>
 
         <div className="mb-8 flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-lg bg-accent-blue text-sm font-bold text-white">
+          <span className="grid size-10 place-items-center rounded-lg bg-accent-blue text-sm font-bold text-white">
             R.
           </span>
           <div>
@@ -65,7 +65,6 @@ export default async function LoginPage({ searchParams }: PageProps) {
               name="email"
               autoComplete="email"
               required
-              autoFocus
               className="admin-input"
             />
           </label>

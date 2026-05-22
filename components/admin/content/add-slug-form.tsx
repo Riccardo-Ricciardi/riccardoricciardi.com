@@ -32,7 +32,7 @@ export function AddSlugForm({
       </label>
       <div className="flex items-end">
         <SubmitButton className="w-full" pendingLabel="Adding…">
-          <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+          <Plus className="size-3.5" aria-hidden="true" />
           Add slug
         </SubmitButton>
       </div>

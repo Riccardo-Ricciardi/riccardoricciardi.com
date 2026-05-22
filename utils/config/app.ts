@@ -13,8 +13,10 @@ import {
  */
 const ENV_LANGUAGES = getLanguagesEnv()
   .split(",")
-  .map((s) => s.trim())
-  .filter(Boolean);
+  .flatMap((s) => {
+    const trimmed = s.trim();
+    return trimmed ? [trimmed] : [];
+  });
 
 const ENV_DEFAULT_LANGUAGE =
   getDefaultLanguageEnv()?.trim() || ENV_LANGUAGES[0] || "en";

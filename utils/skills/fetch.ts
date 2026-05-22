@@ -77,12 +77,10 @@ export const getSkillGroups = cache(async (): Promise<SkillGroup[]> => {
     bucket.sort((a, b) => b.percentage - a.percentage);
   }
 
-  const groups: SkillGroup[] = categories
-    .map((category) => ({
-      category,
-      skills: bySlug.get(category.slug) ?? [],
-    }))
-    .filter((g) => g.skills.length > 0);
+  const groups: SkillGroup[] = categories.flatMap((category) => {
+    const skills = bySlug.get(category.slug) ?? [];
+    return skills.length > 0 ? [{ category, skills }] : [];
+  });
 
   const orphans = bySlug.get(UNCATEGORIZED_SLUG) ?? [];
   if (orphans.length > 0) {

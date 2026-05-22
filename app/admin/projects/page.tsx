@@ -48,7 +48,7 @@ export default async function ProjectsAdminPage() {
         actions={
           <form action={triggerSyncAction}>
             <SubmitButton variant="ghost" pendingLabel="Syncing…">
-              <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+              <RefreshCw className="size-3.5" aria-hidden="true" />
               Sync from GitHub
             </SubmitButton>
           </form>
@@ -65,6 +65,7 @@ export default async function ProjectsAdminPage() {
         />
       ) : (
         <SortableProjects
+          key={rows.map((r) => `${r.id}:${r.position}`).join("|")}
           initial={rows}
           bulkAction={bulkUpdateProjectsAction}
           deleteAction={deleteProjectAction}

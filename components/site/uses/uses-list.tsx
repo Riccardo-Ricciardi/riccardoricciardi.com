@@ -56,7 +56,7 @@ function UsesCard({ item }: { item: UsesItem }) {
   const Inner = (
     <>
       <div className="flex items-start justify-between gap-2">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-control border border-dashed-soft bg-background/60">
+        <span className="grid size-10 shrink-0 place-items-center rounded-control border border-dashed-soft bg-background/60">
           {item.icon_url ? (
             <Image
               src={item.icon_url}
@@ -64,7 +64,7 @@ function UsesCard({ item }: { item: UsesItem }) {
               aria-hidden="true"
               width={24}
               height={24}
-              className="h-6 w-6 object-contain"
+              className="size-6 object-contain"
               unoptimized
             />
           ) : (
@@ -75,7 +75,7 @@ function UsesCard({ item }: { item: UsesItem }) {
         </span>
         {item.url && (
           <ArrowUpRight
-            className="h-4 w-4 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-blue"
+            className="size-4 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-blue"
             aria-hidden="true"
           />
         )}

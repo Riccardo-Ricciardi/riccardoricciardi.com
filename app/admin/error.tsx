@@ -37,11 +37,11 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
           onClick={() => reset()}
           className="admin-button admin-button-primary"
         >
-          <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+          <RotateCcw className="size-3.5" aria-hidden="true" />
           Try again
         </button>
         <Link href="/admin" className="admin-button admin-button-ghost">
-          <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+          <ArrowLeft className="size-3.5" aria-hidden="true" />
           Dashboard
         </Link>
       </div>

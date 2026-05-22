@@ -75,11 +75,11 @@ export default function SiteError({ error, reset }: SiteErrorProps) {
             onClick={() => reset()}
             className="btn-base btn-primary"
           >
-            <RotateCcw className="h-4 w-4" aria-hidden="true" />
+            <RotateCcw className="size-4" aria-hidden="true" />
             {copy.retry}
           </button>
           <Link href={`/${rawLocale}`} className="btn-base btn-ghost">
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            <ArrowLeft className="size-4" aria-hidden="true" />
             {copy.home}
           </Link>
         </div>

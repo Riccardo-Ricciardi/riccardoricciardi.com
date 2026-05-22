@@ -85,34 +85,35 @@ async function mirrorSkills(
     .select("id, name, icon_url, icon_dark_url");
   if (error) throw new Error(`Select skills: ${error.message}`);
 
-  let ok = 0;
-  let failed = 0;
-  let skipped = 0;
+  const rows = (data ?? []) as RowLike[];
+  const results = await Promise.all(
+    rows.map(async (row): Promise<"ok" | "failed" | "skipped"> => {
+      const updates: { icon_url?: string; icon_dark_url?: string } = {};
+      try {
+        const [light, dark] = await Promise.all([
+          mirrorOne(supabase, selfHost, row.name, "light", row.icon_url),
+          mirrorOne(supabase, selfHost, row.name, "dark", row.icon_dark_url),
+        ]);
+        if (light && light !== row.icon_url) updates.icon_url = light;
+        if (dark && dark !== row.icon_dark_url) updates.icon_dark_url = dark;
 
-  for (const row of (data ?? []) as RowLike[]) {
-    const updates: { icon_url?: string; icon_dark_url?: string } = {};
-    try {
-      const light = await mirrorOne(supabase, selfHost, row.name, "light", row.icon_url);
-      if (light && light !== row.icon_url) updates.icon_url = light;
-      const dark = await mirrorOne(supabase, selfHost, row.name, "dark", row.icon_dark_url);
-      if (dark && dark !== row.icon_dark_url) updates.icon_dark_url = dark;
-
-      if (Object.keys(updates).length === 0) {
-        skipped += 1;
-        continue;
+        if (Object.keys(updates).length === 0) return "skipped";
+        const { error: upErr } = await supabase
+          .from("skills")
+          .update(updates)
+          .eq("id", row.id);
+        if (upErr) throw new Error(`Update skills#${row.id}: ${upErr.message}`);
+        return "ok";
+      } catch (err) {
+        console.error(`mirror skills#${row.id} (${row.name}):`, err);
+        return "failed";
       }
-      const { error: upErr } = await supabase
-        .from("skills")
-        .update(updates)
-        .eq("id", row.id);
-      if (upErr) throw new Error(`Update skills#${row.id}: ${upErr.message}`);
-      ok += 1;
-    } catch (err) {
-      console.error(`mirror skills#${row.id} (${row.name}):`, err);
-      failed += 1;
-    }
-  }
-  return { ok, failed, skipped };
+    }),
+  );
+  return results.reduce(
+    (acc, r) => ({ ...acc, [r]: acc[r] + 1 }),
+    { ok: 0, failed: 0, skipped: 0 },
+  );
 }
 
 async function mirrorUses(
@@ -124,29 +125,35 @@ async function mirrorUses(
     .select("id, name, icon_url");
   if (error) throw new Error(`Select uses_items: ${error.message}`);
 
-  let ok = 0;
-  let failed = 0;
-  let skipped = 0;
-
-  for (const row of (data ?? []) as { id: number; name: string; icon_url: string | null }[]) {
-    try {
-      const light = await mirrorOne(supabase, selfHost, row.name, "light", row.icon_url);
-      if (!light || light === row.icon_url) {
-        skipped += 1;
-        continue;
+  const rows = (data ?? []) as { id: number; name: string; icon_url: string | null }[];
+  const results = await Promise.all(
+    rows.map(async (row): Promise<"ok" | "failed" | "skipped"> => {
+      try {
+        const light = await mirrorOne(
+          supabase,
+          selfHost,
+          row.name,
+          "light",
+          row.icon_url,
+        );
+        if (!light || light === row.icon_url) return "skipped";
+        const { error: upErr } = await supabase
+          .from("uses_items")
+          .update({ icon_url: light })
+          .eq("id", row.id);
+        if (upErr)
+          throw new Error(`Update uses_items#${row.id}: ${upErr.message}`);
+        return "ok";
+      } catch (err) {
+        console.error(`mirror uses_items#${row.id} (${row.name}):`, err);
+        return "failed";
       }
-      const { error: upErr } = await supabase
-        .from("uses_items")
-        .update({ icon_url: light })
-        .eq("id", row.id);
-      if (upErr) throw new Error(`Update uses_items#${row.id}: ${upErr.message}`);
-      ok += 1;
-    } catch (err) {
-      console.error(`mirror uses_items#${row.id} (${row.name}):`, err);
-      failed += 1;
-    }
-  }
-  return { ok, failed, skipped };
+    }),
+  );
+  return results.reduce(
+    (acc, r) => ({ ...acc, [r]: acc[r] + 1 }),
+    { ok: 0, failed: 0, skipped: 0 },
+  );
 }
 
 export async function mirrorIconsAction(_formData: FormData) {
@@ -156,8 +163,10 @@ export async function mirrorIconsAction(_formData: FormData) {
 
   let total = { ok: 0, failed: 0, skipped: 0 };
   try {
-    const a = await mirrorSkills(supabase, selfHost);
-    const b = await mirrorUses(supabase, selfHost);
+    const [a, b] = await Promise.all([
+      mirrorSkills(supabase, selfHost),
+      mirrorUses(supabase, selfHost),
+    ]);
     total = {
       ok: a.ok + b.ok,
       failed: a.failed + b.failed,

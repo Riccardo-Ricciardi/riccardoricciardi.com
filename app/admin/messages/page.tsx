@@ -114,12 +114,12 @@ function MessageCard({ row }: { row: MessageRow }) {
           >
             {isRead ? (
               <>
-                <MailOpen className="h-3.5 w-3.5" aria-hidden="true" />
+                <MailOpen className="size-3.5" aria-hidden="true" />
                 Mark unread
               </>
             ) : (
               <>
-                <MailCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                <MailCheck className="size-3.5" aria-hidden="true" />
                 Mark read
               </>
             )}
@@ -130,7 +130,7 @@ function MessageCard({ row }: { row: MessageRow }) {
           fieldValue={row.id}
           label={`message from "${row.name}"`}
           iconOnly
-          className="h-8 w-8 min-h-8 min-w-8"
+          className="size-8 min-h-8 min-w-8"
         />
       </footer>
     </article>

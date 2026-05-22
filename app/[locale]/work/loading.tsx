@@ -15,7 +15,7 @@ export default function Loading() {
               className="flex gap-6 border-b border-dashed-soft py-8 first:border-t"
             >
               <div className="flex flex-col items-center gap-2 pt-1">
-                <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-muted" />
+                <div className="size-2.5 animate-pulse rounded-full bg-muted" />
                 <div className="w-px flex-1 animate-pulse bg-muted" />
               </div>
               <div className="flex flex-1 flex-col gap-3 pb-2">

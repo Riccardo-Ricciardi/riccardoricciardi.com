@@ -90,15 +90,20 @@ export async function bulkUpdateSkillCategoriesAction(formData: FormData) {
     updates.set(slug, u);
   }
 
-  for (const slug of rowSlugs) {
-    const u = updates.get(slug);
-    if (!u || Object.keys(u).length === 0) continue;
-    await supabase.from("skill_categories").update(u).eq("slug", slug);
-  }
+  await Promise.all(
+    Array.from(rowSlugs).map((slug) => {
+      const u = updates.get(slug);
+      if (!u || Object.keys(u).length === 0) return Promise.resolve();
+      return supabase.from("skill_categories").update(u).eq("slug", slug);
+    }),
+  );
 
   const order = String(formData.get("category_order") ?? "");
   if (order) {
-    const slugs = order.split(",").map((s) => s.trim()).filter(Boolean);
+    const slugs = order.split(",").flatMap((s) => {
+      const t = s.trim();
+      return t ? [t] : [];
+    });
     await Promise.all(
       slugs.map((slug, index) =>
         supabase.from("skill_categories").update({ position: index }).eq("slug", slug)

@@ -51,7 +51,7 @@ export function CloneLanguageForm({ languages, action }: Props) {
       </label>
       <div className="flex items-end">
         <SubmitButton className="w-full" pendingLabel="Cloning…">
-          <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+          <Copy className="size-3.5" aria-hidden="true" />
           Clone language
         </SubmitButton>
       </div>

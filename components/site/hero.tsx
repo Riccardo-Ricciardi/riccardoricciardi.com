@@ -43,7 +43,7 @@ export function Hero({
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <Link href={primaryCta.href} className="btn-base btn-lg btn-primary">
               {primaryCta.label}
-              <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
+              <ArrowRight className="ml-1 size-4" aria-hidden="true" />
             </Link>
             {secondaryCta && (
               <Link

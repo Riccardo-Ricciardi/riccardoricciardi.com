@@ -64,8 +64,10 @@ export function getSiteUrl(): string {
 export function getAdminEmails(): string[] {
   return (process.env.ADMIN_EMAILS ?? "info@riccardoricciardi.com")
     .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
+    .flatMap((e) => {
+      const trimmed = e.trim().toLowerCase();
+      return trimmed ? [trimmed] : [];
+    });
 }
 
 export function getResendConfig(): {

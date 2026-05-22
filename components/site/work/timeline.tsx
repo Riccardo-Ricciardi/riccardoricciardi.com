@@ -39,7 +39,7 @@ export function WorkTimeline({
             }`}
           >
             {item.is_current && (
-              <span className="h-1.5 w-1.5 rounded-full bg-accent-blue" />
+              <span className="size-1.5 rounded-full bg-accent-blue" />
             )}
           </span>
 
@@ -56,7 +56,7 @@ export function WorkTimeline({
                     className="inline-flex items-center gap-0.5 hover:text-accent-blue"
                   >
                     {item.company}
-                    <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                    <ArrowUpRight className="size-3.5" aria-hidden="true" />
                   </a>
                 ) : (
                   <span>{item.company}</span>
@@ -85,9 +85,9 @@ export function WorkTimeline({
 
           {item.bullets.length > 0 && (
             <ul className="text-body-sm mt-3 list-none space-y-1.5 p-0 text-muted-foreground">
-              {item.bullets.map((b, i) => (
-                <li key={i} className="flex gap-2">
-                  <span aria-hidden="true" className="mt-2 inline-block h-1 w-1 shrink-0 rounded-full bg-foreground/40" />
+              {item.bullets.map((b) => (
+                <li key={b} className="flex gap-2">
+                  <span aria-hidden="true" className="mt-2 inline-block size-1 shrink-0 rounded-full bg-foreground/40" />
                   <span>{b}</span>
                 </li>
               ))}

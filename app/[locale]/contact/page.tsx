@@ -32,8 +32,10 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const blocks = await getContentBlocks(locale);
-  const codes = await getLanguageCodes();
+  const [blocks, codes] = await Promise.all([
+    getContentBlocks(locale),
+    getLanguageCodes(),
+  ]);
   const title = content(blocks, "contact_heading", "Contact");
   const description = content(
     blocks,
@@ -274,7 +276,7 @@ export default async function ContactPage({ params }: PageProps) {
                 </span>
                 <span
                   aria-hidden="true"
-                  className="grid h-9 w-9 shrink-0 place-items-center rounded-pill border border-dashed-soft text-accent-blue transition-transform group-open:rotate-45"
+                  className="grid size-9 shrink-0 place-items-center rounded-pill border border-dashed-soft text-accent-blue transition-transform group-open:rotate-45"
                 >
                   +
                 </span>

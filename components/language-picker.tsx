@@ -76,7 +76,7 @@ export function LanguagePicker({
   ariaLabel,
   languages,
 }: LanguagePickerProps) {
-  const router = useRouter();
+  const { replace, refresh } = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
   const codes = languages.map((l) => l.code);
@@ -85,8 +85,8 @@ export function LanguagePicker({
     if (next === locale) return;
     document.cookie = `NEXT_LOCALE=${next}; path=/; max-age=31536000; SameSite=Lax`;
     startTransition(() => {
-      router.replace(swapLocale(pathname, next, codes));
-      router.refresh();
+      replace(swapLocale(pathname, next, codes));
+      refresh();
     });
   };
 

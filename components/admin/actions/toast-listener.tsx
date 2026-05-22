@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { Suspense, useEffect, useRef } from "react";
+import { useSearchParams, usePathname } from "next/navigation";
 import { toast } from "sonner";
 
 const OK_MAP: Record<string, string> = {
@@ -13,15 +13,15 @@ const OK_MAP: Record<string, string> = {
   cleared: "Cleared",
 };
 
-export function AdminToastListener() {
+function ToastListenerInner() {
   const params = useSearchParams();
-  const router = useRouter();
   const pathname = usePathname();
+  const { get } = params;
   const lastKeyRef = useRef<string>("");
 
   useEffect(() => {
-    const ok = params.get("ok");
-    const err = params.get("error");
+    const ok = get.call(params, "ok");
+    const err = get.call(params, "error");
     if (!ok && !err) return;
 
     const key = `${pathname}::${ok ?? ""}::${err ?? ""}`;
@@ -39,8 +39,17 @@ export function AdminToastListener() {
     next.delete("ok");
     next.delete("error");
     const search = next.toString();
-    router.replace(search ? `${pathname}?${search}` : pathname, { scroll: false });
-  }, [params, router, pathname]);
+    const url = search ? `${pathname}?${search}` : pathname;
+    window.history.replaceState(null, "", url);
+  }, [params, pathname, get]);
 
   return null;
+}
+
+export function AdminToastListener() {
+  return (
+    <Suspense fallback={null}>
+      <ToastListenerInner />
+    </Suspense>
+  );
 }

@@ -113,7 +113,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         href="/admin/projects"
         className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
       >
-        <ArrowLeft className="h-3 w-3" aria-hidden="true" />
+        <ArrowLeft className="size-3" aria-hidden="true" />
         Back to projects
       </Link>
 
@@ -130,7 +130,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               className="admin-button admin-button-ghost"
             >
               View on GitHub
-              <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+              <ExternalLink className="size-3.5" aria-hidden="true" />
             </Link>
           )
         }
@@ -155,8 +155,11 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               className="flex flex-col gap-2"
             >
               <input type="hidden" name="id" value={project.id} />
-              <label className="admin-eyebrow">Replace screenshot</label>
+              <label className="admin-eyebrow" htmlFor={`screenshot-${project.id}`}>
+                Replace screenshot
+              </label>
               <input
+                id={`screenshot-${project.id}`}
                 type="file"
                 name="file"
                 accept="image/png,image/jpeg,image/webp,image/avif"
@@ -164,7 +167,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                 className="admin-file"
               />
               <SubmitButton pendingLabel="Uploading…">
-                <Upload className="h-3.5 w-3.5" aria-hidden="true" />
+                <Upload className="size-3.5" aria-hidden="true" />
                 Upload
               </SubmitButton>
             </form>
@@ -177,7 +180,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   className="w-full text-xs text-muted-foreground hover:text-rose-500"
                   pendingLabel="Removing…"
                 >
-                  <Trash2 className="h-3 w-3" aria-hidden="true" />
+                  <Trash2 className="size-3" aria-hidden="true" />
                   Remove screenshot (falls back to OG image)
                 </SubmitButton>
               </form>

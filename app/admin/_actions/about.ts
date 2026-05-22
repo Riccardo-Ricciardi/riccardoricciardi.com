@@ -67,14 +67,16 @@ export async function bulkUpdateAboutAction(formData: FormData) {
   }
 
   const now = new Date().toISOString();
-  for (const id of rowIds) {
-    const u = updates.get(id);
-    if (!u) continue;
-    await supabase
-      .from("about_sections")
-      .update({ ...u, updated_at: now })
-      .eq("id", id);
-  }
+  await Promise.all(
+    Array.from(rowIds).map((id) => {
+      const u = updates.get(id);
+      if (!u) return Promise.resolve();
+      return supabase
+        .from("about_sections")
+        .update({ ...u, updated_at: now })
+        .eq("id", id);
+    }),
+  );
 
   const order = String(formData.get("order") ?? "");
   if (order) {

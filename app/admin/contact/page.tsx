@@ -102,6 +102,7 @@ export default async function ContactAdminPage() {
         <div className="flex flex-col gap-3">
           <AddSocialForm action={createSocialLinkAction} />
           <SortableSocial
+            key={social.map((s) => `${s.id}:${s.position}`).join("|")}
             initial={social}
             bulkAction={bulkUpdateSocialAction}
             deleteAction={deleteSocialLinkAction}

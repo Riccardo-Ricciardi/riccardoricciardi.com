@@ -45,11 +45,11 @@ export function DeleteButton({
           aria-label={`Delete ${label}`}
           className={cn(
             "admin-button admin-button-danger admin-tap-44",
-            iconOnly ? "h-9 w-9 px-0 min-h-9 min-w-9" : "",
+            iconOnly ? "size-9 px-0 min-h-9 min-w-9" : "",
             className
           )}
         >
-          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+          <Trash2 className="size-3.5" aria-hidden="true" />
           {!iconOnly && <span>Delete</span>}
         </button>
       </AlertDialogTrigger>
@@ -81,7 +81,7 @@ export function DeleteButton({
                 className="admin-button bg-destructive text-destructive-foreground hover:opacity-90 disabled:opacity-60"
               >
                 {pending && (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
                 )}
                 {pending ? "Deleting…" : "Delete"}
               </button>

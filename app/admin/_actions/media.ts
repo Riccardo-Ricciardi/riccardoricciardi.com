@@ -25,14 +25,14 @@ export async function uploadMediaAction(formData: FormData) {
 
   if (files.length === 0) bounce(PATH, undefined, "no_file");
 
-  for (const f of files) {
-    if (!(f instanceof File) || f.size === 0) continue;
-    try {
-      await uploadImage(f, { folder });
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "upload_failed";
-      bounce(PATH, undefined, encodeURIComponent(msg));
-    }
+  const uploads = files
+    .filter((f): f is File => f instanceof File && f.size > 0)
+    .map((f) => uploadImage(f, { folder }));
+  try {
+    await Promise.all(uploads);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "upload_failed";
+    bounce(PATH, undefined, encodeURIComponent(msg));
   }
 
   bounce(PATH, "uploaded");

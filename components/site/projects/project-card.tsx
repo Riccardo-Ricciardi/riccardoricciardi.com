@@ -58,7 +58,7 @@ export function ProjectCard({ project, priority = false, labels }: ProjectCardPr
               {project.name ?? project.repo}
             </h3>
             <ArrowUpRight
-              className="h-4 w-4 shrink-0 text-muted-foreground transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-blue"
+              className="size-4 shrink-0 text-muted-foreground transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-blue"
               aria-hidden="true"
             />
           </header>
@@ -106,20 +106,20 @@ export function ProjectCard({ project, priority = false, labels }: ProjectCardPr
                   <span className="inline-flex items-center gap-1.5">
                     <span
                       aria-hidden="true"
-                      className="h-2 w-2 rounded-full bg-foreground/60"
+                      className="size-2 rounded-full bg-foreground/60"
                     />
                     {project.language}
                   </span>
                 )}
                 {hasStars && (
                   <span className="inline-flex items-center gap-1">
-                    <Star className="h-3 w-3" aria-hidden="true" />
+                    <Star className="size-3" aria-hidden="true" />
                     {project.stars}
                   </span>
                 )}
                 {hasForks && (
                   <span className="inline-flex items-center gap-1">
-                    <GitFork className="h-3 w-3" aria-hidden="true" />
+                    <GitFork className="size-3" aria-hidden="true" />
                     {project.forks}
                   </span>
                 )}

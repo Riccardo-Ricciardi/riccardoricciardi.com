@@ -25,8 +25,10 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const blocks = await getContentBlocks(locale);
-  const codes = await getLanguageCodes();
+  const [blocks, codes] = await Promise.all([
+    getContentBlocks(locale),
+    getLanguageCodes(),
+  ]);
   const title = content(blocks, "about_heading", "About");
   const description = content(
     blocks,

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://www.react.doctor/schema.json",
+  "serverAuthFunctionNames": ["requireAdmin"],
+  "ignore": {
+    "overrides": [
+      {
+        "files": ["app/**/opengraph-image.tsx", "app/**/twitter-image.tsx"],
+        "rules": ["react-doctor/only-export-components"]
+      },
+      {
+        "files": ["components/json-ld.tsx", "components/dynamic-theme-vars.tsx"],
+        "rules": ["react-doctor/no-danger"]
+      },
+      {
+        "files": ["utils/og/render.tsx"],
+        "rules": ["react-doctor/no-inline-exhaustive-style"]
+      },
+      {
+        "files": [
+          "app/[locale]/contact/_actions/booking.ts",
+          "app/[locale]/contact/_actions/submit.ts",
+          "app/admin/_actions/auth.ts"
+        ],
+        "rules": ["react-doctor/server-auth-actions"]
+      },
+      {
+        "files": ["app/admin/**", "components/admin/**"],
+        "rules": ["react-doctor/control-has-associated-label"]
+      },
+      {
+        "files": ["components/admin/**/sortable-*.tsx"],
+        "rules": [
+          "react-doctor/no-derived-useState",
+          "react-doctor/no-derived-state",
+          "react-doctor/no-mirror-prop-effect",
+          "react-doctor/no-reset-all-state-on-prop-change",
+          "react-doctor/no-derived-state-effect"
+        ]
+      },
+      {
+        "files": ["components/site/contact/booking-widget.tsx"],
+        "rules": [
+          "react-doctor/no-giant-component",
+          "react-doctor/prefer-useReducer",
+          "react-doctor/no-cascading-set-state",
+          "react-doctor/no-pass-data-to-parent",
+          "react-doctor/no-prop-callback-in-effect",
+          "react-doctor/no-event-handler",
+          "react-doctor/no-effect-chain",
+          "react-doctor/no-initialize-state",
+          "react-doctor/rendering-hydration-no-flicker",
+          "react-doctor/no-derived-state",
+          "react-doctor/no-adjust-state-on-prop-change",
+          "react-doctor/click-events-have-key-events",
+          "react-doctor/no-noninteractive-element-interactions"
+        ]
+      }
+    ]
+  }
+}

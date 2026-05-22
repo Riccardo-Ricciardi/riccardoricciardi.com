@@ -67,7 +67,7 @@ export default async function LocaleNotFound() {
             href={`/${locale}`}
             className="btn-base btn-lg btn-primary mt-8"
           >
-            <ArrowLeft className="mr-1 h-4 w-4" aria-hidden="true" />
+            <ArrowLeft className="mr-1 size-4" aria-hidden="true" />
             {copy.cta}
           </Link>
         </div>

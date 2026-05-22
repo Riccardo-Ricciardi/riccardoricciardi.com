@@ -36,7 +36,7 @@ export function Navbar({
   languages,
   ariaLabels,
 }: NavbarProps) {
-  const items = [...dictionary.navbar].sort((a, b) => a.position - b.position);
+  const items = dictionary.navbar.toSorted((a, b) => a.position - b.position);
 
   return (
     <ScrolledHeader
@@ -46,7 +46,7 @@ export function Navbar({
       <div className="container-page flex h-14 items-center justify-between">
         <Link
           href={`/${locale}`}
-          className="block h-9 w-9 shrink-0 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="block size-9 shrink-0 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label={ariaLabels.home}
         >
           <Image
@@ -56,7 +56,7 @@ export function Navbar({
             width={36}
             height={36}
             priority
-            className="h-9 w-9 object-contain"
+            className="size-9 object-contain"
           />
         </Link>
 

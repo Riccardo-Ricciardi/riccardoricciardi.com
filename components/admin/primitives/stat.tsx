@@ -23,7 +23,7 @@ export function Stat({ label, value, hint, icon: Icon, tone = "default", classNa
       <div className="flex items-start justify-between gap-3">
         <p className="admin-eyebrow truncate">{label}</p>
         {Icon && (
-          <Icon className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
+          <Icon className="size-3.5 text-muted-foreground" aria-hidden="true" />
         )}
       </div>
       <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight">

@@ -61,6 +61,7 @@ export default async function NavbarAdminPage() {
       <AddNavbarForm languages={langs} action={createNavbarSlugAction} />
 
       <SortableNavbar
+        key={groups.map((g) => g.slug).join("|")}
         initial={groups}
         languages={langs}
         bulkAction={bulkUpdateNavbarAction}

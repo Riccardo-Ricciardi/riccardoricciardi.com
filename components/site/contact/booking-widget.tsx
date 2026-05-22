@@ -238,7 +238,10 @@ function BookingWidgetInner({
 
   useEffect(() => {
     if (selectedDate && slotsForSelected.length === 0) {
-      const firstAvail = Array.from(slotByDay.keys()).sort()[0];
+      const firstAvail = Array.from(slotByDay.keys()).reduce(
+        (min, k) => (min === null || k < min ? k : min),
+        null as string | null,
+      );
       if (firstAvail) {
         const [y, m, d] = firstAvail.split("-").map(Number);
         setSelectedDate(new Date(y, m - 1, d));
@@ -248,7 +251,10 @@ function BookingWidgetInner({
 
   useEffect(() => {
     if (!selectedDate && slotByDay.size > 0) {
-      const firstAvail = Array.from(slotByDay.keys()).sort()[0];
+      const firstAvail = Array.from(slotByDay.keys()).reduce(
+        (min, k) => (min === null || k < min ? k : min),
+        null as string | null,
+      );
       if (firstAvail) {
         const [y, m, d] = firstAvail.split("-").map(Number);
         setSelectedDate(new Date(y, m - 1, d));
@@ -275,8 +281,8 @@ function BookingWidgetInner({
     <div className="card-base card-flush rounded-surface overflow-hidden">
       <header className="flex flex-col gap-3 border-b border-dashed-soft p-6 md:flex-row md:items-center md:justify-between md:p-8">
         <div className="flex items-start gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-dashed-soft text-accent-blue">
-            <Calendar className="h-5 w-5" aria-hidden="true" />
+          <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-dashed-soft text-accent-blue">
+            <Calendar className="size-5" aria-hidden="true" />
           </span>
           <div className="min-w-0">
             <h3 className="text-h3">
@@ -288,7 +294,7 @@ function BookingWidgetInner({
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-1.5 self-start text-eyebrow md:self-auto">
-          <Globe className="h-3 w-3" aria-hidden="true" />
+          <Globe className="size-3" aria-hidden="true" />
           <span>{labels.timezoneLabel}</span>
           <span className="text-foreground">{timezone}</span>
         </div>
@@ -335,9 +341,9 @@ function BookingWidgetInner({
                 viewMonth.getFullYear() === today.getFullYear() &&
                 viewMonth.getMonth() === today.getMonth()
               }
-              className="grid h-9 w-9 place-items-center rounded-md border border-dashed-soft text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
+              className="grid size-9 place-items-center rounded-md border border-dashed-soft text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
             >
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              <ArrowLeft className="size-4" aria-hidden="true" />
             </button>
             <p className="text-base font-semibold capitalize tracking-tight">
               {monthLabel}
@@ -346,9 +352,9 @@ function BookingWidgetInner({
               type="button"
               aria-label={labels.nextMonth}
               onClick={() => setViewMonth((m) => addMonths(m, 1))}
-              className="grid h-9 w-9 place-items-center rounded-md border border-dashed-soft text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground"
+              className="grid size-9 place-items-center rounded-md border border-dashed-soft text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground"
             >
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              <ArrowRight className="size-4" aria-hidden="true" />
             </button>
           </div>
 
@@ -379,7 +385,7 @@ function BookingWidgetInner({
               );
               return (
                 <button
-                  key={idx}
+                  key={cell.toISOString()}
                   type="button"
                   disabled={disabled}
                   onClick={() => setSelectedDate(cell)}
@@ -398,7 +404,7 @@ function BookingWidgetInner({
                   {count > 0 && !isSelected && (
                     <span
                       aria-hidden="true"
-                      className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-accent-blue"
+                      className="absolute bottom-1 left-1/2 size-1 -translate-x-1/2 rounded-full bg-accent-blue"
                     />
                   )}
                 </button>
@@ -530,9 +536,9 @@ function BookingWidgetSkeleton({ labels }: { labels: BookingLabels }) {
         <div className="flex items-start gap-3">
           <span
             aria-hidden="true"
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-dashed-soft text-accent-blue"
+            className="grid size-10 shrink-0 place-items-center rounded-lg border border-dashed-soft text-accent-blue"
           >
-            <Calendar className="h-5 w-5" />
+            <Calendar className="size-5" />
           </span>
           <div className="min-w-0">
             <h3 className="text-h3">{labels.heading}</h3>
@@ -575,7 +581,7 @@ function ConfirmDialog({
     null
   );
   const handledRef = useRef<string>("");
-  const dialogRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const notesRef = useRef<HTMLTextAreaElement>(null);
@@ -624,15 +630,16 @@ function ConfirmDialog({
   );
 
   return (
-    <div
+    <dialog
       ref={dialogRef}
-      role="dialog"
+      open
       aria-modal="true"
       aria-label={labels.confirmTitle}
       className="fixed inset-0 z-50 flex items-end justify-center bg-background/70 p-4 backdrop-blur sm:items-center"
       onClick={(e) => {
         if (e.target === e.currentTarget) onCancel();
       }}
+      onCancel={onCancel}
     >
       <div className="w-full max-w-md card-base card-flush rounded-surface overflow-hidden">
         <header className="border-b border-dashed-soft p-5">
@@ -729,7 +736,7 @@ function ConfirmDialog({
           </div>
         </form>
       </div>
-    </div>
+    </dialog>
   );
 }
 
@@ -749,9 +756,9 @@ function SubmitBtn({
       className="btn-base btn-primary"
     >
       {pending ? (
-        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+        <Loader2 className="size-4 animate-spin" aria-hidden="true" />
       ) : (
-        <Send className="h-4 w-4" aria-hidden="true" />
+        <Send className="size-4" aria-hidden="true" />
       )}
       {pending ? pendingLabel : label}
     </button>
@@ -785,8 +792,8 @@ function SuccessCard({
   return (
     <div className="card-base card-flush rounded-surface overflow-hidden">
       <div className="flex flex-col items-center gap-4 p-8 text-center md:p-12">
-        <span className="grid h-12 w-12 place-items-center rounded-full border border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-          <Check className="h-6 w-6" aria-hidden="true" />
+        <span className="grid size-12 place-items-center rounded-full border border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+          <Check className="size-6" aria-hidden="true" />
         </span>
         <div>
           <h3 className="text-xl font-semibold tracking-tight md:text-2xl">
@@ -811,7 +818,7 @@ function SuccessCard({
           onClick={onReset}
           className="btn-base btn-sm btn-ghost mt-2"
         >
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          <ArrowLeft className="size-4" aria-hidden="true" />
           {labels.cancel}
         </button>
       </div>

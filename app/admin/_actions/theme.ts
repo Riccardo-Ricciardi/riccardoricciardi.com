@@ -31,14 +31,16 @@ export async function bulkUpdateThemeAction(formData: FormData) {
   }
 
   const now = new Date().toISOString();
-  for (const k of rowKeys) {
-    const u = updates.get(k);
-    if (!u) continue;
-    await supabase
-      .from("theme_settings")
-      .update({ ...u, updated_at: now })
-      .eq("key", k);
-  }
+  await Promise.all(
+    Array.from(rowKeys).map(async (k) => {
+      const u = updates.get(k);
+      if (!u) return;
+      await supabase
+        .from("theme_settings")
+        .update({ ...u, updated_at: now })
+        .eq("key", k);
+    }),
+  );
 
   bounce(PATH, "saved");
 }

@@ -30,8 +30,10 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const blocks = await getContentBlocks(locale);
-  const codes = await getLanguageCodes();
+  const [blocks, codes] = await Promise.all([
+    getContentBlocks(locale),
+    getLanguageCodes(),
+  ]);
   const title = content(blocks, "work_heading", "Work");
   const description = content(
     blocks,
@@ -106,7 +108,7 @@ function WorkListSkeleton() {
           className="flex gap-6 border-b border-dashed-soft py-8 first:border-t"
         >
           <div className="flex flex-col items-center gap-2 pt-1">
-            <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-muted" />
+            <div className="size-2.5 animate-pulse rounded-full bg-muted" />
             <div className="w-px flex-1 animate-pulse bg-muted" />
           </div>
           <div className="flex flex-1 flex-col gap-3 pb-2">

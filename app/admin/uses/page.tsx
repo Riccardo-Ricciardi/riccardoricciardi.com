@@ -104,7 +104,7 @@ export default async function UsesAdminPage() {
         </label>
         <div className="flex items-end">
           <SubmitButton className="w-full" pendingLabel="Adding…">
-            <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+            <Plus className="size-3.5" aria-hidden="true" />
             Add item
           </SubmitButton>
         </div>
@@ -161,7 +161,7 @@ export default async function UsesAdminPage() {
                       name={`uses[${row.id}][visible]`}
                       defaultChecked={row.visible}
                       aria-label="Visible"
-                      className="h-4 w-4 accent-[var(--accent-blue)]"
+                      className="size-4 accent-[var(--accent-blue)]"
                     />
                   </label>
                   <DeleteButton

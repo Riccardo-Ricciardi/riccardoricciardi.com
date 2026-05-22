@@ -52,7 +52,7 @@ export function MediaGrid({ files, deleteAction }: Props) {
                 fieldValue={f.path}
                 label={f.name}
                 iconOnly
-                className="h-7 w-7 min-h-7 min-w-7"
+                className="size-7 min-h-7 min-w-7"
               />
             </div>
           </div>

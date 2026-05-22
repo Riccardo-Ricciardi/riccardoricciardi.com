@@ -98,7 +98,7 @@ export function ContactForm({ locale, labels }: ContactFormProps) {
           tabIndex={-1}
           autoComplete="off"
           aria-hidden="true"
-          className="absolute left-[-9999px] h-0 w-0 opacity-0"
+          className="absolute left-[-9999px] size-0 opacity-0"
         />
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -187,9 +187,9 @@ function SubmitBtn({
       className="btn-base btn-primary w-full sm:w-auto"
     >
       {pending ? (
-        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+        <Loader2 className="size-4 animate-spin" aria-hidden="true" />
       ) : (
-        <Send className="h-4 w-4" aria-hidden="true" />
+        <Send className="size-4" aria-hidden="true" />
       )}
       {pending ? pendingLabel : label}
     </button>
