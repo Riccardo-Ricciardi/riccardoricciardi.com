@@ -7,6 +7,7 @@ import {
   Palette,
   Box,
   Cpu,
+  Code,
   type LucideIcon,
 } from "lucide-react";
 import type { Skill, SkillGroup } from "@/utils/skills/fetch";
@@ -29,6 +30,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Palette,
   Box,
   Cpu,
+  Code,
   Sparkles,
 };
 
@@ -95,7 +97,7 @@ function CategoryCard({
             {label}
           </h3>
         </div>
-        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+        <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
           {countLabel}
         </span>
       </header>
@@ -145,7 +147,7 @@ function SkillRow({ skill }: { skill: Skill }) {
           <span className="truncate text-sm font-medium text-foreground">
             {skill.name}
           </span>
-          <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
+          <span className="font-mono text-xs tabular-nums text-muted-foreground">
             {skill.percentage}
             <span className="opacity-60">%</span>
           </span>

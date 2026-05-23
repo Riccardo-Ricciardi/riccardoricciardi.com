@@ -38,6 +38,7 @@ const ICON_OPTIONS = [
   "Palette",
   "Box",
   "Cpu",
+  "Code",
   "Sparkles",
 ];
 
