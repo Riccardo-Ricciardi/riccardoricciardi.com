@@ -341,7 +341,7 @@ function BookingWidgetInner({
                 viewMonth.getFullYear() === today.getFullYear() &&
                 viewMonth.getMonth() === today.getMonth()
               }
-              className="grid size-9 place-items-center rounded-md border border-dashed-soft text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
+              className="grid size-9 place-items-center rounded-md border border-dashed-soft text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
             >
               <ArrowLeft className="size-4" aria-hidden="true" />
             </button>
@@ -352,7 +352,7 @@ function BookingWidgetInner({
               type="button"
               aria-label={labels.nextMonth}
               onClick={() => setViewMonth((m) => addMonths(m, 1))}
-              className="grid size-9 place-items-center rounded-md border border-dashed-soft text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground"
+              className="grid size-9 place-items-center rounded-md border border-dashed-soft text-muted-foreground transition-colors hover:border-accent-blue hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <ArrowRight className="size-4" aria-hidden="true" />
             </button>
@@ -392,9 +392,9 @@ function BookingWidgetInner({
                   aria-label={dayLabel}
                   aria-pressed={isSelected}
                   className={cn(
-                    "relative aspect-square rounded-md text-sm transition-all",
+                    "relative aspect-square min-h-11 rounded-md text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:min-h-0",
                     disabled
-                      ? "cursor-not-allowed text-muted-foreground/30"
+                      ? "cursor-not-allowed text-muted-foreground/40"
                       : isSelected
                         ? "bg-accent-blue text-white"
                         : "border border-dashed-soft hover:border-accent-blue hover:text-accent-blue"
@@ -413,7 +413,12 @@ function BookingWidgetInner({
           </div>
         </section>
 
-        <section aria-label={labels.pickSlot} className="flex flex-col gap-3">
+        <section
+          aria-label={labels.pickSlot}
+          aria-live="polite"
+          aria-busy={loading}
+          className="flex flex-col gap-3"
+        >
           <div className="flex items-baseline justify-between gap-2">
             <p className="text-eyebrow">
               {selectedDate
@@ -468,7 +473,7 @@ function BookingWidgetInner({
                     <button
                       type="button"
                       onClick={() => setSelectedSlot(slot)}
-                      className="w-full rounded-md border border-dashed-soft bg-background py-2.5 font-mono text-sm tabular-nums transition-all hover:-translate-y-0.5 hover:border-accent-blue hover:text-accent-blue"
+                      className="w-full min-h-11 rounded-md border border-dashed-soft bg-background py-2.5 font-mono text-sm tabular-nums transition-all hover:-translate-y-0.5 hover:border-accent-blue hover:text-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       {time}
                     </button>
@@ -600,18 +605,15 @@ function ConfirmDialog({
   }, [state, onResult]);
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCancel();
-    };
-    document.addEventListener("keydown", onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const dialog = dialogRef.current;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    if (dialog && !dialog.open) dialog.showModal();
     nameRef.current?.focus();
     return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
+      if (dialog?.open) dialog.close();
+      previouslyFocused?.focus?.();
     };
-  }, [onCancel]);
+  }, []);
 
   const fieldErrors =
     state && state.status === "error" ? state.fieldErrors : {};
@@ -632,14 +634,15 @@ function ConfirmDialog({
   return (
     <dialog
       ref={dialogRef}
-      open
-      aria-modal="true"
       aria-label={labels.confirmTitle}
-      className="fixed inset-0 z-50 flex items-end justify-center bg-background/70 p-4 backdrop-blur sm:items-center"
+      className="m-auto max-w-md bg-transparent p-0 backdrop:bg-background/70 backdrop:backdrop-blur"
       onClick={(e) => {
         if (e.target === e.currentTarget) onCancel();
       }}
-      onCancel={onCancel}
+      onCancel={(e) => {
+        e.preventDefault();
+        onCancel();
+      }}
     >
       <div className="w-full max-w-md card-base card-flush rounded-surface overflow-hidden">
         <header className="border-b border-dashed-soft p-5">

@@ -53,7 +53,8 @@ export function WorkTimeline({
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-0.5 hover:text-accent-blue"
+                    aria-label={`${item.company} (opens in new tab)`}
+                    className="inline-flex items-center gap-0.5 rounded-sm underline-offset-4 hover:text-accent-blue hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {item.company}
                     <ArrowUpRight className="size-3.5" aria-hidden="true" />

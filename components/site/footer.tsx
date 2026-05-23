@@ -57,7 +57,7 @@ export async function Footer({ locale }: FooterProps) {
                     href={href}
                     target={external ? "_blank" : undefined}
                     rel={external ? "noopener noreferrer" : undefined}
-                    className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="inline-flex size-11 sm:size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     aria-label={link.label ?? link.kind}
                   >
                     <Icon className="size-4" aria-hidden="true" />

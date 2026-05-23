@@ -34,7 +34,7 @@ export function ProjectCard({ project, priority = false, labels }: ProjectCardPr
         target="_blank"
         rel="noopener noreferrer"
         className="flex flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-        aria-label={`${project.name ?? project.repo} — open project`}
+        aria-label={`${project.name ?? project.repo} — open project (new tab)`}
       >
         <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-dashed-soft bg-muted/30">
           <Image

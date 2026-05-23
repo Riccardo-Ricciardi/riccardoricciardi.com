@@ -36,7 +36,11 @@ export function ProjectsBoard({ projects, allLabel, narrativeLabels }: ProjectsB
   return (
     <div className="flex flex-col gap-6">
       {topics.length > 0 && (
-        <div className="-mx-1 flex flex-wrap gap-1.5 px-1">
+        <div
+          role="group"
+          aria-label={allLabel}
+          className="-mx-1 flex flex-wrap gap-1.5 px-1"
+        >
           <FilterChip
             label={allLabel}
             active={active === null}
@@ -52,6 +56,10 @@ export function ProjectsBoard({ projects, allLabel, narrativeLabels }: ProjectsB
           ))}
         </div>
       )}
+
+      <p aria-live="polite" className="sr-only">
+        {filtered.length}
+      </p>
 
       <ul className="grid list-none items-start gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((project, i) => (
