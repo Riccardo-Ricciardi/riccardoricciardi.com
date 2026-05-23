@@ -22,8 +22,6 @@ interface NavbarProps {
   ariaLabels: {
     nav: string;
     menu: string;
-    menuClose: string;
-    menuTitle: string;
     language: string;
     theme: string;
     home: string;
@@ -85,8 +83,6 @@ export function Navbar({
             items={items}
             locale={locale}
             ariaLabel={ariaLabels.menu}
-            closeLabel={ariaLabels.menuClose}
-            menuTitle={ariaLabels.menuTitle}
           />
         </div>
       </div>

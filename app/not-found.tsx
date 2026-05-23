@@ -36,8 +36,6 @@ const COPY = {
     aria: {
       nav: "Main navigation",
       menu: "Open menu",
-      menuClose: "Close menu",
-      menuTitle: "Menu",
       language: "Change language",
       theme: "Toggle theme",
       home: "Riccardo Ricciardi - Home",
@@ -52,8 +50,6 @@ const COPY = {
     aria: {
       nav: "Navigazione principale",
       menu: "Apri menu",
-      menuClose: "Chiudi menu",
-      menuTitle: "Menu",
       language: "Cambia lingua",
       theme: "Cambia tema",
       home: "Riccardo Ricciardi - Home",
