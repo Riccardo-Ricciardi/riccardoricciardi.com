@@ -314,7 +314,7 @@ function BookingWidgetInner({
                     type="button"
                     onClick={() => setEventSlug(t.slug)}
                     aria-pressed={active}
-                    aria-label={`${t.lengthInMinutes} ${labels.durationUnit} — ${t.title}`}
+                    aria-label={`${t.lengthInMinutes} ${labels.durationUnit} · ${t.title}`}
                     className={cn(
                       "pill-base pill-mono pill-interactive tabular-nums",
                       active && "pill-accent"

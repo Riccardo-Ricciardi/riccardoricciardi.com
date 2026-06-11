@@ -34,6 +34,12 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "supabase_not_configured" }, { status: 500 });
   }
 
+  // Proxy to the Supabase edge function (source: supabase/functions/sync-github).
+  // The sync must only touch projects with kind='repo' and a non-null repo;
+  // kind='case_study' rows are hand-authored and must never be updated or
+  // deleted by the sync. The guard lives in the edge function's select
+  // (.eq("kind", "repo").not("repo", "is", null)); redeploy the function
+  // after changing it, this route only forwards the request.
   const fnUrl = `${supabaseUrl}/functions/v1/sync-github`;
 
   try {

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { cookies, headers } from "next/headers";
 import { ArrowLeft } from "lucide-react";
-import { MouseParticles } from "@/components/mouse-particles";
 import { Eyebrow } from "@/components/site/atoms/eyebrow";
 import { isSupportedLanguage } from "@/utils/config/app";
 import { getDefaultLanguageCode } from "@/utils/i18n/languages";
@@ -42,18 +41,8 @@ export default async function LocaleNotFound() {
     <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden">
       <div
         aria-hidden="true"
-        className="bg-dot bg-dot-mask pointer-events-none absolute inset-0 -z-20"
+        className="bg-scan pointer-events-none absolute inset-0 -z-10"
       />
-      <div
-        aria-hidden="true"
-        className="gradient-glow pointer-events-none absolute inset-0 -z-10"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10"
-      >
-        <MouseParticles count={40} linkDistance={100} repelRadius={120} />
-      </div>
       <div className="container-page section-y">
         <div className="content-narrow flex flex-col items-center text-center">
           <Eyebrow>{copy.eyebrow}</Eyebrow>

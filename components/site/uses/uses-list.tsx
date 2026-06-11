@@ -1,12 +1,18 @@
-import Image from "next/image";
-import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { Eyebrow } from "@/components/site/atoms/eyebrow";
+import { cn } from "@/utils/cn";
 import type { UsesItem } from "@/utils/uses/fetch";
 
 interface UsesListProps {
   items: UsesItem[];
 }
+
+const CATEGORY_ORDER = [
+  "Hardware",
+  "Editor",
+  "Tooling",
+  "Hosting",
+  "AI Services",
+];
 
 export function UsesList({ items }: UsesListProps) {
   if (items.length === 0) return null;
@@ -18,13 +24,6 @@ export function UsesList({ items }: UsesListProps) {
     grouped.set(item.category, arr);
   }
 
-  const CATEGORY_ORDER = [
-    "Hardware",
-    "Editor",
-    "Tooling",
-    "Hosting",
-    "AI Services",
-  ];
   const categories = Array.from(grouped.keys()).sort((a, b) => {
     const ai = CATEGORY_ORDER.indexOf(a);
     const bi = CATEGORY_ORDER.indexOf(b);
@@ -32,14 +31,41 @@ export function UsesList({ items }: UsesListProps) {
   });
 
   return (
-    <div className="flex flex-col gap-12 md:gap-16">
-      {categories.map((category) => (
-        <section key={category}>
-          <Eyebrow as="span">{category}</Eyebrow>
-          <ul className="mt-4 grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="flex flex-col">
+      {categories.map((category, idx) => (
+        <section
+          key={category}
+          aria-label={category}
+          className={cn(
+            "grid gap-x-12 gap-y-6 py-10 first:pt-0 last:pb-0 md:grid-cols-[11rem_1fr]",
+            idx > 0 && "border-t border-border"
+          )}
+        >
+          <h2 className="text-h3">{category}</h2>
+          <ul className="flex list-none flex-col gap-6 p-0">
             {grouped.get(category)!.map((item) => (
-              <li key={item.id}>
-                <UsesCard item={item} />
+              <li key={item.id} className="flex flex-col gap-1">
+                {item.url ? (
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="self-start font-medium tracking-tight transition-colors hover:text-accent-blue"
+                  >
+                    {item.name}
+                    <ArrowUpRight
+                      className="mb-0.5 ml-1 inline size-3.5 text-muted-foreground"
+                      aria-hidden="true"
+                    />
+                  </a>
+                ) : (
+                  <span className="font-medium tracking-tight">{item.name}</span>
+                )}
+                {item.description && (
+                  <p className="text-body-sm max-w-prose text-muted-foreground">
+                    {item.description}
+                  </p>
+                )}
               </li>
             ))}
           </ul>
@@ -47,65 +73,4 @@ export function UsesList({ items }: UsesListProps) {
       ))}
     </div>
   );
-}
-
-function UsesCard({ item }: { item: UsesItem }) {
-  const className =
-    "group relative flex h-full flex-col gap-3 card-base card-interactive no-underline";
-
-  const Inner = (
-    <>
-      <div className="flex items-start justify-between gap-2">
-        <span className="grid size-10 shrink-0 place-items-center rounded-control border border-dashed-soft bg-background/60">
-          {item.icon_url ? (
-            <Image
-              src={item.icon_url}
-              alt=""
-              aria-hidden="true"
-              width={24}
-              height={24}
-              className="size-6 object-contain"
-              unoptimized
-            />
-          ) : (
-            <span className="font-mono text-xs font-semibold tracking-widest text-muted-foreground">
-              {item.name.slice(0, 2).toUpperCase()}
-            </span>
-          )}
-        </span>
-        {item.url && (
-          <ArrowUpRight
-            className="size-4 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-blue"
-            aria-hidden="true"
-          />
-        )}
-      </div>
-
-      <div className="min-w-0">
-        <p className="text-body-sm truncate font-medium tracking-tight">
-          {item.name}
-        </p>
-        {item.description && (
-          <p className="text-caption mt-1 line-clamp-3 leading-relaxed">
-            {item.description}
-          </p>
-        )}
-      </div>
-    </>
-  );
-
-  if (item.url) {
-    return (
-      <Link
-        href={item.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={className}
-      >
-        {Inner}
-      </Link>
-    );
-  }
-
-  return <div className={className}>{Inner}</div>;
 }

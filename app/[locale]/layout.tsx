@@ -137,6 +137,7 @@ export default async function LocaleLayout({
   return (
     <>
       <HtmlLangUpdater lang={locale} />
+      <div className="surface-grain" aria-hidden="true" />
       <SkipLink label={ariaLabels.skip} />
       <Navbar
         locale={locale}

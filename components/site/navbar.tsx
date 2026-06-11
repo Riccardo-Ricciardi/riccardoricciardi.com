@@ -44,18 +44,21 @@ export function Navbar({
       <div className="container-page flex h-14 items-center justify-between">
         <Link
           href={`/${locale}`}
-          className="block size-9 shrink-0 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex shrink-0 items-center gap-2.5 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label={ariaLabels.home}
         >
           <Image
             src={LOGO_URL}
             alt=""
             aria-hidden="true"
-            width={36}
-            height={36}
+            width={32}
+            height={32}
             priority
-            className="size-9 object-contain"
+            className="size-8 object-contain"
           />
+          <span className="hidden font-mono text-sm font-medium tracking-tight text-foreground sm:block">
+            riccardoricciardi
+          </span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-1 text-card-foreground">

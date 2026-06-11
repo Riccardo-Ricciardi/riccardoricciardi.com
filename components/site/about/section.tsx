@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, FileText } from "lucide-react";
@@ -5,7 +6,7 @@ import { getAboutSections } from "@/utils/about/fetch";
 import { getSiteIdentity } from "@/utils/identity/fetch";
 import type { SupportedLanguage } from "@/utils/config/app";
 import { Heading } from "@/components/site/atoms/heading";
-import { Eyebrow } from "@/components/site/atoms/eyebrow";
+import { StatusDot } from "@/components/site/atoms/status-dot";
 import { EmptyState } from "@/components/site/atoms/empty-state";
 
 interface AboutCta {
@@ -13,11 +14,26 @@ interface AboutCta {
   href: string;
 }
 
+interface AboutFacts {
+  location: string;
+  languages: string;
+  availability: string;
+}
+
+interface MakerCell {
+  label: string;
+  line: string;
+}
+
 interface AboutProps {
   heading: string;
-  eyebrow?: string;
   subtitle?: string;
   locale: SupportedLanguage;
+  facts: AboutFacts;
+  pullQuote: string;
+  makerHeading: string;
+  makerCells: MakerCell[];
+  makerUsesCell: MakerCell;
   emptyTitle: string;
   emptyBody: string;
   emptyCta: AboutCta;
@@ -27,9 +43,13 @@ interface AboutProps {
 
 export async function About({
   heading,
-  eyebrow,
   subtitle,
   locale,
+  facts,
+  pullQuote,
+  makerHeading,
+  makerCells,
+  makerUsesCell,
   emptyTitle,
   emptyBody,
   emptyCta,
@@ -41,6 +61,13 @@ export async function About({
     getSiteIdentity(),
   ]);
 
+  const initials = identity.name
+    .split(" ")
+    .map((s) => s[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <section
       aria-labelledby="about-heading"
@@ -48,7 +75,6 @@ export async function About({
     >
       <Heading
         level="h1"
-        eyebrow={eyebrow}
         title={heading}
         subtitle={subtitle}
         id="about-heading"
@@ -58,7 +84,7 @@ export async function About({
       <div className="grid gap-8 md:grid-cols-[1fr_2fr] md:gap-12 lg:gap-16">
         <aside className="md:sticky md:top-24 md:self-start">
           {identity.profile_photo_url ? (
-            <div className="relative aspect-[4/5] w-full max-w-sm overflow-hidden rounded-surface border border-dashed-soft">
+            <div className="relative aspect-[4/5] w-full max-w-sm overflow-hidden rounded-surface border border-border">
               <Image
                 src={identity.profile_photo_url}
                 alt={`${identity.name} portrait`}
@@ -69,17 +95,31 @@ export async function About({
               />
             </div>
           ) : (
-            <div className="grid aspect-[4/5] w-full max-w-sm place-items-center rounded-surface border border-dashed-soft bg-muted/30">
-              <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                {identity.name
-                  .split(" ")
-                  .map((s) => s[0])
-                  .join("")
-                  .slice(0, 2)}
+            <div className="grid aspect-[4/5] w-full max-w-sm place-items-center rounded-surface bg-muted">
+              <span className="font-mono text-sm tracking-[0.2em] text-muted-foreground">
+                {initials}
               </span>
             </div>
           )}
-          <Eyebrow className="mt-4">{identity.name}</Eyebrow>
+
+          <ul className="mt-5 flex w-full max-w-sm list-none flex-col gap-2.5 p-0">
+            <li className="text-telemetry">{facts.location}</li>
+            <li className="text-telemetry">{facts.languages}</li>
+            <li className="text-telemetry flex items-center gap-2">
+              <StatusDot state="live" />
+              {facts.availability}
+            </li>
+            {identity.email && (
+              <li>
+                <a
+                  href={`mailto:${identity.email}`}
+                  className="text-telemetry transition-colors hover:text-foreground"
+                >
+                  {identity.email}
+                </a>
+              </li>
+            )}
+          </ul>
         </aside>
 
         <div className="flex flex-col gap-8 md:gap-10">
@@ -94,22 +134,60 @@ export async function About({
           ) : (
             <>
               {sections.map((section, i) => (
-                <article key={section.id} className="flex flex-col gap-3">
-                  <div className="flex items-baseline gap-3">
-                    <Eyebrow as="span" className="tabular-nums">
-                      {String(i + 1).padStart(2, "0")}
-                    </Eyebrow>
-                    {section.heading && (
-                      <h3 className="text-h3">{section.heading}</h3>
-                    )}
-                  </div>
-                  <div className="text-body-lg ml-9 whitespace-pre-line text-foreground/85">
-                    {section.body}
-                  </div>
-                </article>
+                <Fragment key={section.id}>
+                  <article className="flex flex-col gap-3">
+                    <div className="flex items-baseline gap-3">
+                      <span aria-hidden="true" className="text-telemetry">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      {section.heading && (
+                        <h2 className="text-h3">{section.heading}</h2>
+                      )}
+                    </div>
+                    <div className="text-body-lg ml-9 whitespace-pre-line text-foreground/85">
+                      {section.body}
+                    </div>
+                  </article>
+                  {i === 1 && (
+                    <blockquote className="text-h1 max-w-[24ch] text-balance py-4">
+                      {pullQuote}
+                    </blockquote>
+                  )}
+                </Fragment>
               ))}
 
-              <footer className="mt-4 flex flex-col gap-3 border-t border-dashed-soft pt-8 sm:flex-row sm:items-center">
+              <div className="mt-2 flex flex-col gap-4">
+                <h2 className="text-h3">{makerHeading}</h2>
+                <div className="grid gap-3 sm:grid-cols-[1.4fr_1fr_1fr]">
+                  {makerCells.map((cell) => (
+                    <div key={cell.label} className="card-base flex flex-col gap-2">
+                      <span className="text-telemetry text-foreground">
+                        {cell.label}
+                      </span>
+                      <span className="text-body-sm text-muted-foreground">
+                        {cell.line}
+                      </span>
+                    </div>
+                  ))}
+                  <Link
+                    href={`/${locale}/uses`}
+                    className="group card-base card-interactive flex flex-col gap-2 no-underline"
+                  >
+                    <span className="text-telemetry flex items-center justify-between text-foreground">
+                      {makerUsesCell.label}
+                      <ArrowRight
+                        className="size-3.5 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+                        aria-hidden="true"
+                      />
+                    </span>
+                    <span className="text-body-sm text-muted-foreground">
+                      {makerUsesCell.line}
+                    </span>
+                  </Link>
+                </div>
+              </div>
+
+              <footer className="mt-4 flex flex-col gap-3 border-t border-border pt-8 sm:flex-row sm:items-center">
                 <Link href={primaryCta.href} className="btn-base btn-primary">
                   {primaryCta.label}
                   <ArrowRight className="size-4" aria-hidden="true" />

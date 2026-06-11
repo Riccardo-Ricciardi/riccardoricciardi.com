@@ -206,9 +206,11 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string | null
+          featured: boolean
           forks: number | null
           homepage: string | null
           id: string
+          kind: string
           language: string | null
           name: string | null
           og_image: string | null
@@ -216,11 +218,15 @@ export type Database = {
           position: number
           problem: string | null
           pushed_at: string | null
-          repo: string
+          repo: string | null
           screenshot_url: string | null
+          slug: string | null
           solution: string | null
           stars: number | null
+          status: string | null
+          surface: string | null
           synced_at: string | null
+          telemetry: string | null
           topics: string[] | null
           url: string | null
           visible: boolean
@@ -228,9 +234,11 @@ export type Database = {
         Insert: {
           created_at?: string | null
           description?: string | null
+          featured?: boolean
           forks?: number | null
           homepage?: string | null
           id?: string
+          kind?: string
           language?: string | null
           name?: string | null
           og_image?: string | null
@@ -238,11 +246,15 @@ export type Database = {
           position?: number
           problem?: string | null
           pushed_at?: string | null
-          repo: string
+          repo?: string | null
           screenshot_url?: string | null
+          slug?: string | null
           solution?: string | null
           stars?: number | null
+          status?: string | null
+          surface?: string | null
           synced_at?: string | null
+          telemetry?: string | null
           topics?: string[] | null
           url?: string | null
           visible?: boolean
@@ -250,9 +262,11 @@ export type Database = {
         Update: {
           created_at?: string | null
           description?: string | null
+          featured?: boolean
           forks?: number | null
           homepage?: string | null
           id?: string
+          kind?: string
           language?: string | null
           name?: string | null
           og_image?: string | null
@@ -260,11 +274,15 @@ export type Database = {
           position?: number
           problem?: string | null
           pushed_at?: string | null
-          repo?: string
+          repo?: string | null
           screenshot_url?: string | null
+          slug?: string | null
           solution?: string | null
           stars?: number | null
+          status?: string | null
+          surface?: string | null
           synced_at?: string | null
+          telemetry?: string | null
           topics?: string[] | null
           url?: string | null
           visible?: boolean
@@ -275,6 +293,8 @@ export type Database = {
         Row: {
           description: string | null
           language_id: number
+          metrics: string[]
+          one_liner: string | null
           outcome: string | null
           problem: string | null
           project_id: string
@@ -283,6 +303,8 @@ export type Database = {
         Insert: {
           description?: string | null
           language_id: number
+          metrics?: string[]
+          one_liner?: string | null
           outcome?: string | null
           problem?: string | null
           project_id: string
@@ -291,6 +313,8 @@ export type Database = {
         Update: {
           description?: string | null
           language_id?: number
+          metrics?: string[]
+          one_liner?: string | null
           outcome?: string | null
           problem?: string | null
           project_id?: string
@@ -309,6 +333,63 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipping_log: {
+        Row: {
+          created_at: string | null
+          happened_on: string
+          id: number
+          position: number
+          visible: boolean
+        }
+        Insert: {
+          created_at?: string | null
+          happened_on: string
+          id?: number
+          position?: number
+          visible?: boolean
+        }
+        Update: {
+          created_at?: string | null
+          happened_on?: string
+          id?: number
+          position?: number
+          visible?: boolean
+        }
+        Relationships: []
+      }
+      shipping_log_i18n: {
+        Row: {
+          body: string
+          language_id: number
+          log_id: number
+        }
+        Insert: {
+          body: string
+          language_id: number
+          log_id: number
+        }
+        Update: {
+          body?: string
+          language_id?: number
+          log_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipping_log_i18n_language_id_fkey"
+            columns: ["language_id"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipping_log_i18n_log_id_fkey"
+            columns: ["log_id"]
+            isOneToOne: false
+            referencedRelation: "shipping_log"
             referencedColumns: ["id"]
           },
         ]

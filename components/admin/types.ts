@@ -19,7 +19,7 @@ export type SkillCategory = {
 
 export type Project = {
   id: string;
-  repo: string;
+  repo: string | null;
   name: string | null;
   description: string | null;
   url: string | null;
@@ -33,6 +33,12 @@ export type Project = {
   position: number;
   visible: boolean;
   synced_at: string | null;
+  kind: string;
+  status: string | null;
+  surface: string | null;
+  telemetry: string | null;
+  featured: boolean;
+  slug: string | null;
 };
 
 export type SocialLink = {

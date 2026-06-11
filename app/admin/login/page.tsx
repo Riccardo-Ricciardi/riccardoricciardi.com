@@ -30,7 +30,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
     <div className="relative min-h-screen overflow-hidden bg-background">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-dot bg-dot-mask opacity-50"
+        className="bg-scan pointer-events-none absolute inset-0 opacity-50"
       />
       <div className="relative mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-16">
         <Link

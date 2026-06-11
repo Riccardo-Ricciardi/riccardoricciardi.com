@@ -92,10 +92,11 @@ function SortableRow({
     transform: CSS.Transform.toString(transform),
     transition,
   };
+  const title = row.repo ?? row.slug ?? row.name ?? "untitled";
   const imgSrc =
     row.screenshot_url ||
     row.og_image ||
-    `https://opengraph.githubassets.com/1/${row.repo}`;
+    (row.repo ? `https://opengraph.githubassets.com/1/${row.repo}` : null);
 
   return (
     <li
@@ -109,7 +110,7 @@ function SortableRow({
       <input type="hidden" name={`project[${row.id}][__row]`} value="1" />
       <button
         type="button"
-        aria-label={`Drag ${row.repo}`}
+        aria-label={`Drag ${title}`}
         {...attributes}
         {...listeners}
         className="grid size-9 cursor-grab place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
@@ -120,24 +121,29 @@ function SortableRow({
       <Link
         href={`/admin/projects/${row.id}`}
         className="relative block aspect-[16/9] w-14 overflow-hidden rounded-md border admin-divider bg-muted/30 hover:border-accent-blue sm:w-20"
-        aria-label={`Edit ${row.repo}`}
+        aria-label={`Edit ${title}`}
       >
-        <Image
-          src={imgSrc}
-          alt=""
-          fill
-          sizes="80px"
-          className="object-cover"
-          unoptimized
-        />
+        {imgSrc && (
+          <Image
+            src={imgSrc}
+            alt=""
+            fill
+            sizes="80px"
+            className="object-cover"
+            unoptimized
+          />
+        )}
       </Link>
 
       <Link href={`/admin/projects/${row.id}`} className="min-w-0">
         <p className="truncate font-mono text-sm font-medium hover:text-accent-blue">
-          {row.repo}
+          {title}
         </p>
         <p className="truncate text-[11px] text-muted-foreground">
           {row.name ?? "—"}{" "}
+          {row.kind === "case_study" && (
+            <span className="ml-1 font-mono">· case study</span>
+          )}
           {row.language && (
             <span className="ml-1 font-mono">· {row.language}</span>
           )}
@@ -174,7 +180,7 @@ function SortableRow({
       <DeleteButton
         action={deleteAction}
         fieldValue={row.id}
-        label={row.repo}
+        label={title}
         iconOnly
       />
     </li>

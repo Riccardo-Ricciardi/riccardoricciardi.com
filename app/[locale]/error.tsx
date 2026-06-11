@@ -21,7 +21,7 @@ const COPY: Record<"en" | "it", ErrorCopy> = {
     eyebrow: "Something went wrong",
     title: "An unexpected error occurred",
     description:
-      "I've been notified — you can try again, or head back to the homepage.",
+      "I've been notified. You can try again, or head back to the homepage.",
     retry: "Try again",
     home: "Back to home",
   },
@@ -29,7 +29,7 @@ const COPY: Record<"en" | "it", ErrorCopy> = {
     eyebrow: "Qualcosa è andato storto",
     title: "Si è verificato un errore imprevisto",
     description:
-      "Sono stato avvisato — puoi riprovare o tornare alla homepage.",
+      "Sono stato avvisato. Puoi riprovare o tornare alla homepage.",
     retry: "Riprova",
     home: "Torna alla home",
   },

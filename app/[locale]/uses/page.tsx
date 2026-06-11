@@ -5,6 +5,7 @@ import { Package } from "lucide-react";
 import { Heading } from "@/components/site/atoms/heading";
 import { EmptyState } from "@/components/site/atoms/empty-state";
 import { UsesList } from "@/components/site/uses/uses-list";
+import { StackStrip } from "@/components/site/uses/stack-strip";
 import { getUsesItems } from "@/utils/uses/fetch";
 import { APP_CONFIG } from "@/utils/config/app";
 import {
@@ -54,11 +55,13 @@ export async function generateMetadata({
 
 async function UsesFeed({
   locale,
+  updatedLabel,
   emptyLabel,
   emptyTitle,
   emptyCta,
 }: {
   locale: string;
+  updatedLabel: string;
   emptyLabel: string;
   emptyTitle: string;
   emptyCta: string;
@@ -76,25 +79,62 @@ async function UsesFeed({
     );
   }
 
-  return <UsesList items={items} />;
+  const latest = items.reduce<string | null>(
+    (max, item) =>
+      item.updated_at && (!max || item.updated_at > max)
+        ? item.updated_at
+        : max,
+    null
+  );
+
+  return (
+    <>
+      {latest && (
+        <p className="text-telemetry mb-8 text-right">
+          {updatedLabel} {latest.slice(0, 7)}
+        </p>
+      )}
+      <UsesList items={items} />
+    </>
+  );
 }
 
 function UsesFeedSkeleton() {
   return (
-    <div className="flex flex-col gap-12 md:gap-16">
+    <div className="flex flex-col">
+      <div className="mb-8 h-3 w-32 animate-pulse self-end rounded bg-muted" />
       {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i}>
-          <div className="mb-4 h-3 w-24 animate-pulse rounded bg-muted" />
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div
+          key={i}
+          className={
+            "grid gap-x-12 gap-y-6 py-10 first:pt-0 md:grid-cols-[11rem_1fr]" +
+            (i > 0 ? " border-t border-border" : "")
+          }
+        >
+          <div className="h-5 w-24 animate-pulse rounded bg-muted" />
+          <div className="flex flex-col gap-6">
             {Array.from({ length: 3 }).map((_, j) => (
-              <div
-                key={j}
-                className="h-20 animate-pulse rounded-surface bg-muted"
-              />
+              <div key={j} className="flex flex-col gap-2">
+                <div className="h-4 w-36 animate-pulse rounded bg-muted" />
+                <div className="h-4 w-full max-w-prose animate-pulse rounded bg-muted" />
+              </div>
             ))}
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+function StackStripSkeleton() {
+  return (
+    <div className="mt-16 border-t border-border pt-10 md:mt-20">
+      <div className="h-5 w-48 animate-pulse rounded bg-muted" />
+      <div className="mt-6 flex flex-wrap gap-x-5 gap-y-4">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div key={i} className="size-6 animate-pulse rounded bg-muted" />
+        ))}
+      </div>
     </div>
   );
 }
@@ -104,12 +144,31 @@ export default async function UsesPage({ params }: PageProps) {
   if (!(await isKnownLocale(locale))) notFound();
 
   const blocks = await getContentBlocks(locale);
+  const isIt = locale === "it";
   const heading = content(blocks, "uses_heading", "Uses");
-  const eyebrow = content(blocks, "uses_eyebrow", "/uses");
-  const subtitle = content(
+  const intro = content(
     blocks,
-    "uses_subtitle",
-    "Hardware, editors, libraries, services. What I actually use."
+    "uses_intro_sv",
+    isIt
+      ? "Niente lista della spesa. Solo gli strumenti che apro ogni settimana, con il motivo per cui restano."
+      : "Not a shopping list. Just the tools I open every week, and why they stay."
+  );
+  const updatedLabel = content(
+    blocks,
+    "uses_updated_label",
+    isIt ? "aggiornato" : "updated"
+  );
+  const stackHeading = content(
+    blocks,
+    "uses_stack_heading",
+    isIt ? "Tutto il resto del cassetto" : "Everything in the drawer"
+  );
+  const stackSrLabel = content(
+    blocks,
+    "uses_stack_sr_label",
+    isIt
+      ? "Loghi degli strumenti e delle tecnologie che uso"
+      : "Logos of the tools and technologies I use"
   );
   const emptyLabel = content(
     blocks,
@@ -119,12 +178,12 @@ export default async function UsesPage({ params }: PageProps) {
   const emptyTitle = content(
     blocks,
     "uses_empty_title",
-    locale === "it" ? "In allestimento." : "Still curating."
+    isIt ? "In allestimento." : "Still curating."
   );
   const emptyCta = content(
     blocks,
     "uses_empty_cta",
-    locale === "it" ? "Chiedi cosa uso" : "Ask what I use"
+    isIt ? "Chiedi cosa uso" : "Ask what I use"
   );
 
   return (
@@ -134,9 +193,8 @@ export default async function UsesPage({ params }: PageProps) {
     >
       <Heading
         level="h1"
-        eyebrow={eyebrow}
         title={heading}
-        subtitle={subtitle}
+        subtitle={intro}
         id="uses-heading"
         className="mb-12 md:mb-16"
       />
@@ -144,10 +202,15 @@ export default async function UsesPage({ params }: PageProps) {
       <Suspense fallback={<UsesFeedSkeleton />}>
         <UsesFeed
           locale={locale}
+          updatedLabel={updatedLabel}
           emptyLabel={emptyLabel}
           emptyTitle={emptyTitle}
           emptyCta={emptyCta}
         />
+      </Suspense>
+
+      <Suspense fallback={<StackStripSkeleton />}>
+        <StackStrip heading={stackHeading} srLabel={stackSrLabel} />
       </Suspense>
     </section>
   );

@@ -1,7 +1,7 @@
 import { APP_CONFIG, isSupportedLanguage } from "@/utils/config/app";
 import { renderOg, ogContentType, ogSize } from "@/utils/og/render";
 
-export const alt = "Uses — Riccardo Ricciardi";
+export const alt = "Uses · Riccardo Ricciardi";
 export const size = ogSize;
 export const contentType = ogContentType;
 

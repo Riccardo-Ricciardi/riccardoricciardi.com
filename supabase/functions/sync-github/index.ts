@@ -133,9 +133,13 @@ Deno.serve(async (req: Request) => {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
+  // Sync guard: only GitHub-backed rows. Rows with kind='case_study' are
+  // hand-authored and must never be touched by this sync (no update, no delete).
   const { data: rows, error } = await supabase
     .from("projects")
-    .select("id, repo");
+    .select("id, repo")
+    .eq("kind", "repo")
+    .not("repo", "is", null);
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {

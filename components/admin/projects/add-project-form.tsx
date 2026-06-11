@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import { SubmitButton } from "@/components/admin/actions/submit-button";
+
+type ProjectKind = "repo" | "case_study";
 
 export function AddProjectForm({
   action,
@@ -10,24 +12,52 @@ export function AddProjectForm({
   action: (formData: FormData) => Promise<void>;
 }) {
   const ref = useRef<HTMLFormElement>(null);
+  const [kind, setKind] = useState<ProjectKind>("repo");
   return (
     <form
       ref={ref}
       action={async (fd) => {
         await action(fd);
         ref.current?.reset();
+        setKind("repo");
       }}
-      className="admin-card grid grid-cols-1 gap-2 p-3 sm:grid-cols-[minmax(0,1fr)_8rem_auto]"
+      className="admin-card grid grid-cols-1 gap-2 p-3 sm:grid-cols-[9rem_minmax(0,1fr)_8rem_auto]"
     >
       <label className="flex flex-col gap-1.5">
-        <span className="admin-eyebrow">Repo (owner/name)</span>
-        <input
-          name="repo"
-          required
-          placeholder="Riccardo-Ricciardi/example"
+        <span className="admin-eyebrow">Kind</span>
+        <select
+          name="kind"
+          value={kind}
+          onChange={(e) =>
+            setKind(e.target.value === "case_study" ? "case_study" : "repo")
+          }
           className="admin-input"
-        />
+        >
+          <option value="repo">Repo</option>
+          <option value="case_study">Case study</option>
+        </select>
       </label>
+      {kind === "repo" ? (
+        <label className="flex flex-col gap-1.5">
+          <span className="admin-eyebrow">Repo (owner/name)</span>
+          <input
+            name="repo"
+            required
+            placeholder="Riccardo-Ricciardi/example"
+            className="admin-input"
+          />
+        </label>
+      ) : (
+        <label className="flex flex-col gap-1.5">
+          <span className="admin-eyebrow">Slug (kebab-case)</span>
+          <input
+            name="slug"
+            required
+            placeholder="client-dashboard"
+            className="admin-input"
+          />
+        </label>
+      )}
       <label className="flex items-end gap-2 sm:pb-2">
         <input
           type="checkbox"

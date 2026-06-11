@@ -18,10 +18,10 @@ import { Heading } from "@/components/site/atoms/heading";
 
 interface ContactProps {
   heading: string;
-  eyebrow?: string;
   subtitle?: string;
   trust?: string;
   trustItems?: string[];
+  email?: string | null;
 }
 
 function splitTrust(trust?: string, fallback?: string[]): string[] {
@@ -36,10 +36,10 @@ function splitTrust(trust?: string, fallback?: string[]): string[] {
 
 export function Contact({
   heading,
-  eyebrow,
   subtitle,
   trust,
   trustItems,
+  email,
 }: ContactProps) {
   const items = splitTrust(trust, trustItems);
   const icons = [Clock, ShieldCheck];
@@ -52,7 +52,6 @@ export function Contact({
       <div className="content-narrow flex flex-col items-center text-center">
         <Heading
           level="h1"
-          eyebrow={eyebrow}
           title={heading}
           subtitle={subtitle}
           align="center"
@@ -77,6 +76,15 @@ export function Contact({
               );
             })}
           </ul>
+        )}
+
+        {email && (
+          <a
+            href={`mailto:${email}`}
+            className="text-telemetry mt-5 transition-colors hover:text-foreground"
+          >
+            {email}
+          </a>
         )}
       </div>
     </section>

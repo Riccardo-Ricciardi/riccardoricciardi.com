@@ -1,11 +1,21 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Clock4 } from "lucide-react";
 import { Heading } from "@/components/site/atoms/heading";
-import { EmptyState } from "@/components/site/atoms/empty-state";
-import { WorkTimeline } from "@/components/site/work/timeline";
-import { getWorkExperience } from "@/utils/work/fetch";
+import {
+  CaseStudies,
+  CaseStudiesSkeleton,
+} from "@/components/site/work/case-studies";
+import {
+  ShippingLog,
+  ShippingLogSkeleton,
+} from "@/components/site/work/shipping-log";
+import {
+  GithubStrip,
+  GithubStripSkeleton,
+} from "@/components/site/work/github-strip";
+import { ClosingCta } from "@/components/site/closing-cta";
+import { getSiteIdentity } from "@/utils/identity/fetch";
 import { APP_CONFIG } from "@/utils/config/app";
 import {
   getLanguageCodes,
@@ -52,112 +62,113 @@ export async function generateMetadata({
   };
 }
 
-async function WorkList({ locale }: { locale: string }) {
-  const [items, blocks] = await Promise.all([
-    getWorkExperience(locale),
-    getContentBlocks(locale),
-  ]);
-
-  const currentLabel = content(blocks, "work_current_label", "current");
-  const presentLabel = content(blocks, "work_present_label", "present");
-  const emptyTitle = content(
-    blocks,
-    "work_empty_title",
-    locale === "it" ? "Presto qui." : "Soon here."
-  );
-  const emptyBody = content(
-    blocks,
-    "work_empty_body",
-    locale === "it"
-      ? "Sto preparando una timeline curata delle esperienze più rilevanti. Nel frattempo, se vuoi parlarne con me, scrivimi."
-      : "I'm putting together a curated timeline of the most relevant roles. In the meantime, drop me a line if you want to talk."
-  );
-  const emptyCta = content(
-    blocks,
-    "work_empty_cta",
-    locale === "it" ? "Parliamone" : "Get in touch"
-  );
-
-  if (items.length === 0) {
-    return (
-      <EmptyState
-        icon={Clock4}
-        title={emptyTitle}
-        description={emptyBody}
-        action={{ href: `/${locale}/contact`, label: emptyCta }}
-      />
-    );
-  }
-
-  return (
-    <WorkTimeline
-      items={items}
-      locale={locale}
-      currentLabel={currentLabel}
-      presentLabel={presentLabel}
-    />
-  );
-}
-
-function WorkListSkeleton() {
-  return (
-    <div className="flex flex-col gap-0">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div
-          key={i}
-          className="flex gap-6 border-b border-dashed-soft py-8 first:border-t"
-        >
-          <div className="flex flex-col items-center gap-2 pt-1">
-            <div className="size-2.5 animate-pulse rounded-full bg-muted" />
-            <div className="w-px flex-1 animate-pulse bg-muted" />
-          </div>
-          <div className="flex flex-1 flex-col gap-3 pb-2">
-            <div className="h-5 w-40 animate-pulse rounded bg-muted" />
-            <div className="h-4 w-28 animate-pulse rounded bg-muted" />
-            <div className="h-3 w-24 animate-pulse rounded bg-muted" />
-            <div className="mt-2 flex flex-col gap-1.5">
-              <div className="h-3 w-full animate-pulse rounded bg-muted" />
-              <div className="h-3 w-5/6 animate-pulse rounded bg-muted" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default async function WorkPage({ params }: PageProps) {
   const { locale } = await params;
   if (!(await isKnownLocale(locale))) notFound();
 
-  const blocks = await getContentBlocks(locale);
-  const heading = content(blocks, "work_heading", "Work");
-  const eyebrow = content(blocks, "work_eyebrow", "/work");
-  const subtitle = content(
+  const isIt = locale === "it";
+  const [blocks, identity] = await Promise.all([
+    getContentBlocks(locale),
+    getSiteIdentity(),
+  ]);
+
+  const heading = content(
     blocks,
-    "work_subtitle",
-    "A timeline of roles, companies, and turning points."
+    "work_heading",
+    isIt ? "Lavori" : "Work"
+  );
+  const intro = content(
+    blocks,
+    "work_intro_sv",
+    isIt
+      ? "Non una lista di progetti. Sistemi in produzione, con problemi veri e numeri veri. Questo è quello che gira adesso."
+      : "Not a project list. Systems in production, with real problems and real numbers. This is what's running now."
+  );
+  const problemLabel = content(
+    blocks,
+    "work_problem_label",
+    isIt ? "Problema" : "Problem"
+  );
+  const solutionLabel = content(
+    blocks,
+    "work_solution_label",
+    isIt ? "Soluzione" : "Solution"
+  );
+  const outcomeLabel = content(
+    blocks,
+    "work_outcome_label",
+    isIt ? "Risultato" : "Outcome"
+  );
+  const shippingHeading = content(
+    blocks,
+    "shipping_log_heading",
+    isIt ? "Registro dei rilasci" : "Shipping log"
+  );
+  const githubHeading = content(
+    blocks,
+    "github_strip_heading",
+    isIt ? "Altri esperimenti su GitHub" : "More experiments on GitHub"
+  );
+  const closingHeading = content(
+    blocks,
+    "closing_heading",
+    isIt ? "Hai un processo che fa male?" : "Got a process that hurts?"
+  );
+  const closingSub = content(
+    blocks,
+    "closing_sub",
+    isIt
+      ? "Raccontami cosa ti mangia le ore. Se il software può sistemarlo ti dico come. Rispondo io, entro 24 ore."
+      : "Tell me what eats your hours. If software can fix it, I'll tell you how. I reply personally, within 24 hours."
+  );
+  const contactLabel = content(
+    blocks,
+    "contact_label",
+    isIt ? "Scrivimi" : "Write me"
   );
 
   return (
-    <section
-      aria-labelledby="work-heading"
-      className="container-page section-divider-b section-y"
-    >
-      <div className="content-narrow">
-        <Heading
-          level="h1"
-          eyebrow={eyebrow}
-          title={heading}
-          subtitle={subtitle}
-          id="work-heading"
-          className="mb-12 md:mb-16"
-        />
+    <>
+      <section
+        aria-labelledby="work-heading"
+        className="container-page section-divider-b section-y"
+      >
+        <div className="content-narrow">
+          <Heading
+            level="h1"
+            title={heading}
+            subtitle={intro}
+            id="work-heading"
+          />
+        </div>
+      </section>
 
-        <Suspense fallback={<WorkListSkeleton />}>
-          <WorkList locale={locale} />
-        </Suspense>
-      </div>
-    </section>
+      <Suspense fallback={<CaseStudiesSkeleton />}>
+        <CaseStudies
+          locale={locale}
+          labels={{
+            problem: problemLabel,
+            solution: solutionLabel,
+            outcome: outcomeLabel,
+          }}
+        />
+      </Suspense>
+
+      <Suspense fallback={<ShippingLogSkeleton />}>
+        <ShippingLog locale={locale} heading={shippingHeading} />
+      </Suspense>
+
+      <Suspense fallback={<GithubStripSkeleton />}>
+        <GithubStrip locale={locale} heading={githubHeading} />
+      </Suspense>
+
+      <ClosingCta
+        heading={closingHeading}
+        sub={closingSub}
+        buttonLabel={contactLabel}
+        href={`/${locale}/contact`}
+        email={identity.email}
+      />
+    </>
   );
 }

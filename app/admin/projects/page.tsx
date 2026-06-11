@@ -23,7 +23,7 @@ export default async function ProjectsAdminPage() {
   const { data } = await supabase
     .from("projects")
     .select(
-      "id, repo, name, description, url, homepage, stars, forks, language, topics, og_image, screenshot_url, position, visible, synced_at"
+      "id, repo, name, description, url, homepage, stars, forks, language, topics, og_image, screenshot_url, position, visible, synced_at, kind, status, surface, telemetry, featured, slug"
     )
     .order("position", { ascending: true });
 

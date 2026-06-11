@@ -1,17 +1,21 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { MouseParticles } from "@/components/mouse-particles";
+import { StatusDot } from "@/components/site/atoms/status-dot";
 
 interface HeroProps {
+  wordmarkLine: string;
+  availability: string;
   title: string;
-  subtitle: string;
+  proofClause: string;
   primaryCta: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
 }
 
 export function Hero({
+  wordmarkLine,
+  availability,
   title,
-  subtitle,
+  proofClause,
   primaryCta,
   secondaryCta,
 }: HeroProps) {
@@ -19,28 +23,40 @@ export function Hero({
     <section className="section-divider-b relative">
       <div
         aria-hidden="true"
-        className="bg-dot bg-dot-mask pointer-events-none absolute inset-0 -z-20"
+        className="bg-scan pointer-events-none absolute inset-0 -z-10"
       />
-      <div
-        aria-hidden="true"
-        className="gradient-glow pointer-events-none absolute inset-0 -z-10"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 hidden md:block"
-      >
-        <MouseParticles count={55} linkDistance={110} repelRadius={130} />
-      </div>
 
       <div className="container-page section-y">
-        <div className="content-narrow flex flex-col items-center text-center">
-          <h1 className="text-display text-balance">
+        <div className="flex max-w-4xl flex-col items-start gap-6">
+          <div
+            className="enter-fade-up flex w-full flex-wrap items-center justify-between gap-3"
+            style={{ "--enter-delay": "0ms" } as React.CSSProperties}
+          >
+            <p className="text-eyebrow">{wordmarkLine}</p>
+            <p className="pill-base text-telemetry">
+              <StatusDot state="live" />
+              {availability}
+            </p>
+          </div>
+
+          <h1
+            className="text-display enter-fade-up text-balance"
+            style={{ "--enter-delay": "60ms" } as React.CSSProperties}
+          >
             {title}
           </h1>
-          <p className="text-body-lg mt-5 max-w-2xl text-balance text-muted-foreground">
-            {subtitle}
+
+          <p
+            className="text-body-lg enter-fade-up max-w-2xl text-muted-foreground"
+            style={{ "--enter-delay": "120ms" } as React.CSSProperties}
+          >
+            {proofClause}
           </p>
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+
+          <div
+            className="enter-fade-up flex flex-wrap items-center gap-3"
+            style={{ "--enter-delay": "180ms" } as React.CSSProperties}
+          >
             <Link href={primaryCta.href} className="btn-base btn-lg btn-primary">
               {primaryCta.label}
               <ArrowRight className="ml-1 size-4" aria-hidden="true" />

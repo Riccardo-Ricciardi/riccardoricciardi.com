@@ -1,5 +1,6 @@
 "use server";
 
+import { z } from "zod";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { requireAdmin } from "@/utils/auth/admin";
 import {
@@ -8,17 +9,49 @@ import {
   pathFromPublicUrl,
 } from "@/utils/storage/upload";
 import { getCronSecretOptional, getSiteUrlOptional } from "@/utils/env";
-import { asBool, asInt, asStr, bounce } from "./_shared";
+import { asBool, asInt, asNullableStr, asStr, bounce } from "./_shared";
 
 const PATH = "/admin/projects";
+
+const kindSchema = z.enum(["repo", "case_study"]);
+const statusSchema = z.enum(["live", "shipped", "archived"]);
+const slugSchema = z
+  .string()
+  .min(1)
+  .max(80)
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug must be lowercase kebab-case");
+
+type ProjectKind = z.infer<typeof kindSchema>;
+
+function parseSlug(
+  raw: string,
+  kind: ProjectKind,
+  errPath: string
+): string | null {
+  if (kind === "case_study") {
+    const parsed = slugSchema.safeParse(raw);
+    if (!parsed.success) bounce(errPath, undefined, "slug_required");
+    return parsed.data;
+  }
+  if (!raw) return null;
+  const parsed = slugSchema.safeParse(raw);
+  if (!parsed.success) bounce(errPath, undefined, "invalid_slug");
+  return parsed.data;
+}
 
 export async function createProjectAction(formData: FormData) {
   await requireAdmin();
   const supabase = createAdminClient();
 
-  const repo = asStr(formData.get("repo"));
+  const kindParsed = kindSchema.safeParse(asStr(formData.get("kind")) || "repo");
+  if (!kindParsed.success) bounce(PATH, undefined, "invalid_kind");
+  const kind = kindParsed.data;
+
+  const repo = asNullableStr(formData.get("repo"));
   const visible = asBool(formData.get("visible"));
-  if (!repo) bounce(PATH, undefined, "repo_required");
+  if (kind === "repo" && !repo) bounce(PATH, undefined, "repo_required");
+
+  const slug = parseSlug(asStr(formData.get("slug")).toLowerCase(), kind, PATH);
 
   const { data: maxRow } = await supabase
     .from("projects")
@@ -30,10 +63,52 @@ export async function createProjectAction(formData: FormData) {
 
   const { error } = await supabase
     .from("projects")
-    .insert({ repo, visible, position: maxPos + 1 });
+    .insert({ repo, kind, slug, visible, position: maxPos + 1 });
   if (error) bounce(PATH, undefined, encodeURIComponent(error.message));
 
   bounce(PATH, "created");
+}
+
+export async function updateProjectDetailsAction(formData: FormData) {
+  await requireAdmin();
+  const supabase = createAdminClient();
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) bounce(PATH);
+  const detailPath = `${PATH}/${id}`;
+
+  const kindParsed = kindSchema.safeParse(asStr(formData.get("kind")));
+  if (!kindParsed.success) bounce(detailPath, undefined, "invalid_kind");
+  const kind = kindParsed.data;
+
+  const statusRaw = asStr(formData.get("status"));
+  let status: string | null = null;
+  if (statusRaw && statusRaw !== "none") {
+    const statusParsed = statusSchema.safeParse(statusRaw);
+    if (!statusParsed.success) bounce(detailPath, undefined, "invalid_status");
+    status = statusParsed.data;
+  }
+
+  const repo = asNullableStr(formData.get("repo"));
+  if (kind === "repo" && !repo) bounce(detailPath, undefined, "repo_required");
+
+  const slug = parseSlug(
+    asStr(formData.get("slug")).toLowerCase(),
+    kind,
+    detailPath
+  );
+
+  const surface = asNullableStr(formData.get("surface"));
+  const telemetry = asNullableStr(formData.get("telemetry"));
+  const featured = asBool(formData.get("featured"));
+
+  const { error } = await supabase
+    .from("projects")
+    .update({ kind, status, repo, slug, surface, telemetry, featured })
+    .eq("id", id);
+  if (error) bounce(detailPath, undefined, encodeURIComponent(error.message));
+
+  bounce(detailPath, "saved");
 }
 
 export async function deleteProjectAction(formData: FormData) {
@@ -119,9 +194,9 @@ export async function uploadProjectScreenshotAction(formData: FormData) {
     .eq("id", id)
     .maybeSingle();
   const project = data as
-    | { repo: string; screenshot_url: string | null }
+    | { repo: string | null; screenshot_url: string | null }
     | null;
-  const safeRepo = project?.repo.replace("/", "-") ?? id;
+  const safeRepo = project?.repo?.replace("/", "-") ?? id;
 
   try {
     const { url } = await uploadImage(file as File, {
@@ -177,16 +252,25 @@ export async function upsertProjectI18nAction(formData: FormData) {
   const project_id = String(formData.get("project_id") ?? "");
   const language_id = asInt(formData.get("language_id"));
   const description = asStr(formData.get("description"));
+  const one_liner = asStr(formData.get("one_liner"));
   const problem = asStr(formData.get("problem"));
   const solution = asStr(formData.get("solution"));
   const outcome = asStr(formData.get("outcome"));
+  const metricsRaw = asStr(formData.get("metrics"));
   if (!project_id || !language_id) bounce(PATH);
+
+  const metrics = metricsRaw.split(/\r?\n/).flatMap((s) => {
+    const t = s.trim();
+    return t ? [t] : [];
+  });
 
   const hasAnyValue =
     Boolean(description) ||
+    Boolean(one_liner) ||
     Boolean(problem) ||
     Boolean(solution) ||
-    Boolean(outcome);
+    Boolean(outcome) ||
+    metrics.length > 0;
 
   if (!hasAnyValue) {
     await supabase
@@ -200,9 +284,11 @@ export async function upsertProjectI18nAction(formData: FormData) {
         project_id,
         language_id,
         description: description || null,
+        one_liner: one_liner || null,
         problem: problem || null,
         solution: solution || null,
         outcome: outcome || null,
+        metrics,
       },
       { onConflict: "project_id,language_id" }
     );

@@ -11,6 +11,7 @@ export type UsesItem = {
   url: string | null;
   icon_url: string | null;
   position: number;
+  updated_at: string | null;
   description: string | null;
 };
 
@@ -21,6 +22,7 @@ type Row = {
   url: string | null;
   icon_url: string | null;
   position: number;
+  updated_at: string | null;
 };
 
 type I18nRow = {
@@ -37,7 +39,7 @@ export const getUsesItems = cache(
     const [base, i18n] = await Promise.all([
       supabase
         .from("uses_items")
-        .select("id, category, name, url, icon_url, position")
+        .select("id, category, name, url, icon_url, position, updated_at")
         .eq("visible", true)
         .order("category", { ascending: true })
         .order("position", { ascending: true }),

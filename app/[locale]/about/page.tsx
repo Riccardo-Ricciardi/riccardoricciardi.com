@@ -55,7 +55,6 @@ export default async function AboutPage({ params }: PageProps) {
   const isIt = locale === "it";
 
   const heading = content(blocks, "about_heading", "About");
-  const eyebrow = content(blocks, "about_eyebrow", "/about");
   const subtitle = content(
     blocks,
     "about_subtitle",
@@ -99,12 +98,80 @@ export default async function AboutPage({ params }: PageProps) {
     `/${locale}/work`
   );
 
+  const facts = {
+    location: content(
+      blocks,
+      "about_facts_location",
+      isIt ? "Napoli, Italia" : "Naples, Italy"
+    ),
+    languages: content(
+      blocks,
+      "about_facts_languages",
+      isIt ? "Italiano e inglese" : "Italian and English"
+    ),
+    availability: content(
+      blocks,
+      "hero_availability",
+      isIt ? "Napoli · disponibile" : "Naples · available"
+    ),
+  };
+
+  const pullQuote = content(
+    blocks,
+    "about_pull_quote",
+    isIt ? "Quello che prometto, lo rilascio." : "I ship what I promise."
+  );
+
+  const makerHeading = content(
+    blocks,
+    "maker_heading",
+    isIt ? "Sul banco" : "On the bench"
+  );
+  const makerCells = [
+    {
+      label: content(blocks, "maker_esp32_label", "ESP32 / Arduino"),
+      line: content(
+        blocks,
+        "maker_esp32_line",
+        isIt
+          ? "Sensori, relay e firmware per la casa."
+          : "Sensors, relays and firmware around the house."
+      ),
+    },
+    {
+      label: content(blocks, "maker_bambu_label", "Bambu Lab A1"),
+      line: content(
+        blocks,
+        "maker_bambu_line",
+        isIt
+          ? "Stampa 3D per scocche, staffe e ricambi."
+          : "3D printing for enclosures, brackets and spare parts."
+      ),
+    },
+  ];
+  const makerUsesCell = {
+    label: content(
+      blocks,
+      "maker_uses_label",
+      isIt ? "Tutto il resto" : "Everything else"
+    ),
+    line: content(
+      blocks,
+      "maker_uses_line",
+      isIt ? "La lista completa di cosa uso." : "The full list of what I use."
+    ),
+  };
+
   return (
     <About
       heading={heading}
-      eyebrow={eyebrow}
       subtitle={subtitle}
       locale={locale}
+      facts={facts}
+      pullQuote={pullQuote}
+      makerHeading={makerHeading}
+      makerCells={makerCells}
+      makerUsesCell={makerUsesCell}
       emptyTitle={emptyTitle}
       emptyBody={emptyBody}
       emptyCta={{ label: emptyCta, href: `/${locale}/contact` }}

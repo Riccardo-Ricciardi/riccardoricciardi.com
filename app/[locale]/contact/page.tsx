@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Contact } from "@/components/site/contact/section";
 import { ContactForm } from "@/components/site/contact/contact-form";
+import { ContactPanels } from "@/components/site/contact/contact-panels";
 import {
   BookingWidget,
   type BookingLabels,
@@ -12,6 +13,7 @@ import {
   isKnownLocale,
 } from "@/utils/i18n/languages";
 import { content, getContentBlocks } from "@/utils/content/fetch";
+import { getSiteIdentity } from "@/utils/identity/fetch";
 import { isCalConfigured } from "@/utils/cal/client";
 import { getCalUsername } from "@/utils/env";
 
@@ -154,11 +156,13 @@ export default async function ContactPage({ params }: PageProps) {
   if (!(await isKnownLocale(locale))) notFound();
 
   const isIt = locale === "it";
-  const blocks = await getContentBlocks(locale);
+  const [blocks, identity] = await Promise.all([
+    getContentBlocks(locale),
+    getSiteIdentity(),
+  ]);
   const calEnabled = isCalConfigured() && getCalUsername().length > 0;
 
   const heading = content(blocks, "contact_heading", "Got a project? Let's talk.");
-  const eyebrow = content(blocks, "contact_eyebrow", "/contact");
   const subtitle = content(
     blocks,
     "contact_subtitle",
@@ -218,76 +222,56 @@ export default async function ContactPage({ params }: PageProps) {
         : "Tell me about your project or idea…"
     ),
   };
-  const bookingSectionLabel = content(
+  const writeTab = content(
     blocks,
-    "booking_section_label",
-    isIt ? "Prenota una chiamata" : "Book a call"
+    "contact_tab_write",
+    isIt ? "Scrivimi" : "Write me"
   );
-  const bookingAlternativeEyebrow = content(
+  const callTab = content(
     blocks,
-    "booking_alternative_eyebrow",
-    isIt ? "Alternativa" : "Alternative"
+    "contact_tab_call",
+    isIt ? "Prenota una call" : "Book a call"
   );
-  const bookingAlternativeTitle = content(
+  const toggleLabel = content(
     blocks,
-    "booking_alternative_title",
-    isIt
-      ? "Preferisci scegliere un orario?"
-      : "Prefer to pick a time slot?"
+    "contact_toggle_label",
+    isIt ? "Scegli come contattarmi" : "Choose how to reach me"
   );
 
   return (
     <>
       <Contact
         heading={heading}
-        eyebrow={eyebrow}
         subtitle={subtitle}
         trust={trust}
+        email={identity.email}
       />
 
-      <section
-        aria-labelledby="contact-form-heading"
-        className={
-          "container-page pb-16 pt-10 md:pt-12 " +
-          (calEnabled ? "section-divider-b md:pb-20" : "md:pb-24")
-        }
-      >
-        <h2 id="contact-form-heading" className="sr-only">
-          {formHeading}
-        </h2>
-        <div className="mx-auto max-w-2xl">
-          <ContactForm locale={locale} labels={formLabels} />
-        </div>
-      </section>
-
-      {calEnabled && (
+      {calEnabled ? (
+        <section className="container-page pb-20 pt-10 md:pb-28 md:pt-12">
+          <ContactPanels
+            writeLabel={writeTab}
+            callLabel={callTab}
+            toggleLabel={toggleLabel}
+            form={<ContactForm locale={locale} labels={formLabels} />}
+            booking={
+              <BookingWidget
+                locale={locale}
+                labels={bookingLabels(locale, blocks)}
+              />
+            }
+          />
+        </section>
+      ) : (
         <section
-          aria-label={bookingSectionLabel}
-          className="container-page pb-20 pt-10 md:pb-28 md:pt-12"
+          aria-labelledby="contact-form-heading"
+          className="container-page pb-16 pt-10 md:pb-24 md:pt-12"
         >
+          <h2 id="contact-form-heading" className="sr-only">
+            {formHeading}
+          </h2>
           <div className="mx-auto max-w-2xl">
-            <details className="group [&_summary::-webkit-details-marker]:hidden">
-              <summary className="card-base card-interactive flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 transition-colors">
-                <span className="flex flex-col gap-0.5">
-                  <span className="text-eyebrow">{bookingAlternativeEyebrow}</span>
-                  <span className="text-h4 text-left">
-                    {bookingAlternativeTitle}
-                  </span>
-                </span>
-                <span
-                  aria-hidden="true"
-                  className="grid size-9 shrink-0 place-items-center rounded-pill border border-dashed-soft text-accent-blue transition-transform group-open:rotate-45"
-                >
-                  +
-                </span>
-              </summary>
-              <div className="mt-4">
-                <BookingWidget
-                  locale={locale}
-                  labels={bookingLabels(locale, blocks)}
-                />
-              </div>
-            </details>
+            <ContactForm locale={locale} labels={formLabels} />
           </div>
         </section>
       )}

@@ -1,16 +1,14 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { Hero } from "@/components/site/hero";
-import { Services } from "@/components/site/services/section";
-import { SERVICE_ICONS } from "@/components/site/services/service-icons";
-import { Skills } from "@/components/site/skills/section";
-import { Projects } from "@/components/site/projects/section";
+import { Proof } from "@/components/site/proof/section";
+import { Surfaces, type SurfaceEntry } from "@/components/site/surfaces/section";
+import { Services, type ServiceItem } from "@/components/site/services/section";
+import { ClosingCta } from "@/components/site/closing-cta";
 import { GlobalLoader } from "@/components/global-loader";
-import {
-  getLanguageCodes,
-  isKnownLocale,
-} from "@/utils/i18n/languages";
+import { getLanguageCodes, isKnownLocale } from "@/utils/i18n/languages";
 import { content, getContentBlocks } from "@/utils/content/fetch";
+import { getSiteIdentity } from "@/utils/identity/fetch";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
@@ -25,148 +23,177 @@ interface PageProps {
   params: Promise<{ locale: string }>;
 }
 
+const SURFACE_IDS = [
+  "windows-desktop",
+  "raspberry-pi",
+  "web",
+  "ios",
+  "embedded-esp32",
+] as const;
+
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   if (!(await isKnownLocale(locale))) notFound();
 
-  const blocks = await getContentBlocks(locale);
+  const isIt = locale === "it";
+  const [blocks, identity] = await Promise.all([
+    getContentBlocks(locale),
+    getSiteIdentity(),
+  ]);
 
   const heroTitle = content(
     blocks,
     "hero_title",
-    "I build modern, accessible web products."
+    isIt
+      ? "Costruisco prodotti web che funzionano."
+      : "I build web products that work."
   );
-  const heroSubtitle = content(
+  const heroProof = content(
     blocks,
-    "hero_subtitle",
-    "Full-stack developer focused on React, Next.js, and serverless architectures."
+    "hero_proof_clause",
+    isIt
+      ? "Due sistemi girano adesso: un tool F24 usato da commercialisti veri e un motore di contenuti su un Raspberry Pi."
+      : "Two systems are live right now: an F24 tool for real accountants, and a content engine on a Raspberry Pi."
+  );
+  const heroWordmark = content(
+    blocks,
+    "hero_wordmark_line",
+    "RICCARDO RICCIARDI · NAPOLI"
+  );
+  const heroAvailability = content(
+    blocks,
+    "hero_availability",
+    isIt ? "Napoli · disponibile" : "Naples · available"
   );
   const heroPrimary = content(
     blocks,
-    "hero_primary_cta",
-    "Got a project? Let's talk"
+    "hero_cta_primary",
+    isIt ? "Guarda cosa gira" : "See what's running"
   );
-  const heroSecondary = content(blocks, "hero_secondary_cta", "View projects");
-  const skillsHeading = content(blocks, "skills_heading", "My skills");
-  const skillsEyebrow = content(blocks, "skills_eyebrow", "Stack");
-  const skillsEmptyTitle = content(
+  const contactLabel = content(
     blocks,
-    "skills_empty_title",
-    locale === "it" ? "Stack in arrivo." : "Stack coming soon."
+    "contact_label",
+    isIt ? "Scrivimi" : "Write me"
   );
-  const skillsEmptyBody = content(
-    blocks,
-    "skills_empty_body",
-    locale === "it"
-      ? "Sto curando la lista degli strumenti che uso davvero."
-      : "I'm curating the list of tools I actually use."
-  );
-  const projectsHeading = content(blocks, "projects_heading", "My projects");
-  const projectsEyebrow = content(blocks, "projects_eyebrow", "Recent work");
-  const projectsSubtitle = content(
-    blocks,
-    "projects_subtitle",
-    "A selection of recent work, synced from GitHub."
-  );
-  const allLabel = content(blocks, "common_all", "All");
-  const narrativeLabels = {
-    problem: content(
-      blocks,
-      "projects_narrative_problem",
-      locale === "it" ? "Problema" : "Problem"
-    ),
-    solution: content(
-      blocks,
-      "projects_narrative_solution",
-      locale === "it" ? "Soluzione" : "Solution"
-    ),
-    outcome: content(
-      blocks,
-      "projects_narrative_outcome",
-      locale === "it" ? "Risultato" : "Result"
-    ),
-  };
 
-  const servicesEyebrow = content(blocks, "services_eyebrow", "Services");
+  const proofHeading = content(
+    blocks,
+    "proof_heading",
+    isIt ? "In esecuzione adesso" : "Running now"
+  );
+  const proofLinkLabel = content(
+    blocks,
+    "proof_link_label",
+    isIt ? "Leggi il caso studio" : "Read the case study"
+  );
+
+  const surfacesHeading = content(
+    blocks,
+    "surfaces_heading",
+    isIt ? "Superfici su cui rilascio" : "Surfaces I ship on"
+  );
+  const surfacesIntro = content(
+    blocks,
+    "surfaces_intro",
+    isIt
+      ? "Niente nuvola di competenze. Superfici su cui rilascio davvero: dietro ognuna c'è un prodotto."
+      : "Not a skills cloud. Surfaces I actually ship to: each one has a product behind it."
+  );
+
+  const surfaceHref: Record<string, string | undefined> = {
+    "windows-desktop": `/${locale}/work#f24-tool`,
+    "raspberry-pi": `/${locale}/work#social-automation`,
+    ios: `/${locale}/work#map-switch`,
+    web: `/${locale}/work`,
+    "embedded-esp32": `/${locale}/about`,
+  };
+  const surfaceEntries: SurfaceEntry[] = SURFACE_IDS.map((id) => ({
+    id,
+    label: content(blocks, `surface_${id}_label`, id),
+    line: content(blocks, `surface_${id}_line`, ""),
+    href: surfaceHref[id],
+    tinted: id === "windows-desktop" || id === "raspberry-pi",
+  })).filter((entry) => entry.line);
+
   const servicesHeading = content(
     blocks,
     "services_heading",
-    "How I can help"
+    isIt ? "Come posso aiutarti" : "How I can help"
   );
-  const servicesSubtitle = content(
+  const serviceItems: ServiceItem[] = [
+    {
+      id: "desktop-automation",
+      title: content(
+        blocks,
+        "service_desktop-automation_title",
+        isIt ? "Automazione desktop e processi" : "Desktop & process automation"
+      ),
+      body: content(blocks, "service_desktop-automation_body", ""),
+      primary: true,
+    },
+    {
+      id: "full-stack-product",
+      title: content(
+        blocks,
+        "service_full-stack-product_title",
+        isIt ? "Prodotto full-stack" : "Full-stack product"
+      ),
+      body: content(blocks, "service_full-stack-product_body", ""),
+    },
+    {
+      id: "integrations-rescue",
+      title: content(
+        blocks,
+        "service_integrations-rescue_title",
+        isIt ? "Integrazioni e salvataggi" : "Integrations & rescue"
+      ),
+      body: content(blocks, "service_integrations-rescue_body", ""),
+    },
+  ].filter((s) => s.title && s.body);
+
+  const closingHeading = content(
     blocks,
-    "services_subtitle",
-    "Three engagement formats. Pick what fits, or write to me with something different."
+    "closing_heading",
+    isIt ? "Hai un processo che fa male?" : "Got a process that hurts?"
   );
-  const serviceItems = [
-    {
-      title: content(blocks, "service_1_title", "Full-stack web app"),
-      body: content(
-        blocks,
-        "service_1_body",
-        "From idea to deploy: design, frontend, API, database, hosting."
-      ),
-      icon: SERVICE_ICONS[0],
-    },
-    {
-      title: content(blocks, "service_2_title", "Refactor & migrations"),
-      body: content(
-        blocks,
-        "service_2_body",
-        "Pick up an existing codebase, untangle the parts that hurt, ship the upgrade."
-      ),
-      icon: SERVICE_ICONS[1],
-    },
-    {
-      title: content(blocks, "service_3_title", "Integrations"),
-      body: content(
-        blocks,
-        "service_3_body",
-        "Auth, payments, storage, third-party APIs. Wire them into your stack."
-      ),
-      icon: SERVICE_ICONS[2],
-    },
-  ].filter((s) => s.title || s.body);
+  const closingSub = content(
+    blocks,
+    "closing_sub",
+    isIt
+      ? "Raccontami cosa ti mangia le ore. Se il software può sistemarlo ti dico come. Rispondo io, entro 24 ore."
+      : "Tell me what eats your hours. If software can fix it, I'll tell you how. I reply personally, within 24 hours."
+  );
 
   return (
     <>
       <Hero
+        wordmarkLine={heroWordmark}
+        availability={heroAvailability}
         title={heroTitle}
-        subtitle={heroSubtitle}
-        primaryCta={{
-          label: heroPrimary,
-          href: `/${locale}/contact`,
-        }}
-        secondaryCta={{
-          label: heroSecondary,
-          href: "#projects",
-        }}
+        proofClause={heroProof}
+        primaryCta={{ label: heroPrimary, href: "#proof" }}
+        secondaryCta={{ label: contactLabel, href: `/${locale}/contact` }}
+      />
+      <Suspense fallback={<GlobalLoader />}>
+        <Proof locale={locale} heading={proofHeading} linkLabel={proofLinkLabel} />
+      </Suspense>
+      <Surfaces
+        heading={surfacesHeading}
+        intro={surfacesIntro}
+        entries={surfaceEntries}
       />
       <Services
-        eyebrow={servicesEyebrow}
         heading={servicesHeading}
-        subtitle={servicesSubtitle}
         items={serviceItems}
+        contactHref={`/${locale}/contact`}
       />
-      <Suspense fallback={<GlobalLoader />}>
-        <Skills
-          heading={skillsHeading}
-          eyebrow={skillsEyebrow}
-          locale={locale}
-          emptyTitle={skillsEmptyTitle}
-          emptyBody={skillsEmptyBody}
-        />
-      </Suspense>
-      <Suspense fallback={<GlobalLoader />}>
-        <Projects
-          heading={projectsHeading}
-          eyebrow={projectsEyebrow}
-          subtitle={projectsSubtitle}
-          locale={locale}
-          allLabel={allLabel}
-          narrativeLabels={narrativeLabels}
-        />
-      </Suspense>
+      <ClosingCta
+        heading={closingHeading}
+        sub={closingSub}
+        buttonLabel={contactLabel}
+        href={`/${locale}/contact`}
+        email={identity.email}
+      />
     </>
   );
 }
