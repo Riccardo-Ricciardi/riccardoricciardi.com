@@ -1,7 +1,16 @@
 # HANDOFF — Redesign "Dev-Tool / Infrastructure"
 
-Branch: `redesign/dev-tool-infra` (creato da `main`). **NON committato.** Mostra i diff, non pushare.
-Data: 2026-06-15. Spec completa: `.audit/redesign-spec-dev-tool.md`.
+Branch: **`main`** (il branch `redesign/dev-tool-infra` è stato eliminato — si lavora solo su main).
+Stato: **SHIPPED** — commit `61925ec`, deploy Vercel `dpl_9foHLDxt5z3d76e5RFdTQ4JGp5W2` READY, live su riccardoricciardi.com.
+Spec completa: `.audit/redesign-spec-dev-tool.md`.
+
+## Sessione 2026-06-16 (pomeriggio) — hero v2 + rimozioni + deploy
+
+- **Hero ridisegnata**: rimossa la `SystemMap` (richiesta Riccardo). Layout type-forward + scroll-cue. `system-map.tsx` ora orfano (non importato).
+- **`ScrollSpine`** (`components/site/fx/scroll-spine.tsx`): firma di scroll page-wide. Nodo glow scende il rail sinistro col progresso scroll, rail "carico" sopra. Solo transform/scaleY via 1 CSS var rAF-throttled (passive). Reduced-motion: listener non agganciato + freeze CSS. Nascosto `< 768px`. CSS in `fx.css` (`.scroll-spine*`, `.scroll-cue`).
+- **Progetti rimossi** (migration `0034`, applicata a prod): `social-automation` (in dev) + `map-switch` (non suo) → `projects.visible = false`. Copy scrubata: `hero_proof_clause`, `service_integrations-rescue_body`. Surfaces ridotte a 3: `windows-desktop` / `web` / `embedded-esp32` (tolte `raspberry-pi` e `ios`).
+- **FASE 5 v2** (prod): LCP 89ms / CLS 0.00 / INP 43ms. Screenshot 768/1024 dark+light, reduced-motion ok.
+- **Git**: tutto su `main`, committato e **pushato**, deploy automatico Vercel partito (webhook OK stavolta).
 
 > ⚠️ Il branch contiene anche **lavoro non-committato preesistente** (redesign "Sistema Vivo" + rimozione segnali live di oggi: StatusDot, telemetry, ecc.). Il redesign dev-tool si somma a quello.
 
