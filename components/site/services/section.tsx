@@ -53,7 +53,7 @@ export function Services({
               <Link
                 href={contactHref}
                 className={cn(
-                  "card-base card-interactive trace-card card-pad-lg group flex h-full flex-col gap-3 no-underline",
+                  "card-base card-interactive card-pad-lg group flex h-full flex-col gap-3 no-underline",
                   item.primary && "border-accent-blue"
                 )}
               >

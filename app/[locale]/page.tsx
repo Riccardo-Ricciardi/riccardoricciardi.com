@@ -6,7 +6,6 @@ import { Surfaces, type SurfaceEntry } from "@/components/site/surfaces/section"
 import { Services, type ServiceItem } from "@/components/site/services/section";
 import { CodeShowcase } from "@/components/site/code/showcase";
 import { StackRow } from "@/components/site/stack/section";
-import { ScrollSpine } from "@/components/site/fx/scroll-spine";
 import { ClosingCta } from "@/components/site/closing-cta";
 import { GlobalLoader } from "@/components/global-loader";
 import { getLanguageCodes, isKnownLocale } from "@/utils/i18n/languages";
@@ -124,14 +123,12 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <>
-      <ScrollSpine />
       <Hero
         wordmarkLine={heroWordmark}
         title={heroTitle}
         proofClause={heroProof}
         primaryCta={{ label: heroPrimary, href: "#proof" }}
         secondaryCta={{ label: contactLabel, href: `/${locale}/contact` }}
-        scrollLabel={content(blocks, "hero_scroll_label", "scroll")}
       />
       <CodeShowcase
         eyebrow={codeEyebrow}

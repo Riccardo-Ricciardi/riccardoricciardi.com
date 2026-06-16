@@ -90,7 +90,7 @@ export function Surfaces({ eyebrow, heading, intro, entries }: SurfacesProps) {
               </>
             );
             const cardClass = cn(
-              "card-base trace-card group flex h-full flex-col gap-2",
+              "card-base group flex h-full flex-col gap-2",
               isLead && "card-pad-lg gap-3 border-accent-blue",
               entry.href && "card-interactive no-underline"
             );

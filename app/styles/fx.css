@@ -190,102 +190,6 @@
     box-shadow: var(--elev-glow);
   }
 
-  /* ── 5. scroll-spine: il segnale che percorre l'INTERA pagina ──── */
-  /* un nodo luminoso scende il rail sinistro col progresso di scroll; */
-  /* sopra il nodo il rail è "carico" (accent), sotto è tenue.         */
-  .scroll-spine {
-    position: fixed;
-    inset-block: 0;
-    left: max(0.75rem, calc((100vw - 1400px) / 2));
-    width: 16px;
-    z-index: 15;
-    pointer-events: none;
-    display: none;
-  }
-  @media (min-width: 768px) {
-    .scroll-spine {
-      display: block;
-    }
-  }
-  .scroll-spine > span {
-    position: absolute;
-    left: 0;
-    pointer-events: none;
-  }
-  .scroll-spine-rail {
-    top: 0;
-    bottom: 0;
-    width: 1.5px;
-    background: linear-gradient(
-      to bottom,
-      transparent 0,
-      var(--grid-line) 5%,
-      var(--grid-line) 95%,
-      transparent 100%
-    );
-    opacity: 0.55;
-  }
-  .scroll-spine-charge {
-    top: 0;
-    width: 1.5px;
-    height: 100%;
-    transform-origin: top center;
-    transform: scaleY(var(--spine, 0));
-    background: linear-gradient(
-      to bottom,
-      color-mix(in oklab, var(--beam) 30%, transparent),
-      var(--beam)
-    );
-    box-shadow: 0 0 10px 1px var(--beam-soft);
-  }
-  .scroll-spine-node {
-    top: -5px;
-    left: -4.25px;
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
-    background: var(--accent-blue);
-    transform: translateY(calc(var(--spine, 0) * (100vh - 1px)));
-    box-shadow:
-      0 0 0 4px color-mix(in oklab, var(--accent-blue) 14%, transparent),
-      0 0 26px 5px var(--beam-soft);
-  }
-
-  /* scroll cue nell'hero: un dot che cade lento (stesso gesto del trace) */
-  .scroll-cue {
-    position: relative;
-    width: 1px;
-    height: 28px;
-    background: linear-gradient(to bottom, var(--border), transparent);
-    overflow: hidden;
-  }
-  .scroll-cue::after {
-    content: "";
-    position: absolute;
-    left: -1px;
-    top: 0;
-    width: 3px;
-    height: 8px;
-    border-radius: 2px;
-    background: var(--accent-blue);
-    box-shadow: 0 0 8px var(--beam-soft);
-    animation: scroll-cue-fall calc(var(--trace-dur) * 0.85) var(--ease-in-out)
-      infinite;
-  }
-  @keyframes scroll-cue-fall {
-    0% {
-      transform: translateY(-8px);
-      opacity: 0;
-    }
-    30% {
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(28px);
-      opacity: 0;
-    }
-  }
-
   /* WebGL hero surface fades in over the CSS poster once loaded */
   .hero-canvas-fade {
     animation: hero-canvas-in 1.4s var(--ease-out) forwards;
@@ -324,17 +228,5 @@
   }
   .fx-core-soft {
     animation: none;
-  }
-  /* spine + scroll cue: stato statico, niente travel */
-  .scroll-spine-charge {
-    transform: scaleY(0.16);
-  }
-  .scroll-spine-node {
-    transform: translateY(16vh);
-  }
-  .scroll-cue::after {
-    animation: none;
-    top: 2px;
-    opacity: 0.8;
   }
 }

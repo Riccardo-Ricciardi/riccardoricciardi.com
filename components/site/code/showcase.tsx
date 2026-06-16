@@ -69,7 +69,7 @@ export function CodeShowcase({ eyebrow, heading, intro }: CodeShowcaseProps) {
         />
 
         <Reveal className="min-w-0">
-          <div className="trace-border surface-glow overflow-hidden rounded-[var(--radius-surface)] border border-border bg-card">
+          <div className="surface-glow overflow-hidden rounded-[var(--radius-surface)] border border-border bg-card">
             <div className="flex items-center gap-2 border-b border-border px-4 py-2.5">
               <span
                 aria-hidden="true"

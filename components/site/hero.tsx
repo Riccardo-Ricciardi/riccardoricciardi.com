@@ -8,7 +8,6 @@ interface HeroProps {
   proofClause: string;
   primaryCta: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
-  scrollLabel?: string;
 }
 
 export function Hero({
@@ -17,13 +16,11 @@ export function Hero({
   proofClause,
   primaryCta,
   secondaryCta,
-  scrollLabel,
 }: HeroProps) {
   const words = title.split(" ");
   const lastWordDelay = 60 + Math.max(words.length - 1, 0) * 45;
   const proofDelay = lastWordDelay + 90;
   const ctaDelay = lastWordDelay + 150;
-  const cueDelay = ctaDelay + 140;
 
   return (
     <section className="section-divider-b relative overflow-hidden">
@@ -83,16 +80,6 @@ export function Hero({
                 {secondaryCta.label}
               </Link>
             )}
-          </div>
-
-          <div
-            className="enter-fade-up mt-8 hidden items-center gap-3 sm:flex"
-            style={{ "--enter-delay": `${cueDelay}ms` } as React.CSSProperties}
-          >
-            <span aria-hidden="true" className="scroll-cue" />
-            <span className="text-eyebrow text-fg-subtle">
-              {scrollLabel || "scroll"}
-            </span>
           </div>
         </div>
       </div>
