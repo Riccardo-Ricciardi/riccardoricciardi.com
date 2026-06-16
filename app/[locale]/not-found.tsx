@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { Eyebrow } from "@/components/site/atoms/eyebrow";
 import { isSupportedLanguage } from "@/utils/config/app";
 import { getDefaultLanguageCode } from "@/utils/i18n/languages";
+import { content, getContentBlocks } from "@/utils/content/fetch";
 
 async function detectLocale(): Promise<string> {
   const cookieStore = await cookies();
@@ -18,24 +19,15 @@ async function detectLocale(): Promise<string> {
   return getDefaultLanguageCode();
 }
 
-const COPY = {
-  en: {
-    eyebrow: "Error 404",
-    title: "Page not found",
-    description: "The page you were looking for doesn't exist or has been moved.",
-    cta: "Back to home",
-  },
-  it: {
-    eyebrow: "Errore 404",
-    title: "Pagina non trovata",
-    description: "La pagina che cercavi non esiste o è stata spostata.",
-    cta: "Torna alla home",
-  },
-} as const;
-
 export default async function LocaleNotFound() {
   const locale = await detectLocale();
-  const copy = COPY[locale as keyof typeof COPY] ?? COPY.en;
+  const blocks = await getContentBlocks(locale);
+  const copy = {
+    eyebrow: content(blocks, "notfound_eyebrow", ""),
+    title: content(blocks, "notfound_title", ""),
+    description: content(blocks, "notfound_description", ""),
+    cta: content(blocks, "notfound_cta", ""),
+  };
 
   return (
     <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden">

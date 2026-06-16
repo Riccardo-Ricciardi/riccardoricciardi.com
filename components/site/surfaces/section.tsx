@@ -1,5 +1,13 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import {
+  ArrowUpRight,
+  CircuitBoard,
+  Cpu,
+  Globe,
+  Monitor,
+  Smartphone,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/utils/cn";
 import { Heading } from "@/components/site/atoms/heading";
 import { Reveal } from "@/components/site/atoms/reveal";
@@ -13,66 +21,95 @@ export interface SurfaceEntry {
 }
 
 interface SurfacesProps {
+  eyebrow: string;
   heading: string;
   intro: string;
   entries: SurfaceEntry[];
 }
 
 const CELL_SPANS = [
+  "lg:col-span-4 lg:row-span-2",
+  "lg:col-span-2",
+  "lg:col-span-2",
   "lg:col-span-3",
   "lg:col-span-3",
-  "lg:col-span-2",
-  "lg:col-span-2",
-  "lg:col-span-2",
 ];
 
-export function Surfaces({ heading, intro, entries }: SurfacesProps) {
+const LEAD_GRADIENT =
+  "radial-gradient(120% 80% at 100% 0%, var(--glow-soft), transparent 60%)";
+
+const SURFACE_ICONS: Record<string, LucideIcon> = {
+  "windows-desktop": Monitor,
+  "raspberry-pi": Cpu,
+  web: Globe,
+  ios: Smartphone,
+  "embedded-esp32": CircuitBoard,
+};
+
+export function Surfaces({ eyebrow, heading, intro, entries }: SurfacesProps) {
   return (
     <section className="section-divider-b">
       <div className="container-page section-y flex flex-col gap-10">
-        <Heading level="h2" title={heading} subtitle={intro} />
+        <Heading level="h2" eyebrow={eyebrow} title={heading} subtitle={intro} />
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
           {entries.map((entry, index) => {
+            const Icon = SURFACE_ICONS[entry.id];
+            const isLead = index === 0;
             const body = (
               <>
-                <p className="text-telemetry uppercase tracking-[0.08em] text-foreground">
-                  {entry.label}
-                </p>
-                <p className="text-body-sm text-muted-foreground">
+                <div className="flex items-center gap-2.5">
+                  {Icon && (
+                    <Icon
+                      className={cn(
+                        "shrink-0 transition-colors duration-150",
+                        isLead
+                          ? "size-7 text-signal"
+                          : "size-5 text-fg-subtle group-hover:text-foreground"
+                      )}
+                      aria-hidden="true"
+                    />
+                  )}
+                  <p className="text-telemetry uppercase tracking-[0.08em] text-foreground">
+                    {entry.label}
+                  </p>
+                </div>
+                <p
+                  className={cn(
+                    "text-muted-foreground",
+                    isLead ? "text-body max-w-md" : "text-body-sm"
+                  )}
+                >
                   {entry.line}
                 </p>
                 {entry.href && (
                   <ArrowUpRight
-                    className="mt-auto size-4 text-fg-subtle transition-colors duration-150 group-hover:text-accent-blue"
+                    className="mt-auto size-4 text-fg-subtle transition duration-150 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground"
                     aria-hidden="true"
                   />
                 )}
               </>
             );
+            const cardClass = cn(
+              "card-base trace-card group flex h-full flex-col gap-2",
+              isLead && "card-pad-lg gap-3 border-accent-blue",
+              entry.href && "card-interactive no-underline"
+            );
+            const cardStyle = isLead
+              ? { backgroundImage: LEAD_GRADIENT }
+              : undefined;
             return (
               <Reveal
                 as="li"
                 key={entry.id}
-                delayMs={index * 50}
-                className={cn("min-h-36", CELL_SPANS[index])}
+                delayMs={Math.min(index * 40, 120)}
+                className={cn(isLead ? "min-h-[17rem]" : "min-h-36", CELL_SPANS[index])}
               >
                 {entry.href ? (
-                  <Link
-                    href={entry.href}
-                    className={cn(
-                      "card-base card-interactive group flex h-full flex-col gap-2 no-underline",
-                      entry.tinted && "bg-live-soft"
-                    )}
-                  >
+                  <Link href={entry.href} className={cardClass} style={cardStyle}>
                     {body}
                   </Link>
                 ) : (
-                  <div
-                    className={cn(
-                      "card-base flex h-full flex-col gap-2",
-                      entry.tinted && "bg-live-soft"
-                    )}
-                  >
+                  <div className={cardClass} style={cardStyle}>
                     {body}
                   </div>
                 )}

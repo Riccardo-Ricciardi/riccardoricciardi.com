@@ -12,6 +12,8 @@ import {
 } from "@/utils/cal/client";
 import { logger } from "@/utils/logger";
 import { getCalEventSlug, getCalUsername } from "@/utils/env";
+import { content, getContentBlocks } from "@/utils/content/fetch";
+import { APP_CONFIG, isSupportedLanguage } from "@/utils/config/app";
 
 export type BookingFieldKey = "name" | "email" | "notes";
 
@@ -35,40 +37,6 @@ const bookingSchema = z.object({
   locale: z.string().max(5).default("en"),
   eventTypeSlug: z.string().min(1, "event_required"),
 });
-
-function localizedBookingError(locale: string, key: string): string {
-  const map: Record<string, Record<string, string>> = {
-    en: {
-      not_configured: "Bookings aren't available right now.",
-      no_username: "Bookings aren't available right now.",
-      event_not_found: "That meeting type isn't available.",
-      booking_failed: "Couldn't book that slot. Please pick another time.",
-      start_required: "Please pick a time slot.",
-      event_required: "Please pick a meeting type.",
-      name_too_short: "Please enter your name (at least 2 characters).",
-      name_too_long: "Name is too long.",
-      invalid_email: "Please enter a valid email.",
-      email_too_long: "Email is too long.",
-      notes_too_long: "Notes are too long (max 1000 characters).",
-      fields_required: "Please fill in all the required fields.",
-    },
-    it: {
-      not_configured: "Le prenotazioni non sono disponibili al momento.",
-      no_username: "Le prenotazioni non sono disponibili al momento.",
-      event_not_found: "Questo tipo di chiamata non è disponibile.",
-      booking_failed: "Non riesco a prenotare questo orario. Scegline un altro.",
-      start_required: "Scegli un orario.",
-      event_required: "Scegli il tipo di chiamata.",
-      name_too_short: "Inserisci il tuo nome (almeno 2 caratteri).",
-      name_too_long: "Nome troppo lungo.",
-      invalid_email: "Email non valida.",
-      email_too_long: "Email troppo lunga.",
-      notes_too_long: "Note troppo lunghe (max 1000 caratteri).",
-      fields_required: "Compila tutti i campi richiesti.",
-    },
-  };
-  return map[locale]?.[key] ?? map.en[key] ?? key;
-}
 
 function username(): string {
   return getCalUsername().trim();
@@ -166,7 +134,11 @@ export async function createBookingAction(
   formData: FormData
 ): Promise<BookingState> {
   const rawLocale = String(formData.get("locale") ?? "en").slice(0, 5);
-  const t = (k: string) => localizedBookingError(rawLocale, k);
+  const safeLocale = isSupportedLanguage(rawLocale)
+    ? rawLocale
+    : APP_CONFIG.defaultLanguage;
+  const blocks = await getContentBlocks(safeLocale);
+  const t = (k: string) => content(blocks, `booking_err_${k}`, "");
 
   if (!isCalConfigured()) {
     return {

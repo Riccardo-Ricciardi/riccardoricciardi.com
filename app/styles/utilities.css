@@ -41,10 +41,10 @@
     border-bottom: 1px solid transparent;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    transition: background-color var(--dur-base) var(--ease-out),
-      border-color var(--dur-base) var(--ease-out),
-      backdrop-filter var(--dur-base) var(--ease-out),
-      -webkit-backdrop-filter var(--dur-base) var(--ease-out);
+    transition: background-color var(--dur-base) var(--ease-standard),
+      border-color var(--dur-base) var(--ease-standard),
+      backdrop-filter var(--dur-base) var(--ease-standard),
+      -webkit-backdrop-filter var(--dur-base) var(--ease-standard);
   }
   .navbar-shell[data-scrolled="true"] {
     background-color: color-mix(in oklab, var(--background) 82%, transparent);
@@ -81,9 +81,19 @@
   }
 
   .text-balance { text-wrap: balance; }
-  .link-accent { color: var(--accent-blue); }
-  .link-accent:hover { color: var(--accent-blue-hover); }
+  .link-accent { color: var(--text-signal); }
+  .link-accent:hover { color: var(--text-signal); }
+  .link-underline {
+    background-image: linear-gradient(var(--accent-blue), var(--accent-blue));
+    background-size: 0% 1px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    transition: background-size var(--dur-base) var(--ease-standard);
+  }
+  .link-underline:hover,
+  .group:hover .link-underline { background-size: 100% 1px; }
   .text-accent-blue { color: var(--accent-blue); }
+  .text-signal { color: var(--text-signal); }
   .bg-accent-blue { background-color: var(--accent-blue); }
   .bg-accent-blue-soft { background-color: var(--accent-blue-soft); }
   .border-accent-blue { border-color: var(--accent-blue); }
@@ -93,10 +103,10 @@
 
 @layer utilities {
   .text-display {
-    font-family: var(--font-mono), ui-monospace, monospace;
+    font-family: var(--font-sans), system-ui, sans-serif;
     font-size: var(--text-display);
     line-height: var(--leading-display);
-    font-weight: var(--weight-heading);
+    font-weight: var(--weight-display);
     letter-spacing: var(--tracking-display);
   }
   .text-h1 {
@@ -162,17 +172,25 @@
     font-size: 0.875rem;
     font-weight: var(--weight-label);
     line-height: 1;
-    transition: background-color var(--dur-base) var(--ease-out),
-      border-color var(--dur-base) var(--ease-out),
-      color var(--dur-base) var(--ease-out),
-      transform var(--dur-fast) var(--ease-out);
+    transition: background-color var(--dur-base) var(--ease-standard),
+      border-color var(--dur-base) var(--ease-standard),
+      color var(--dur-base) var(--ease-standard),
+      box-shadow var(--dur-base) var(--ease-standard),
+      transform var(--dur-fast) var(--ease-standard);
     cursor: pointer;
   }
+  .btn-base:hover { transform: translateY(-1px); }
   .btn-base:active { transform: scale(0.97); }
   .btn-base:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 2px var(--accent-blue-soft);
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+    box-shadow: none;
   }
+  .btn-arrow {
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .btn-primary:hover .btn-arrow,
+  .btn-ghost:hover .btn-arrow { transform: translateX(2px); }
   .btn-base:disabled,
   .btn-base[aria-disabled="true"] {
     cursor: not-allowed;
@@ -187,19 +205,25 @@
     color: var(--fg-default);
     border: 1px solid var(--border-default);
   }
-  .btn-ghost:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+  .btn-ghost:hover { border-color: var(--accent-blue); color: var(--text-signal); }
 
   .card-base {
     background: var(--bg-elevated);
     border: 1px solid var(--border);
     border-radius: var(--radius-card);
     padding: var(--card-padding);
-    transition: border-color var(--dur-base) var(--ease-out),
-      transform var(--dur-base) var(--ease-out);
+    transition: border-color var(--dur-base) var(--ease-standard),
+      box-shadow var(--dur-base) var(--ease-standard),
+      transform var(--dur-base) var(--ease-standard);
   }
   .card-flush { padding: 0; }
   .card-interactive { cursor: pointer; }
-  .card-interactive:hover { border-color: var(--accent-blue); transform: translateY(-1px); }
+  .card-interactive:hover {
+    border-color: var(--accent-blue);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+  .card-interactive:active { transform: translateY(0) scale(0.995); }
   .card-pad-lg { padding: var(--card-padding-lg); }
 
   .pill-base {
@@ -224,17 +248,17 @@
   .pill-accent { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); }
   .pill-soft {
     background: var(--accent-blue-soft);
-    color: var(--accent-blue);
+    color: var(--text-signal);
     border-style: solid;
     border-color: transparent;
   }
   .pill-interactive {
-    transition: border-color var(--dur-fast) var(--ease-out),
-      color var(--dur-fast) var(--ease-out),
-      background var(--dur-fast) var(--ease-out);
+    transition: border-color var(--dur-fast) var(--ease-standard),
+      color var(--dur-fast) var(--ease-standard),
+      background var(--dur-fast) var(--ease-standard);
     cursor: pointer;
   }
-  .pill-interactive:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+  .pill-interactive:hover { border-color: var(--accent-blue); color: var(--text-signal); }
 
   .chip-metric {
     display: inline-flex;
@@ -269,40 +293,19 @@
     background: var(--bg-default);
     font-size: 0.875rem;
     color: var(--fg-default);
-    transition: border-color var(--dur-base) var(--ease-out),
-      box-shadow var(--dur-base) var(--ease-out);
+    transition: border-color var(--dur-base) var(--ease-standard),
+      box-shadow var(--dur-base) var(--ease-standard);
   }
   .field-input:focus-visible {
     outline: none;
     border-color: var(--accent-blue);
-    box-shadow: 0 0 0 2px var(--accent-blue-soft);
+    box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--accent-blue);
   }
   .field-textarea { min-height: 7rem; resize: vertical; line-height: var(--leading-body); }
   .field-error { font-size: var(--text-caption); color: oklch(0.6 0.18 27); }
 }
 
 @layer utilities {
-  .status-dot {
-    display: inline-block;
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: var(--radius-pill);
-    background: var(--fg-subtle);
-    flex-shrink: 0;
-  }
-  .status-dot[data-state="live"] { background: var(--live); }
-  .status-dot[data-state="shipped"] { background: var(--accent-blue); }
-  .status-dot[data-state="archived"] { background: var(--fg-subtle); }
-  @media (prefers-reduced-motion: no-preference) {
-    .status-dot[data-state="live"] {
-      animation: dot-pulse 2.4s var(--ease-in-out) infinite;
-    }
-  }
-  @keyframes dot-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.45; }
-  }
-
   .enter-fade-up {
     opacity: 1;
     transform: translateY(0);
@@ -317,12 +320,14 @@
   .reveal {
     opacity: 0;
     transform: translateY(16px);
+    will-change: transform, opacity;
     transition: opacity var(--dur-enter) var(--ease-out) var(--enter-delay, 0ms),
       transform var(--dur-enter) var(--ease-out) var(--enter-delay, 0ms);
   }
   .reveal[data-inview="true"] {
     opacity: 1;
     transform: translateY(0);
+    will-change: auto;
   }
   .reveal-clip {
     clip-path: inset(0 100% 0 0);
@@ -340,5 +345,61 @@
       clip-path: none;
       transition: none;
     }
+  }
+}
+
+@layer utilities {
+  .fx-line {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: fx-draw 1.4s var(--ease-out) var(--fx-delay, 0ms) forwards;
+  }
+  .fx-core {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: fx-core-breathe 5s var(--ease-in-out) infinite;
+  }
+  .chip-metric-meter {
+    position: relative;
+    overflow: hidden;
+  }
+  .chip-meter-fill {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 100%;
+    background: var(--accent-blue);
+    transform-origin: left center;
+    transition: transform 900ms var(--ease-out) 120ms;
+  }
+  .hero-glow {
+    background: radial-gradient(
+      640px circle at 72% 38%,
+      var(--accent-blue-soft),
+      transparent 70%
+    );
+  }
+  @media (max-width: 1023px) {
+    .hero-glow {
+      background: radial-gradient(
+        420px circle at 50% 18%,
+        var(--accent-blue-soft),
+        transparent 70%
+      );
+    }
+  }
+  @keyframes fx-draw {
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes fx-core-breathe {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.04); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fx-line { animation: none; stroke-dashoffset: 0; }
+    .fx-core { animation: none; }
+    .chip-meter-fill { transition: none; }
+    .link-underline { transition: none; }
   }
 }

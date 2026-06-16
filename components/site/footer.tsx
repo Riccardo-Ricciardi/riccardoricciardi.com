@@ -38,30 +38,16 @@ export async function Footer({ locale }: FooterProps) {
     getContentBlocks(locale),
   ]);
 
-  const isItalian = locale === "it";
-  const claim = content(
-    blocks,
-    "footer_claim",
-    isItalian
-      ? "Costruisco prodotti web che funzionano."
-      : "I build web products that work."
-  );
-  const navHeading = content(
-    blocks,
-    "footer_nav_heading",
-    isItalian ? "Pagine" : "Pages"
-  );
-  const connectHeading = content(
-    blocks,
-    "footer_connect_heading",
-    isItalian ? "Contatti" : "Connect"
-  );
+  const claim = content(blocks, "footer_claim", "");
+  const navHeading = content(blocks, "footer_nav_heading", "");
+  const connectHeading = content(blocks, "footer_connect_heading", "");
 
   const navItems = dictionary.navbar.toSorted((a, b) => a.position - b.position);
   const year = new Date().getFullYear();
-  const built = isItalian
-    ? `Sviluppato da ${identity.name}`
-    : `Built by ${identity.name}`;
+  const built = content(blocks, "footer_built_by", "").replace(
+    "{name}",
+    identity.name
+  );
 
   return (
     <footer className="section-divider-t mt-auto">

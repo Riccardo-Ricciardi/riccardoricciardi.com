@@ -35,12 +35,8 @@ export async function generateMetadata({
     getContentBlocks(locale),
     getLanguageCodes(),
   ]);
-  const title = content(blocks, "uses_heading", "Uses");
-  const description = content(
-    blocks,
-    "uses_subtitle",
-    "Hardware, editors, libraries, services."
-  );
+  const title = content(blocks, "uses_heading", "");
+  const description = content(blocks, "uses_subtitle", "");
   return {
     title,
     description,
@@ -144,47 +140,14 @@ export default async function UsesPage({ params }: PageProps) {
   if (!(await isKnownLocale(locale))) notFound();
 
   const blocks = await getContentBlocks(locale);
-  const isIt = locale === "it";
-  const heading = content(blocks, "uses_heading", "Uses");
-  const intro = content(
-    blocks,
-    "uses_intro_sv",
-    isIt
-      ? "Niente lista della spesa. Solo gli strumenti che apro ogni settimana, con il motivo per cui restano."
-      : "Not a shopping list. Just the tools I open every week, and why they stay."
-  );
-  const updatedLabel = content(
-    blocks,
-    "uses_updated_label",
-    isIt ? "aggiornato" : "updated"
-  );
-  const stackHeading = content(
-    blocks,
-    "uses_stack_heading",
-    isIt ? "Tutto il resto del cassetto" : "Everything in the drawer"
-  );
-  const stackSrLabel = content(
-    blocks,
-    "uses_stack_sr_label",
-    isIt
-      ? "Loghi degli strumenti e delle tecnologie che uso"
-      : "Logos of the tools and technologies I use"
-  );
-  const emptyLabel = content(
-    blocks,
-    "common_empty_uses",
-    "Still putting this together."
-  );
-  const emptyTitle = content(
-    blocks,
-    "uses_empty_title",
-    isIt ? "In allestimento." : "Still curating."
-  );
-  const emptyCta = content(
-    blocks,
-    "uses_empty_cta",
-    isIt ? "Chiedi cosa uso" : "Ask what I use"
-  );
+  const heading = content(blocks, "uses_heading", "");
+  const intro = content(blocks, "uses_intro_sv", "");
+  const updatedLabel = content(blocks, "uses_updated_label", "");
+  const stackHeading = content(blocks, "uses_stack_heading", "");
+  const stackSrLabel = content(blocks, "uses_stack_sr_label", "");
+  const emptyLabel = content(blocks, "common_empty_uses", "");
+  const emptyTitle = content(blocks, "uses_empty_title", "");
+  const emptyCta = content(blocks, "uses_empty_cta", "");
 
   return (
     <section

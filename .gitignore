@@ -60,3 +60,11 @@ next-env.d.ts
 supabase/.temp/
 supabase/.branches/
 .env*.local
+
+# redesign QA screenshots (local only)
+/redesign-*.png
+/inspect-proof.png
+
+# mcp / agent local scratch
+.playwright-mcp/
+.agents/

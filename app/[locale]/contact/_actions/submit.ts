@@ -6,6 +6,8 @@ import { z } from "zod";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { getContactIpSalt, getResendConfig } from "@/utils/env";
 import { logger } from "@/utils/logger";
+import { content, getContentBlocks } from "@/utils/content/fetch";
+import { APP_CONFIG, isSupportedLanguage } from "@/utils/config/app";
 
 export type ContactFieldKey = "name" | "email" | "message";
 
@@ -48,34 +50,6 @@ const contactSchema = z.object({
   locale: z.string().max(5).default("en"),
 });
 
-function localizedError(locale: string, key: string): string {
-  const map: Record<string, Record<string, string>> = {
-    en: {
-      fields_required: "All fields are required.",
-      name_too_short: "Please enter your name (at least 2 characters).",
-      name_too_long: "Name is too long (max 100 characters).",
-      invalid_email: "Please enter a valid email.",
-      email_too_long: "Email is too long.",
-      message_too_short: "Message is too short (at least 5 characters).",
-      message_too_long: "Message is too long (max 2000 characters).",
-      rate_limited: "Too many messages. Try again later.",
-      server_error: "Something went wrong. Please try again.",
-    },
-    it: {
-      fields_required: "Compila tutti i campi.",
-      name_too_short: "Inserisci il tuo nome (almeno 2 caratteri).",
-      name_too_long: "Nome troppo lungo (max 100 caratteri).",
-      invalid_email: "Email non valida.",
-      email_too_long: "Email troppo lunga.",
-      message_too_short: "Messaggio troppo breve (almeno 5 caratteri).",
-      message_too_long: "Messaggio troppo lungo (max 2000 caratteri).",
-      rate_limited: "Troppi messaggi. Riprova più tardi.",
-      server_error: "Qualcosa è andato storto. Riprova.",
-    },
-  };
-  return map[locale]?.[key] ?? map.en[key] ?? key;
-}
-
 function clientIpHash(ipHeader: string | null): string | null {
   if (!ipHeader) return null;
   const ip = ipHeader.split(",")[0]?.trim() ?? "";
@@ -96,7 +70,11 @@ export async function submitContactMessageAction(
   }
 
   const rawLocale = String(formData.get("locale") ?? "en").slice(0, 5);
-  const t = (k: string) => localizedError(rawLocale, k);
+  const safeLocale = isSupportedLanguage(rawLocale)
+    ? rawLocale
+    : APP_CONFIG.defaultLanguage;
+  const blocks = await getContentBlocks(safeLocale);
+  const t = (k: string) => content(blocks, `contact_err_${k}`, "");
 
   const parsed = contactSchema.safeParse({
     name: formData.get("name") ?? "",

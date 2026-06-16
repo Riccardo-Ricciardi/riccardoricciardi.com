@@ -5,11 +5,12 @@ import { ProofRow } from "@/components/site/proof/proof-row";
 
 interface ProofProps {
   locale: SupportedLanguage;
+  eyebrow: string;
   heading: string;
   linkLabel: string;
 }
 
-export async function Proof({ locale, heading, linkLabel }: ProofProps) {
+export async function Proof({ locale, eyebrow, heading, linkLabel }: ProofProps) {
   const studies = await getCaseStudies(locale);
   const featured = studies.filter((p) => p.featured);
   if (featured.length === 0) return null;
@@ -17,7 +18,7 @@ export async function Proof({ locale, heading, linkLabel }: ProofProps) {
   return (
     <section id="proof" className="section-divider-b">
       <div className="container-page section-y flex flex-col gap-12">
-        <Heading level="h2" title={heading} />
+        <Heading level="h2" eyebrow={eyebrow} title={heading} />
         <div className="flex flex-col gap-12">
           {featured.map((project, index) => (
             <ProofRow

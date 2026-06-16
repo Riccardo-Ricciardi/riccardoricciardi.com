@@ -1,0 +1,327 @@
+/* ════════════════════════════════════════════════════════════════
+   Signature motion "trace" + depth backgrounds.
+   Gesto firma: una luce percorre LENTAMENTE le linee strutturali
+   (bordi, archi del grafo, griglia). Calmo, lento, nessun blink.
+   Tutto compositor-friendly + fallback reduced-motion.
+   ════════════════════════════════════════════════════════════════ */
+
+@property --trace-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@layer utilities {
+  /* ── 1. trace-border: beam che percorre il PERIMETRO ──────────── */
+  /* always-on, solo su superfici-chiave (hero frame, terminal). */
+  .trace-border {
+    position: relative;
+    contain: paint;
+  }
+  .trace-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from var(--trace-angle),
+      transparent 0deg,
+      transparent 250deg,
+      var(--beam-soft) 320deg,
+      var(--beam) 350deg,
+      transparent 360deg
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.85;
+    animation: trace-spin var(--trace-dur) var(--trace-ease) infinite;
+  }
+
+  /* ── trace-card: beam rivelato all'hover/focus (cheap: paused) ─── */
+  .trace-card {
+    position: relative;
+    contain: paint;
+  }
+  .trace-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from var(--trace-angle),
+      transparent 0deg,
+      transparent 250deg,
+      var(--beam-soft) 320deg,
+      var(--beam) 350deg,
+      transparent 360deg
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--dur-base) var(--ease-standard);
+    animation: trace-spin var(--trace-dur) var(--trace-ease) infinite;
+    animation-play-state: paused;
+  }
+  .trace-card:hover::before,
+  .trace-card:focus-within::before {
+    opacity: 0.95;
+    animation-play-state: running;
+  }
+
+  @keyframes trace-spin {
+    to {
+      --trace-angle: 360deg;
+    }
+  }
+
+  /* ── 2. fx-trace: dash luminoso che VIAGGIA lungo un path SVG ──── */
+  /* il path deve avere pathLength={1}. Base path resta tenue. */
+  .fx-trace {
+    stroke-dasharray: 0.08 0.92;
+    stroke-dashoffset: 1;
+    stroke: var(--beam);
+    filter: drop-shadow(0 0 2px var(--beam-soft));
+    animation: fx-trace-travel var(--trace-dur) linear var(--fx-delay, 0ms)
+      infinite;
+  }
+  @keyframes fx-trace-travel {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .fx-core-soft {
+    transform-box: fill-box;
+    transform-origin: center;
+    /* locked to 2x --trace-dur so the core stays in phase with the trace */
+    animation: fx-core-breathe calc(var(--trace-dur) * 2) var(--ease-in-out)
+      infinite;
+  }
+
+  /* ── 3. sfondi stratificati (mai tinta piatta) ────────────────── */
+  .bg-grid-fade {
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    background-position: center top;
+    -webkit-mask-image: radial-gradient(
+      ellipse 80% 66% at 50% 0%,
+      #000 32%,
+      transparent 88%
+    );
+    mask-image: radial-gradient(
+      ellipse 80% 66% at 50% 0%,
+      #000 32%,
+      transparent 88%
+    );
+  }
+  .bg-dots-fade {
+    background-image: radial-gradient(var(--dot) 1px, transparent 1.4px);
+    background-size: 22px 22px;
+    -webkit-mask-image: radial-gradient(
+      ellipse 70% 70% at 50% 40%,
+      #000 20%,
+      transparent 78%
+    );
+    mask-image: radial-gradient(
+      ellipse 70% 70% at 50% 40%,
+      #000 20%,
+      transparent 78%
+    );
+  }
+  .glow-radial {
+    background: radial-gradient(
+      60% 60% at 50% 0%,
+      var(--glow-strong),
+      transparent 72%
+    );
+  }
+  .glow-radial-soft {
+    background: radial-gradient(
+      50% 50% at 70% 30%,
+      var(--glow-soft),
+      transparent 70%
+    );
+  }
+
+  /* ── 4. spotlight: glow che segue il cursore (--mx/--my via JS) ── */
+  .spotlight {
+    position: relative;
+  }
+  .spotlight::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      220px circle at var(--mx, 50%) var(--my, -20%),
+      var(--glow-soft),
+      transparent 62%
+    );
+    opacity: 0;
+    transition: opacity var(--dur-slow) var(--ease-standard);
+    z-index: 0;
+  }
+  .spotlight:hover::after {
+    opacity: 1;
+  }
+
+  /* surface elevata con glow firma (per il visual hero + terminal) */
+  .surface-glow {
+    box-shadow: var(--elev-glow);
+  }
+
+  /* ── 5. scroll-spine: il segnale che percorre l'INTERA pagina ──── */
+  /* un nodo luminoso scende il rail sinistro col progresso di scroll; */
+  /* sopra il nodo il rail è "carico" (accent), sotto è tenue.         */
+  .scroll-spine {
+    position: fixed;
+    inset-block: 0;
+    left: max(0.75rem, calc((100vw - 1400px) / 2));
+    width: 16px;
+    z-index: 15;
+    pointer-events: none;
+    display: none;
+  }
+  @media (min-width: 768px) {
+    .scroll-spine {
+      display: block;
+    }
+  }
+  .scroll-spine > span {
+    position: absolute;
+    left: 0;
+    pointer-events: none;
+  }
+  .scroll-spine-rail {
+    top: 0;
+    bottom: 0;
+    width: 1.5px;
+    background: linear-gradient(
+      to bottom,
+      transparent 0,
+      var(--grid-line) 5%,
+      var(--grid-line) 95%,
+      transparent 100%
+    );
+    opacity: 0.55;
+  }
+  .scroll-spine-charge {
+    top: 0;
+    width: 1.5px;
+    height: 100%;
+    transform-origin: top center;
+    transform: scaleY(var(--spine, 0));
+    background: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--beam) 30%, transparent),
+      var(--beam)
+    );
+    box-shadow: 0 0 10px 1px var(--beam-soft);
+  }
+  .scroll-spine-node {
+    top: -5px;
+    left: -4.25px;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--accent-blue);
+    transform: translateY(calc(var(--spine, 0) * (100vh - 1px)));
+    box-shadow:
+      0 0 0 4px color-mix(in oklab, var(--accent-blue) 14%, transparent),
+      0 0 26px 5px var(--beam-soft);
+  }
+
+  /* scroll cue nell'hero: un dot che cade lento (stesso gesto del trace) */
+  .scroll-cue {
+    position: relative;
+    width: 1px;
+    height: 28px;
+    background: linear-gradient(to bottom, var(--border), transparent);
+    overflow: hidden;
+  }
+  .scroll-cue::after {
+    content: "";
+    position: absolute;
+    left: -1px;
+    top: 0;
+    width: 3px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--accent-blue);
+    box-shadow: 0 0 8px var(--beam-soft);
+    animation: scroll-cue-fall calc(var(--trace-dur) * 0.85) var(--ease-in-out)
+      infinite;
+  }
+  @keyframes scroll-cue-fall {
+    0% {
+      transform: translateY(-8px);
+      opacity: 0;
+    }
+    30% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(28px);
+      opacity: 0;
+    }
+  }
+}
+
+/* ── reduced-motion: niente travel, stato statico equivalente ───── */
+@media (prefers-reduced-motion: reduce) {
+  /* freeze the trace at the beam's bright angle so the signature still reads */
+  .trace-border::before {
+    animation: none;
+    --trace-angle: 340deg;
+    opacity: 0.7;
+  }
+  .trace-card::before {
+    animation: none;
+  }
+  .trace-card:hover::before,
+  .trace-card:focus-within::before {
+    --trace-angle: 340deg;
+    opacity: 0.6;
+  }
+  /* keep the path-trace dash visible mid-arc instead of a flat line */
+  .fx-trace {
+    animation: none;
+    stroke-dashoffset: 0.5;
+    opacity: 0.7;
+  }
+  .fx-core-soft {
+    animation: none;
+  }
+  /* spine + scroll cue: stato statico, niente travel */
+  .scroll-spine-charge {
+    transform: scaleY(0.16);
+  }
+  .scroll-spine-node {
+    transform: translateY(16vh);
+  }
+  .scroll-cue::after {
+    animation: none;
+    top: 2px;
+    opacity: 0.8;
+  }
+}

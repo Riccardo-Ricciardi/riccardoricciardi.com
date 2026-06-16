@@ -45,11 +45,7 @@ function CaseStudyArticle({
         id={project.slug ?? project.id}
         className="flex scroll-mt-20 flex-col gap-6"
       >
-        <TelemetryLine
-          state={project.status ?? "shipped"}
-          stateLabel={stateLabel}
-          segments={segments}
-        />
+        <TelemetryLine stateLabel={stateLabel} segments={segments} />
         <h2 className="text-h2 text-balance text-foreground">{project.name}</h2>
         {project.description && (
           <p className="text-body-lg max-w-prose text-muted-foreground">
@@ -60,7 +56,7 @@ function CaseStudyArticle({
           <div className="card-base card-flush overflow-hidden">
             <Image
               src={image}
-              alt={`${project.name} screenshot`}
+              alt={project.name ?? ""}
               width={1280}
               height={800}
               className="aspect-[16/10] w-full object-cover object-top"

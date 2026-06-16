@@ -6,34 +6,8 @@ import { useParams } from "next/navigation";
 import { ArrowLeft, RotateCcw } from "lucide-react";
 import { Eyebrow } from "@/components/site/atoms/eyebrow";
 import { Heading } from "@/components/site/atoms/heading";
+import { useErrorCopy } from "@/components/site/error-copy-context";
 import { logger } from "@/utils/logger";
-
-interface ErrorCopy {
-  eyebrow: string;
-  title: string;
-  description: string;
-  retry: string;
-  home: string;
-}
-
-const COPY: Record<"en" | "it", ErrorCopy> = {
-  en: {
-    eyebrow: "Something went wrong",
-    title: "An unexpected error occurred",
-    description:
-      "I've been notified. You can try again, or head back to the homepage.",
-    retry: "Try again",
-    home: "Back to home",
-  },
-  it: {
-    eyebrow: "Qualcosa è andato storto",
-    title: "Si è verificato un errore imprevisto",
-    description:
-      "Sono stato avvisato. Puoi riprovare o tornare alla homepage.",
-    retry: "Riprova",
-    home: "Torna alla home",
-  },
-};
 
 interface SiteErrorProps {
   error: Error & { digest?: string };
@@ -42,9 +16,8 @@ interface SiteErrorProps {
 
 export default function SiteError({ error, reset }: SiteErrorProps) {
   const params = useParams<{ locale?: string }>();
-  const rawLocale = typeof params?.locale === "string" ? params.locale : "en";
-  const localeKey: "en" | "it" = rawLocale === "it" ? "it" : "en";
-  const copy = COPY[localeKey];
+  const rawLocale = typeof params?.locale === "string" ? params.locale : "";
+  const copy = useErrorCopy();
 
   useEffect(() => {
     logger.error("site: render error", {

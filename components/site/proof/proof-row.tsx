@@ -6,8 +6,7 @@ import type { Project } from "@/utils/projects/fetch";
 import { telemetryParts } from "@/utils/projects/telemetry";
 import type { SupportedLanguage } from "@/utils/config/app";
 import { TelemetryLine } from "@/components/site/atoms/telemetry-line";
-import { MetricChip } from "@/components/site/atoms/metric-chip";
-import { StatusDot } from "@/components/site/atoms/status-dot";
+import { AnimatedMetricChip } from "@/components/site/atoms/animated-metric-chip";
 import { Reveal } from "@/components/site/atoms/reveal";
 
 interface ProofRowProps {
@@ -18,14 +17,21 @@ interface ProofRowProps {
 }
 
 function SystemPanel({ project }: { project: Project }) {
+  const metrics = project.metrics.slice(0, 3);
   return (
     <div className="card-base card-flush overflow-hidden">
-      <div className="flex items-center justify-between border-b border-border bg-muted px-4 py-2.5">
-        <span className="text-telemetry">{project.slug}</span>
-        <StatusDot state={project.status ?? "shipped"} />
+      <div className="flex items-center justify-between gap-3 border-b border-border bg-muted px-4 py-2.5">
+        <span className="text-telemetry truncate">{project.slug}</span>
+        <div className="flex items-center gap-2.5">
+          {project.surface && (
+            <span className="text-telemetry text-fg-subtle">
+              {project.surface}
+            </span>
+          )}
+        </div>
       </div>
       <ul className="flex flex-col px-4 py-3">
-        {project.metrics.map((metric) => (
+        {metrics.map((metric) => (
           <li
             key={metric}
             className="text-telemetry flex items-center gap-2 py-1.5"
@@ -33,17 +39,9 @@ function SystemPanel({ project }: { project: Project }) {
             <span aria-hidden="true" className="text-fg-subtle">
               ▸
             </span>
-            {metric}
+            <span>{metric}</span>
           </li>
         ))}
-        {project.surface && (
-          <li className="text-telemetry flex items-center gap-2 border-t border-border-subtle py-1.5 pt-2.5">
-            <span aria-hidden="true" className="text-fg-subtle">
-              ▸
-            </span>
-            surface: {project.surface}
-          </li>
-        )}
       </ul>
     </div>
   );
@@ -61,11 +59,11 @@ export function ProofRow({ project, locale, linkLabel, layout }: ProofRowProps) 
           href={href}
           className="card-base card-interactive group flex flex-col gap-3 no-underline"
         >
-          <TelemetryLine state={project.status ?? "shipped"} stateLabel={stateLabel} segments={segments} />
+          <TelemetryLine stateLabel={stateLabel} segments={segments} />
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <h3 className="text-h3 text-foreground">{project.name}</h3>
-            <span className="text-body-sm flex items-center gap-1 text-accent-blue">
-              {linkLabel}
+            <span className="text-body-sm flex items-center gap-1 text-signal">
+              <span className="link-underline">{linkLabel}</span>
               <ArrowRight
                 className="size-4 transition-transform duration-150 group-hover:translate-x-0.5"
                 aria-hidden="true"
@@ -77,7 +75,7 @@ export function ProofRow({ project, locale, linkLabel, layout }: ProofRowProps) 
           </p>
           <div className="flex flex-wrap gap-2">
             {project.metrics.slice(0, 3).map((metric) => (
-              <MetricChip key={metric}>{metric}</MetricChip>
+              <AnimatedMetricChip key={metric}>{metric}</AnimatedMetricChip>
             ))}
           </div>
         </Link>
@@ -102,8 +100,8 @@ export function ProofRow({ project, locale, linkLabel, layout }: ProofRowProps) 
             mirrored && "lg:order-2"
           )}
         >
-          <TelemetryLine state={project.status ?? "shipped"} stateLabel={stateLabel} segments={segments} />
-          <h3 className="text-h2 text-foreground">{project.name}</h3>
+          <TelemetryLine stateLabel={stateLabel} segments={segments.slice(0, 1)} />
+          <h3 className="text-h3 text-foreground">{project.name}</h3>
           <p className="text-body-lg text-muted-foreground">
             {project.description}
           </p>
@@ -114,11 +112,11 @@ export function ProofRow({ project, locale, linkLabel, layout }: ProofRowProps) 
           )}
           <div className="flex flex-wrap gap-2">
             {project.metrics.map((metric) => (
-              <MetricChip key={metric}>{metric}</MetricChip>
+              <AnimatedMetricChip key={metric}>{metric}</AnimatedMetricChip>
             ))}
           </div>
-          <span className="text-body-sm flex items-center gap-1 text-accent-blue">
-            {linkLabel}
+          <span className="text-body-sm flex items-center gap-1 text-signal">
+            <span className="link-underline">{linkLabel}</span>
             <ArrowRight
               className="size-4 transition-transform duration-150 group-hover:translate-x-0.5"
               aria-hidden="true"
@@ -131,9 +129,10 @@ export function ProofRow({ project, locale, linkLabel, layout }: ProofRowProps) 
             <div className="card-base card-flush overflow-hidden">
               <Image
                 src={image}
-                alt={`${project.name} screenshot`}
+                alt={project.name || project.slug || "Project screenshot"}
                 width={1280}
                 height={800}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 640px"
                 className="aspect-[16/10] w-full object-cover object-top"
               />
             </div>

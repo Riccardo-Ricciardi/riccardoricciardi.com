@@ -98,7 +98,6 @@ export function ContactForm({ locale, labels }: ContactFormProps) {
           tabIndex={-1}
           autoComplete="off"
           aria-hidden="true"
-          aria-label="Leave empty"
           className="absolute left-[-9999px] size-0 opacity-0"
         />
 

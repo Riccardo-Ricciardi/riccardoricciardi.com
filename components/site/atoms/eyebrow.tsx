@@ -16,7 +16,14 @@ export function Eyebrow({
   id,
 }: EyebrowProps) {
   return (
-    <Tag id={id} className={cn("text-eyebrow", className)}>
+    <Tag
+      id={id}
+      className={cn("text-eyebrow inline-flex items-center gap-2", className)}
+    >
+      <span
+        aria-hidden="true"
+        className="size-1.5 shrink-0 rounded-[1px] bg-accent-blue"
+      />
       {children}
     </Tag>
   );

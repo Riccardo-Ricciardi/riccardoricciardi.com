@@ -39,7 +39,6 @@ interface BookingWidgetProps {
 }
 
 export interface BookingLabels {
-  heading: string;
   description: string;
   loading: string;
   noSlots: string;
@@ -285,10 +284,7 @@ function BookingWidgetInner({
             <Calendar className="size-5" aria-hidden="true" />
           </span>
           <div className="min-w-0">
-            <h3 className="text-h3">
-              {labels.heading}
-            </h3>
-            <p className="text-body-sm mt-1 text-muted-foreground">
+            <p className="text-body-sm text-muted-foreground">
               {labels.description}
             </p>
           </div>
@@ -546,8 +542,7 @@ function BookingWidgetSkeleton({ labels }: { labels: BookingLabels }) {
             <Calendar className="size-5" />
           </span>
           <div className="min-w-0">
-            <h3 className="text-h3">{labels.heading}</h3>
-            <p className="text-body-sm mt-1 text-muted-foreground">
+            <p className="text-body-sm text-muted-foreground">
               {labels.description}
             </p>
           </div>

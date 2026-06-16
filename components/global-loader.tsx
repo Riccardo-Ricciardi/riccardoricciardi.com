@@ -6,6 +6,7 @@ import "ldrs/react/Bouncy.css";
 
 interface GlobalLoaderProps {
   fullscreen?: boolean;
+  label?: string;
 }
 
 function subscribeDark(onChange: () => void): () => void {
@@ -27,7 +28,7 @@ function getDarkServerSnapshot(): boolean {
   return false;
 }
 
-export function GlobalLoader({ fullscreen = true }: GlobalLoaderProps) {
+export function GlobalLoader({ fullscreen = true, label }: GlobalLoaderProps) {
   const isDark = useSyncExternalStore(
     subscribeDark,
     getDarkSnapshot,
@@ -40,7 +41,7 @@ export function GlobalLoader({ fullscreen = true }: GlobalLoaderProps) {
       <output
         className="flex w-full items-center justify-center py-16"
         aria-live="polite"
-        aria-label="Loading"
+        aria-label={label || undefined}
       >
         <Bouncy size="60" speed="2" color={color} />
       </output>
@@ -51,7 +52,7 @@ export function GlobalLoader({ fullscreen = true }: GlobalLoaderProps) {
     <output
       className="fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center bg-background"
       aria-live="polite"
-      aria-label="Loading"
+      aria-label={label || undefined}
     >
       <Bouncy size="100" speed="2" color={color} />
     </output>

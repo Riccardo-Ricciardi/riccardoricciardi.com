@@ -29,12 +29,8 @@ export async function generateMetadata({
     getContentBlocks(locale),
     getLanguageCodes(),
   ]);
-  const title = content(blocks, "about_heading", "About");
-  const description = content(
-    blocks,
-    "about_subtitle",
-    "Full-stack developer."
-  );
+  const title = content(blocks, "about_heading", "");
+  const description = content(blocks, "about_subtitle", "");
   return {
     title,
     description,
@@ -52,46 +48,19 @@ export default async function AboutPage({ params }: PageProps) {
   if (!(await isKnownLocale(locale))) notFound();
 
   const blocks = await getContentBlocks(locale);
-  const isIt = locale === "it";
 
-  const heading = content(blocks, "about_heading", "About");
-  const subtitle = content(
-    blocks,
-    "about_subtitle",
-    "Full-stack developer with a soft spot for interface, performance, and detail."
-  );
-  const emptyTitle = content(
-    blocks,
-    "about_empty_title",
-    isIt ? "Pagina in scrittura." : "Still writing this page."
-  );
-  const emptyBody = content(
-    blocks,
-    "common_empty_about",
-    isIt
-      ? "Sto preparando una bio onesta. Nel frattempo, scrivimi se vuoi saperne di più."
-      : "I'm putting together an honest bio. In the meantime, get in touch if you want to know more."
-  );
-  const emptyCta = content(
-    blocks,
-    "about_empty_cta",
-    isIt ? "Scrivimi" : "Get in touch"
-  );
-  const primaryCtaLabel = content(
-    blocks,
-    "about_cta_primary_label",
-    isIt ? "Vediamoci" : "Let's talk"
-  );
+  const heading = content(blocks, "about_heading", "");
+  const subtitle = content(blocks, "about_subtitle", "");
+  const emptyTitle = content(blocks, "about_empty_title", "");
+  const emptyBody = content(blocks, "common_empty_about", "");
+  const emptyCta = content(blocks, "about_empty_cta", "");
+  const primaryCtaLabel = content(blocks, "about_cta_primary_label", "");
   const primaryCtaHref = content(
     blocks,
     "about_cta_primary_href",
     `/${locale}/contact`
   );
-  const secondaryCtaLabel = content(
-    blocks,
-    "about_cta_secondary_label",
-    isIt ? "Vedi i lavori" : "See the work"
-  );
+  const secondaryCtaLabel = content(blocks, "about_cta_secondary_label", "");
   const secondaryCtaHref = content(
     blocks,
     "about_cta_secondary_href",
@@ -99,67 +68,27 @@ export default async function AboutPage({ params }: PageProps) {
   );
 
   const facts = {
-    location: content(
-      blocks,
-      "about_facts_location",
-      isIt ? "Napoli, Italia" : "Naples, Italy"
-    ),
-    languages: content(
-      blocks,
-      "about_facts_languages",
-      isIt ? "Italiano e inglese" : "Italian and English"
-    ),
-    availability: content(
-      blocks,
-      "hero_availability",
-      isIt ? "Napoli · disponibile" : "Naples · available"
-    ),
+    location: content(blocks, "about_facts_location", ""),
+    languages: content(blocks, "about_facts_languages", ""),
+    availability: content(blocks, "hero_availability", ""),
   };
 
-  const pullQuote = content(
-    blocks,
-    "about_pull_quote",
-    isIt ? "Quello che prometto, lo rilascio." : "I ship what I promise."
-  );
+  const pullQuote = content(blocks, "about_pull_quote", "");
 
-  const makerHeading = content(
-    blocks,
-    "maker_heading",
-    isIt ? "Sul banco" : "On the bench"
-  );
+  const makerHeading = content(blocks, "maker_heading", "");
   const makerCells = [
     {
       label: content(blocks, "maker_esp32_label", "ESP32 / Arduino"),
-      line: content(
-        blocks,
-        "maker_esp32_line",
-        isIt
-          ? "Sensori, relay e firmware per la casa."
-          : "Sensors, relays and firmware around the house."
-      ),
+      line: content(blocks, "maker_esp32_line", ""),
     },
     {
       label: content(blocks, "maker_bambu_label", "Bambu Lab A1"),
-      line: content(
-        blocks,
-        "maker_bambu_line",
-        isIt
-          ? "Stampa 3D per scocche, staffe e ricambi."
-          : "3D printing for enclosures, brackets and spare parts."
-      ),
+      line: content(blocks, "maker_bambu_line", ""),
     },
   ];
   const makerUsesCell = {
-    label: content(
-      blocks,
-      "maker_uses_label",
-      isIt ? "Tutto il resto" : "Everything else"
-    ),
-    line: content(
-      blocks,
-      "maker_uses_line",
-      isIt ? "La lista completa di cosa uso." : "The full list of what I use."
-    ),
+    label: content(blocks, "maker_uses_label", ""),
+    line: content(blocks, "maker_uses_line", ""),
   };
 
   return (

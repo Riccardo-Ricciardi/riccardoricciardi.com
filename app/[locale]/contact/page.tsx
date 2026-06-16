@@ -38,12 +38,8 @@ export async function generateMetadata({
     getContentBlocks(locale),
     getLanguageCodes(),
   ]);
-  const title = content(blocks, "contact_heading", "Contact");
-  const description = content(
-    blocks,
-    "contact_subtitle",
-    "Got a project? Let's talk."
-  );
+  const title = content(blocks, "contact_heading", "");
+  const description = content(blocks, "contact_subtitle", "");
   return {
     title,
     description,
@@ -60,94 +56,36 @@ function bookingLabels(
   locale: string,
   blocks: Map<string, string>
 ): BookingLabels {
-  const isIt = locale === "it";
-  const c = (slug: string, fallback: string) => content(blocks, slug, fallback);
-  const weekdaysRaw = c(
-    "booking_weekdays",
-    isIt
-      ? "Lun,Mar,Mer,Gio,Ven,Sab,Dom"
-      : "Mon,Tue,Wed,Thu,Fri,Sat,Sun"
-  );
+  const c = (slug: string, fallback = "") => content(blocks, slug, fallback);
+  const weekdaysRaw = c("booking_weekdays");
   return {
-    heading: c("booking_heading", isIt ? "Prenota una chiamata" : "Book a call"),
-    description: c(
-      "booking_description",
-      isIt
-        ? "30 minuti in video, gratuiti. Scegli giorno e ora che ti vanno."
-        : "30-minute video call, free. Pick the day and time that works."
-    ),
-    loading: c("booking_loading", isIt ? "Carico gli slot…" : "Loading slots…"),
-    noSlots: c(
-      "booking_no_slots",
-      isIt
-        ? "Nessuno slot disponibile in questo giorno."
-        : "No slots available on this day."
-    ),
-    noSlotsHint: c(
-      "booking_no_slots_hint",
-      isIt
-        ? "Non vedi orari disponibili? Scrivimi direttamente qui sopra."
-        : "Don't see a time that works? Send me a message above instead."
-    ),
-    pickDay: c("booking_pick_day", isIt ? "Scegli un giorno" : "Pick a day"),
-    pickSlot: c("booking_pick_slot", isIt ? "Scegli un orario" : "Pick a time"),
-    pickEventType: c(
-      "booking_pick_event",
-      isIt ? "Tipo di chiamata" : "Call type"
-    ),
+    description: c("booking_description"),
+    loading: c("booking_loading"),
+    noSlots: c("booking_no_slots"),
+    noSlotsHint: c("booking_no_slots_hint"),
+    pickDay: c("booking_pick_day"),
+    pickSlot: c("booking_pick_slot"),
+    pickEventType: c("booking_pick_event"),
     weekdays: weekdaysRaw.split(",").map((s) => s.trim()),
     monthFormat: "long",
-    confirmTitle: c(
-      "booking_confirm_title",
-      isIt ? "Conferma prenotazione" : "Confirm booking"
-    ),
-    confirmSubtitle: c(
-      "booking_confirm_subtitle",
-      isIt
-        ? "Inserisci i tuoi dati e prenoto subito."
-        : "Enter your details and I'll book the slot."
-    ),
-    name: c("booking_name", isIt ? "Nome" : "Name"),
+    confirmTitle: c("booking_confirm_title"),
+    confirmSubtitle: c("booking_confirm_subtitle"),
+    name: c("booking_name"),
     email: c("booking_email", "Email"),
-    notes: c("booking_notes", isIt ? "Note" : "Notes"),
-    notesPlaceholder: c(
-      "booking_notes_placeholder",
-      isIt ? "Cosa vorresti discutere?" : "What would you like to discuss?"
-    ),
-    namePlaceholder: c(
-      "booking_name_placeholder",
-      isIt ? "Come ti chiami?" : "Your name"
-    ),
-    emailPlaceholder: c(
-      "booking_email_placeholder",
-      isIt ? "tua@email.com" : "you@email.com"
-    ),
-    submit: c("booking_submit", isIt ? "Conferma" : "Confirm"),
-    submitting: c("booking_submitting", isIt ? "Prenoto…" : "Booking…"),
-    cancel: c("booking_cancel", isIt ? "Annulla" : "Cancel"),
-    successTitle: c(
-      "booking_success_title",
-      isIt ? "Prenotazione confermata" : "Booking confirmed"
-    ),
-    successBodyTemplate: c(
-      "booking_success_body",
-      isIt
-        ? "Ti aspetto {when}. Riceverai un'email di conferma a breve."
-        : "See you {when}. A confirmation email is on its way."
-    ),
-    errorTitle: c(
-      "booking_error",
-      isIt
-        ? "Qualcosa è andato storto, riprova."
-        : "Something went wrong, please try again."
-    ),
-    prevMonth: c(
-      "booking_prev_month",
-      isIt ? "Mese precedente" : "Previous month"
-    ),
-    nextMonth: c("booking_next_month", isIt ? "Mese successivo" : "Next month"),
+    notes: c("booking_notes"),
+    notesPlaceholder: c("booking_notes_placeholder"),
+    namePlaceholder: c("booking_name_placeholder"),
+    emailPlaceholder: c("booking_email_placeholder"),
+    submit: c("booking_submit"),
+    submitting: c("booking_submitting"),
+    cancel: c("booking_cancel"),
+    successTitle: c("booking_success_title"),
+    successBodyTemplate: c("booking_success_body"),
+    errorTitle: c("booking_error"),
+    prevMonth: c("booking_prev_month"),
+    nextMonth: c("booking_next_month"),
     durationUnit: c("booking_duration_unit", "min"),
-    timezoneLabel: c("booking_timezone_label", isIt ? "Fuso" : "TZ"),
+    timezoneLabel: c("booking_timezone_label"),
   };
 }
 
@@ -155,88 +93,31 @@ export default async function ContactPage({ params }: PageProps) {
   const { locale } = await params;
   if (!(await isKnownLocale(locale))) notFound();
 
-  const isIt = locale === "it";
   const [blocks, identity] = await Promise.all([
     getContentBlocks(locale),
     getSiteIdentity(),
   ]);
   const calEnabled = isCalConfigured() && getCalUsername().length > 0;
 
-  const heading = content(blocks, "contact_heading", "Got a project? Let's talk.");
-  const subtitle = content(
-    blocks,
-    "contact_subtitle",
-    "Tell me what you're building or what problem you're trying to solve. I usually reply within 24 hours, weekdays."
-  );
-  const trust = content(
-    blocks,
-    "contact_trust",
-    "Reply within 24h · Treated with confidence"
-  );
-  const formHeading = content(
-    blocks,
-    "contact_form_section_label",
-    isIt ? "Modulo di contatto" : "Contact form"
-  );
+  const heading = content(blocks, "contact_heading", "");
+  const subtitle = content(blocks, "contact_subtitle", "");
+  const trust = content(blocks, "contact_trust", "");
+  const formHeading = content(blocks, "contact_form_section_label", "");
   const formLabels = {
-    name: content(blocks, "contact_form_name", isIt ? "Nome" : "Name"),
+    name: content(blocks, "contact_form_name", ""),
     email: content(blocks, "contact_form_email", "Email"),
-    message: content(
-      blocks,
-      "contact_form_message",
-      isIt ? "Messaggio" : "Message"
-    ),
-    submit: content(
-      blocks,
-      "contact_form_submit",
-      isIt ? "Invia messaggio" : "Send message"
-    ),
-    sending: content(blocks, "contact_form_sending", isIt ? "Invio…" : "Sending…"),
-    successTitle: content(
-      blocks,
-      "contact_form_success_title",
-      isIt ? "Messaggio inviato" : "Message sent"
-    ),
-    successBody: content(
-      blocks,
-      "contact_form_success_body",
-      isIt
-        ? "Ti risponderò appena possibile."
-        : "I'll get back to you as soon as possible."
-    ),
-    namePlaceholder: content(
-      blocks,
-      "contact_form_name_placeholder",
-      isIt ? "Come ti chiami?" : "Your name"
-    ),
-    emailPlaceholder: content(
-      blocks,
-      "contact_form_email_placeholder",
-      isIt ? "tua@email.com" : "you@email.com"
-    ),
-    messagePlaceholder: content(
-      blocks,
-      "contact_form_message_placeholder",
-      isIt
-        ? "Raccontami il progetto o l'idea…"
-        : "Tell me about your project or idea…"
-    ),
+    message: content(blocks, "contact_form_message", ""),
+    submit: content(blocks, "contact_form_submit", ""),
+    sending: content(blocks, "contact_form_sending", ""),
+    successTitle: content(blocks, "contact_form_success_title", ""),
+    successBody: content(blocks, "contact_form_success_body", ""),
+    namePlaceholder: content(blocks, "contact_form_name_placeholder", ""),
+    emailPlaceholder: content(blocks, "contact_form_email_placeholder", ""),
+    messagePlaceholder: content(blocks, "contact_form_message_placeholder", ""),
   };
-  const writeTab = content(
-    blocks,
-    "contact_tab_write",
-    isIt ? "Scrivimi" : "Write me"
-  );
-  const callTab = content(
-    blocks,
-    "contact_tab_call",
-    isIt ? "Prenota una call" : "Book a call"
-  );
-  const toggleLabel = content(
-    blocks,
-    "contact_toggle_label",
-    isIt ? "Scegli come contattarmi" : "Choose how to reach me"
-  );
+  const writeTab = content(blocks, "contact_tab_write", "");
+  const callTab = content(blocks, "contact_tab_call", "");
+  const toggleLabel = content(blocks, "contact_toggle_label", "");
 
   return (
     <>

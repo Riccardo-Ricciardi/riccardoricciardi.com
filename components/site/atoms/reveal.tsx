@@ -24,7 +24,10 @@ export function Reveal({
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
-    if (typeof IntersectionObserver === "undefined") {
+    const prefersReduced =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced || typeof IntersectionObserver === "undefined") {
       setInView(true);
       return;
     }
@@ -38,7 +41,7 @@ export function Reveal({
           }
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.2 }
     );
     observer.observe(node);
     return () => observer.disconnect();

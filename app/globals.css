@@ -3,6 +3,7 @@
 
 @import "./styles/tokens.css";
 @import "./styles/utilities.css";
+@import "./styles/fx.css";
 @import "./styles/admin.css";
 
 @custom-variant dark (&:is(.dark *));

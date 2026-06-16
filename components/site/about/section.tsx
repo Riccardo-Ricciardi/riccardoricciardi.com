@@ -6,7 +6,6 @@ import { getAboutSections } from "@/utils/about/fetch";
 import { getSiteIdentity } from "@/utils/identity/fetch";
 import type { SupportedLanguage } from "@/utils/config/app";
 import { Heading } from "@/components/site/atoms/heading";
-import { StatusDot } from "@/components/site/atoms/status-dot";
 import { EmptyState } from "@/components/site/atoms/empty-state";
 
 interface AboutCta {
@@ -87,7 +86,7 @@ export async function About({
             <div className="relative aspect-[4/5] w-full max-w-sm overflow-hidden rounded-surface border border-border">
               <Image
                 src={identity.profile_photo_url}
-                alt={`${identity.name} portrait`}
+                alt={identity.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover"
@@ -105,10 +104,7 @@ export async function About({
           <ul className="mt-5 flex w-full max-w-sm list-none flex-col gap-2.5 p-0">
             <li className="text-telemetry">{facts.location}</li>
             <li className="text-telemetry">{facts.languages}</li>
-            <li className="text-telemetry flex items-center gap-2">
-              <StatusDot state="live" />
-              {facts.availability}
-            </li>
+            <li className="text-telemetry">{facts.availability}</li>
             {identity.email && (
               <li>
                 <a

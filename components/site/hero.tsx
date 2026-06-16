@@ -1,65 +1,87 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { StatusDot } from "@/components/site/atoms/status-dot";
+import { ParticleField } from "@/components/site/fx/particle-field";
 
 interface HeroProps {
   wordmarkLine: string;
-  availability: string;
   title: string;
   proofClause: string;
   primaryCta: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
+  scrollLabel?: string;
 }
 
 export function Hero({
   wordmarkLine,
-  availability,
   title,
   proofClause,
   primaryCta,
   secondaryCta,
+  scrollLabel,
 }: HeroProps) {
+  const words = title.split(" ");
+  const lastWordDelay = 60 + Math.max(words.length - 1, 0) * 45;
+  const proofDelay = lastWordDelay + 90;
+  const ctaDelay = lastWordDelay + 150;
+  const cueDelay = ctaDelay + 140;
+
   return (
-    <section className="section-divider-b relative">
+    <section className="section-divider-b relative overflow-hidden">
       <div
         aria-hidden="true"
-        className="bg-scan pointer-events-none absolute inset-0 -z-10"
+        className="bg-grid-fade pointer-events-none absolute inset-0 -z-10"
       />
+      <div
+        aria-hidden="true"
+        className="glow-radial pointer-events-none absolute inset-x-0 -top-24 -z-10 h-[600px] opacity-70"
+      />
+      <ParticleField density={3} maxParticles={56} linkDistance={130} />
 
-      <div className="container-page section-y">
-        <div className="flex max-w-4xl flex-col items-start gap-6">
+      <div className="container-page relative">
+        <div className="flex min-h-[clamp(32rem,80vh,50rem)] flex-col justify-center gap-7 py-16">
           <div
-            className="enter-fade-up flex w-full flex-wrap items-center justify-between gap-3"
+            className="enter-fade-up flex items-center gap-2.5"
             style={{ "--enter-delay": "0ms" } as React.CSSProperties}
           >
+            <span
+              aria-hidden="true"
+              className="size-1.5 rounded-[1px] bg-accent-blue"
+            />
             <p className="text-eyebrow">{wordmarkLine}</p>
-            <p className="pill-base text-telemetry">
-              <StatusDot state="live" />
-              {availability}
-            </p>
           </div>
 
-          <h1
-            className="text-display enter-fade-up text-balance"
-            style={{ "--enter-delay": "60ms" } as React.CSSProperties}
-          >
-            {title}
+          <h1 className="text-display text-balance max-w-[16ch]">
+            {words.map((word, index) => (
+              <span key={`${word}-${index}`}>
+                <span
+                  className="enter-fade-up inline-block"
+                  style={
+                    {
+                      "--enter-delay": `${60 + index * 45}ms`,
+                    } as React.CSSProperties
+                  }
+                >
+                  {word}
+                </span>
+                {index < words.length - 1 ? " " : null}
+              </span>
+            ))}
           </h1>
 
           <p
-            className="text-body-lg enter-fade-up max-w-2xl text-muted-foreground"
-            style={{ "--enter-delay": "120ms" } as React.CSSProperties}
+            className="text-body-lg enter-fade-up max-w-[54ch] text-muted-foreground"
+            style={{ "--enter-delay": `${proofDelay}ms` } as React.CSSProperties}
           >
             {proofClause}
           </p>
 
           <div
             className="enter-fade-up flex flex-wrap items-center gap-3"
-            style={{ "--enter-delay": "180ms" } as React.CSSProperties}
+            style={{ "--enter-delay": `${ctaDelay}ms` } as React.CSSProperties}
           >
             <Link href={primaryCta.href} className="btn-base btn-lg btn-primary">
               {primaryCta.label}
-              <ArrowRight className="ml-1 size-4" aria-hidden="true" />
+              <ArrowRight className="btn-arrow ml-1 size-4" aria-hidden="true" />
             </Link>
             {secondaryCta && (
               <Link
@@ -69,6 +91,16 @@ export function Hero({
                 {secondaryCta.label}
               </Link>
             )}
+          </div>
+
+          <div
+            className="enter-fade-up mt-8 hidden items-center gap-3 sm:flex"
+            style={{ "--enter-delay": `${cueDelay}ms` } as React.CSSProperties}
+          >
+            <span aria-hidden="true" className="scroll-cue" />
+            <span className="text-eyebrow text-fg-subtle">
+              {scrollLabel || "scroll"}
+            </span>
           </div>
         </div>
       </div>

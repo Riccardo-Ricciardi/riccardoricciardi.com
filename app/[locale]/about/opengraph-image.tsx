@@ -1,7 +1,8 @@
 import { APP_CONFIG, isSupportedLanguage } from "@/utils/config/app";
+import { content, getContentBlocks } from "@/utils/content/fetch";
 import { renderOg, ogContentType, ogSize } from "@/utils/og/render";
 
-export const alt = "About · Riccardo Ricciardi";
+export const alt = APP_CONFIG.author.name;
 export const size = ogSize;
 export const contentType = ogContentType;
 
@@ -13,13 +14,11 @@ export default async function Image({
   const locale = isSupportedLanguage(params.locale)
     ? params.locale
     : APP_CONFIG.defaultLanguage;
-  const isIt = locale === "it";
+  const blocks = await getContentBlocks(locale);
   return renderOg({
     eyebrow: "/about",
-    title: isIt ? "Chi sono" : "About",
-    subtitle: isIt
-      ? "Il mio percorso, gli strumenti, l'approccio."
-      : "My path, tools, and approach.",
+    title: content(blocks, "og_about_title", ""),
+    subtitle: content(blocks, "og_about_subtitle", ""),
     brand: APP_CONFIG.siteUrl.replace(/^https?:\/\//, ""),
   });
 }

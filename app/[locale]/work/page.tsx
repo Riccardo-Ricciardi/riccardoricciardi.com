@@ -44,12 +44,8 @@ export async function generateMetadata({
     getContentBlocks(locale),
     getLanguageCodes(),
   ]);
-  const title = content(blocks, "work_heading", "Work");
-  const description = content(
-    blocks,
-    "work_subtitle",
-    "My career timeline."
-  );
+  const title = content(blocks, "work_heading", "");
+  const description = content(blocks, "work_subtitle", "");
   return {
     title,
     description,
@@ -66,66 +62,21 @@ export default async function WorkPage({ params }: PageProps) {
   const { locale } = await params;
   if (!(await isKnownLocale(locale))) notFound();
 
-  const isIt = locale === "it";
   const [blocks, identity] = await Promise.all([
     getContentBlocks(locale),
     getSiteIdentity(),
   ]);
 
-  const heading = content(
-    blocks,
-    "work_heading",
-    isIt ? "Lavori" : "Work"
-  );
-  const intro = content(
-    blocks,
-    "work_intro_sv",
-    isIt
-      ? "Non una lista di progetti. Sistemi in produzione, con problemi veri e numeri veri. Questo è quello che gira adesso."
-      : "Not a project list. Systems in production, with real problems and real numbers. This is what's running now."
-  );
-  const problemLabel = content(
-    blocks,
-    "work_problem_label",
-    isIt ? "Problema" : "Problem"
-  );
-  const solutionLabel = content(
-    blocks,
-    "work_solution_label",
-    isIt ? "Soluzione" : "Solution"
-  );
-  const outcomeLabel = content(
-    blocks,
-    "work_outcome_label",
-    isIt ? "Risultato" : "Outcome"
-  );
-  const shippingHeading = content(
-    blocks,
-    "shipping_log_heading",
-    isIt ? "Registro dei rilasci" : "Shipping log"
-  );
-  const githubHeading = content(
-    blocks,
-    "github_strip_heading",
-    isIt ? "Altri esperimenti su GitHub" : "More experiments on GitHub"
-  );
-  const closingHeading = content(
-    blocks,
-    "closing_heading",
-    isIt ? "Hai un processo che fa male?" : "Got a process that hurts?"
-  );
-  const closingSub = content(
-    blocks,
-    "closing_sub",
-    isIt
-      ? "Raccontami cosa ti mangia le ore. Se il software può sistemarlo ti dico come. Rispondo io, entro 24 ore."
-      : "Tell me what eats your hours. If software can fix it, I'll tell you how. I reply personally, within 24 hours."
-  );
-  const contactLabel = content(
-    blocks,
-    "contact_label",
-    isIt ? "Scrivimi" : "Write me"
-  );
+  const heading = content(blocks, "work_heading", "");
+  const intro = content(blocks, "work_intro_sv", "");
+  const problemLabel = content(blocks, "work_problem_label", "");
+  const solutionLabel = content(blocks, "work_solution_label", "");
+  const outcomeLabel = content(blocks, "work_outcome_label", "");
+  const shippingHeading = content(blocks, "shipping_log_heading", "");
+  const githubHeading = content(blocks, "github_strip_heading", "");
+  const closingHeading = content(blocks, "closing_heading", "");
+  const closingSub = content(blocks, "closing_sub", "");
+  const contactLabel = content(blocks, "contact_label", "");
 
   return (
     <>
