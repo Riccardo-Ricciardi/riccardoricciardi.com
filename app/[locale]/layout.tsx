@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Navbar } from "@/components/site/navbar";
 import { Footer } from "@/components/site/footer";
 import { SmoothScroll } from "@/components/site/fx/smooth-scroll";
+import { GeoField } from "@/components/site/fx/geo-field";
 import { SkipLink } from "@/components/skip-link";
 import { JsonLd } from "@/components/json-ld";
 import { HtmlLangUpdater } from "@/components/html-lang-updater";
@@ -128,6 +129,7 @@ export default async function LocaleLayout({
     <>
       <HtmlLangUpdater lang={locale} />
       <SmoothScroll />
+      <GeoField />
       <div className="surface-grain" aria-hidden="true" />
       <SkipLink label={ariaLabels.skip} />
       <Navbar
@@ -137,7 +139,7 @@ export default async function LocaleLayout({
         ariaLabels={ariaLabels}
       />
       <ErrorCopyProvider copy={errorCopy}>
-        <main id="main" className="flex-1">
+        <main id="main" className="relative z-10 flex-1">
           {children}
         </main>
       </ErrorCopyProvider>

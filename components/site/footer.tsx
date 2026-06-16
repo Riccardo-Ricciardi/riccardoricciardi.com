@@ -50,7 +50,7 @@ export async function Footer({ locale }: FooterProps) {
   );
 
   return (
-    <footer className="section-divider-t mt-auto">
+    <footer className="section-divider-t relative z-10 mt-auto">
       <div className="container-page grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-3">
         <div className="flex flex-col gap-3">
           <p className="font-mono text-sm font-medium tracking-tight text-foreground">
