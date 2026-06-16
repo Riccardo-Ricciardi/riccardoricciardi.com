@@ -37,6 +37,18 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
   }
+  /* Lenis owns scrolling when active — disable native smooth to avoid fights */
+  html.lenis-on,
+  html.lenis,
+  html.lenis body {
+    scroll-behavior: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
 }
 
 ::-webkit-scrollbar {

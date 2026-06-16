@@ -67,7 +67,7 @@ export function Contact({
                 <li key={`${item}-${idx}`}>
                   <span className="inline-flex items-center gap-2 rounded-pill border border-dashed-soft bg-background/60 px-3 py-1 text-xs font-medium text-muted-foreground">
                     <Icon
-                      className="size-3.5 text-accent-blue"
+                      className="size-3.5 text-signal"
                       aria-hidden="true"
                     />
                     {item}

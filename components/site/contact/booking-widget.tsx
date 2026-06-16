@@ -280,7 +280,7 @@ function BookingWidgetInner({
     <div className="card-base card-flush rounded-surface overflow-hidden">
       <header className="flex flex-col gap-3 border-b border-dashed-soft p-6 md:flex-row md:items-center md:justify-between md:p-8">
         <div className="flex items-start gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-dashed-soft text-accent-blue">
+          <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-dashed-soft text-signal">
             <Calendar className="size-5" aria-hidden="true" />
           </span>
           <div className="min-w-0">
@@ -393,7 +393,7 @@ function BookingWidgetInner({
                       ? "cursor-not-allowed text-muted-foreground/40"
                       : isSelected
                         ? "bg-accent-blue text-white"
-                        : "border border-dashed-soft hover:border-accent-blue hover:text-accent-blue"
+                        : "border border-dashed-soft hover:border-accent-blue hover:text-signal"
                   )}
                 >
                   <span className="tabular-nums" aria-hidden="true">{cell.getDate()}</span>
@@ -469,7 +469,7 @@ function BookingWidgetInner({
                     <button
                       type="button"
                       onClick={() => setSelectedSlot(slot)}
-                      className="w-full min-h-11 rounded-md border border-dashed-soft bg-background py-2.5 font-mono text-sm tabular-nums transition-all hover:-translate-y-0.5 hover:border-accent-blue hover:text-accent-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                      className="w-full min-h-11 rounded-md border border-dashed-soft bg-background py-2.5 font-mono text-sm tabular-nums transition-all hover:-translate-y-0.5 hover:border-accent-blue hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       {time}
                     </button>
@@ -537,7 +537,7 @@ function BookingWidgetSkeleton({ labels }: { labels: BookingLabels }) {
         <div className="flex items-start gap-3">
           <span
             aria-hidden="true"
-            className="grid size-10 shrink-0 place-items-center rounded-lg border border-dashed-soft text-accent-blue"
+            className="grid size-10 shrink-0 place-items-center rounded-lg border border-dashed-soft text-signal"
           >
             <Calendar className="size-5" />
           </span>
@@ -806,7 +806,7 @@ function SuccessCard({
             href={meetingUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-xs text-accent-blue hover:underline"
+            className="font-mono text-xs text-signal hover:underline"
           >
             {meetingUrl}
           </a>

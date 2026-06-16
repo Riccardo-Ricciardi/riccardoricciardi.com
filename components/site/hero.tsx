@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { ParticleField } from "@/components/site/fx/particle-field";
+import { HeroBackdrop } from "@/components/site/fx/hero-backdrop";
 
 interface HeroProps {
   wordmarkLine: string;
@@ -27,15 +27,7 @@ export function Hero({
 
   return (
     <section className="section-divider-b relative overflow-hidden">
-      <div
-        aria-hidden="true"
-        className="bg-grid-fade pointer-events-none absolute inset-0 -z-10"
-      />
-      <div
-        aria-hidden="true"
-        className="glow-radial pointer-events-none absolute inset-x-0 -top-24 -z-10 h-[600px] opacity-70"
-      />
-      <ParticleField density={3} maxParticles={56} linkDistance={130} />
+      <HeroBackdrop />
 
       <div className="container-page relative">
         <div className="flex min-h-[clamp(32rem,80vh,50rem)] flex-col justify-center gap-7 py-16">

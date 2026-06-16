@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Navbar } from "@/components/site/navbar";
 import { Footer } from "@/components/site/footer";
+import { SmoothScroll } from "@/components/site/fx/smooth-scroll";
 import { SkipLink } from "@/components/skip-link";
 import { JsonLd } from "@/components/json-ld";
 import { HtmlLangUpdater } from "@/components/html-lang-updater";
@@ -126,6 +127,7 @@ export default async function LocaleLayout({
   return (
     <>
       <HtmlLangUpdater lang={locale} />
+      <SmoothScroll />
       <div className="surface-grain" aria-hidden="true" />
       <SkipLink label={ariaLabels.skip} />
       <Navbar

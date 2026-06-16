@@ -32,7 +32,7 @@ export function ContactPanels({
           onClick={() => setActive("write")}
           className={cn(
             "btn-base btn-ghost flex-1",
-            active === "write" && "border-accent-blue text-accent-blue"
+            active === "write" && "border-accent-blue text-signal"
           )}
         >
           {writeLabel}
@@ -44,7 +44,7 @@ export function ContactPanels({
           onClick={() => setActive("call")}
           className={cn(
             "btn-base btn-ghost flex-1",
-            active === "call" && "border-accent-blue text-accent-blue"
+            active === "call" && "border-accent-blue text-signal"
           )}
         >
           {callLabel}

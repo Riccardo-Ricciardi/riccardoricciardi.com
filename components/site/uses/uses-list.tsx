@@ -50,7 +50,7 @@ export function UsesList({ items }: UsesListProps) {
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="self-start font-medium tracking-tight transition-colors hover:text-accent-blue"
+                    className="self-start font-medium tracking-tight transition-colors hover:text-signal"
                   >
                     {item.name}
                     <ArrowUpRight

@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { cn } from "@/utils/cn";
+import { motion, useReducedMotion, type Variants } from "motion/react";
 
 interface RevealProps {
   children: React.ReactNode;
@@ -11,50 +10,48 @@ interface RevealProps {
   className?: string;
 }
 
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0 },
+};
+
+const clip: Variants = {
+  hidden: { opacity: 0, clipPath: "inset(0 100% 0 0)" },
+  show: { opacity: 1, clipPath: "inset(0 0% 0 0)" },
+};
+
 export function Reveal({
   children,
-  as: Tag = "div",
+  as = "div",
   variant = "fade-up",
   delayMs = 0,
   className,
 }: RevealProps) {
-  const ref = useRef<HTMLElement | null>(null);
-  const [inView, setInView] = useState(false);
+  const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    const prefersReduced =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced || typeof IntersectionObserver === "undefined") {
-      setInView(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setInView(true);
-            observer.disconnect();
-            break;
-          }
-        }
-      },
-      { threshold: 0.2 }
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
+  if (reduce) {
+    const Tag = as;
+    return <Tag className={className}>{children}</Tag>;
+  }
+
+  const MotionTag = motion[as] as typeof motion.div;
+  const variants = variant === "clip" ? clip : fadeUp;
 
   return (
-    <Tag
-      ref={ref as React.Ref<never>}
-      className={cn(variant === "fade-up" ? "reveal" : "reveal-clip", className)}
-      data-inview={inView ? "true" : "false"}
-      style={delayMs ? ({ "--enter-delay": `${delayMs}ms` } as React.CSSProperties) : undefined}
+    <MotionTag
+      className={className}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.2, margin: "0px 0px -8% 0px" }}
+      variants={variants}
+      transition={{
+        type: "spring",
+        stiffness: 88,
+        damping: 18,
+        delay: delayMs / 1000,
+      }}
     >
       {children}
-    </Tag>
+    </MotionTag>
   );
 }

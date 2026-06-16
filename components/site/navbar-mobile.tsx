@@ -36,7 +36,7 @@ export function NavbarMobile({ items, locale, ariaLabel }: NavbarMobileProps) {
           variant="ghost"
           size="icon"
           aria-label={ariaLabel}
-          className="text-foreground/80 transition-colors hover:bg-transparent hover:text-accent-blue"
+          className="text-foreground/80 transition-colors hover:bg-transparent hover:text-signal"
         >
           <Menu />
         </Button>

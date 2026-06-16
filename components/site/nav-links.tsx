@@ -34,8 +34,8 @@ export function NavLinks({ items, locale }: NavLinksProps) {
               href={hrefFor(locale, slug)}
               aria-current={active ? "page" : undefined}
               className={
-                "relative inline-block whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring hover:text-accent-blue " +
-                (active ? "text-accent-blue" : "text-foreground/80")
+                "relative inline-block whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring hover:text-signal " +
+                (active ? "text-signal" : "text-foreground/80")
               }
             >
               {label}
