@@ -50,7 +50,9 @@ export function Surfaces({ eyebrow, heading, intro, entries }: SurfacesProps) {
   return (
     <section className="section-divider-b">
       <div className="container-page section-y flex flex-col gap-10">
-        <Heading level="h2" eyebrow={eyebrow} title={heading} subtitle={intro} />
+        <Reveal variant="fade-up">
+          <Heading level="h2" eyebrow={eyebrow} title={heading} subtitle={intro} />
+        </Reveal>
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
           {entries.map((entry, index) => {
             const Icon = SURFACE_ICONS[entry.id];
@@ -101,7 +103,8 @@ export function Surfaces({ eyebrow, heading, intro, entries }: SurfacesProps) {
               <Reveal
                 as="li"
                 key={entry.id}
-                delayMs={Math.min(index * 40, 120)}
+                variant="rise"
+                delayMs={Math.min(index * 70, 280)}
                 className={cn(isLead ? "min-h-[17rem]" : "min-h-36", CELL_SPANS[index])}
               >
                 {entry.href ? (

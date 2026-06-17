@@ -7,7 +7,9 @@ import { telemetryParts } from "@/utils/projects/telemetry";
 import type { SupportedLanguage } from "@/utils/config/app";
 import { TelemetryLine } from "@/components/site/atoms/telemetry-line";
 import { AnimatedMetricChip } from "@/components/site/atoms/animated-metric-chip";
+import { CountUp } from "@/components/site/atoms/count-up";
 import { Reveal } from "@/components/site/atoms/reveal";
+import { Parallax } from "@/components/site/fx/parallax";
 
 interface ProofRowProps {
   project: Project;
@@ -16,33 +18,81 @@ interface ProofRowProps {
   layout: "lead" | "mirror" | "banner";
 }
 
-function SystemPanel({ project }: { project: Project }) {
-  const metrics = project.metrics.slice(0, 3);
+const SPARK = [5, 7, 6, 9, 8, 10, 9, 11, 10, 12, 11, 13, 12, 14, 13, 15];
+const LEADING_NUMBER = /^(\d{1,6})(.*)$/;
+
+function MetricRow({ metric }: { metric: string }) {
+  const m = LEADING_NUMBER.exec(metric);
+  return (
+    <li className="text-telemetry flex items-center gap-2 py-1.5">
+      <span aria-hidden="true" className="text-fg-subtle">
+        ▸
+      </span>
+      {m ? (
+        <span className="whitespace-pre">
+          <CountUp value={parseInt(m[1], 10)} className="text-signal tabular-nums" />
+          {m[2]}
+        </span>
+      ) : (
+        <span>{metric}</span>
+      )}
+    </li>
+  );
+}
+
+function SystemPanel({
+  project,
+  stateLabel,
+}: {
+  project: Project;
+  stateLabel: string;
+}) {
+  const metrics = project.metrics.slice(0, 4);
   return (
     <div className="card-base card-flush overflow-hidden">
       <div className="flex items-center justify-between gap-3 border-b border-border bg-muted px-4 py-2.5">
-        <span className="text-telemetry truncate">{project.slug}</span>
-        <div className="flex items-center gap-2.5">
-          {project.surface && (
-            <span className="text-telemetry text-fg-subtle">
-              {project.surface}
-            </span>
+        <div className="flex min-w-0 items-center gap-2">
+          <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-accent-blue" />
+          <span className="text-telemetry truncate">{project.slug}</span>
+        </div>
+        <div className="flex shrink-0 items-center gap-2.5">
+          {stateLabel ? (
+            <span className="text-telemetry text-signal">{stateLabel}</span>
+          ) : (
+            project.surface && (
+              <span className="text-telemetry text-fg-subtle">{project.surface}</span>
+            )
           )}
         </div>
       </div>
+
+      <div
+        aria-hidden="true"
+        className="flex h-9 items-end gap-0.5 border-b border-border px-4 py-2"
+      >
+        {SPARK.map((h, i) => (
+          <span
+            key={i}
+            style={{ height: `${(h / 15) * 100}%` }}
+            className={cn(
+              "flex-1 rounded-[1px]",
+              i >= SPARK.length - 2 ? "bg-accent-blue" : "bg-muted-foreground/35"
+            )}
+          />
+        ))}
+      </div>
+
       <ul className="flex flex-col px-4 py-3">
         {metrics.map((metric) => (
-          <li
-            key={metric}
-            className="text-telemetry flex items-center gap-2 py-1.5"
-          >
-            <span aria-hidden="true" className="text-fg-subtle">
-              ▸
-            </span>
-            <span>{metric}</span>
-          </li>
+          <MetricRow key={metric} metric={metric} />
         ))}
       </ul>
+
+      <div className="text-telemetry flex items-center gap-2 border-t border-border px-4 py-2.5">
+        <span className="text-signal">$</span>
+        <span className="text-foreground">deploy --prod</span>
+        <span className="ml-auto text-fg-subtle">· live</span>
+      </div>
     </div>
   );
 }
@@ -124,7 +174,7 @@ export function ProofRow({ project, locale, linkLabel, layout }: ProofRowProps) 
           </span>
         </div>
 
-        <div className={cn(mirrored && "lg:order-1")}>
+        <Parallax speed={0.05} className={cn(mirrored && "lg:order-1")}>
           {image ? (
             <div className="card-base card-flush overflow-hidden">
               <Image
@@ -137,9 +187,9 @@ export function ProofRow({ project, locale, linkLabel, layout }: ProofRowProps) 
               />
             </div>
           ) : (
-            <SystemPanel project={project} />
+            <SystemPanel project={project} stateLabel={stateLabel} />
           )}
-        </div>
+        </Parallax>
       </Link>
     </Reveal>
   );

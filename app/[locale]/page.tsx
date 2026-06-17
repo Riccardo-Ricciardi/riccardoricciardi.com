@@ -2,7 +2,8 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { Hero } from "@/components/site/hero";
 import { Proof } from "@/components/site/proof/section";
-import { Surfaces, type SurfaceEntry } from "@/components/site/surfaces/section";
+import { type SurfaceEntry } from "@/components/site/surfaces/section";
+import { SurfacesBento } from "@/components/site/surfaces/bento";
 import { Services, type ServiceItem } from "@/components/site/services/section";
 import { CodeShowcase } from "@/components/site/code/showcase";
 import { StackRow } from "@/components/site/stack/section";
@@ -55,16 +56,29 @@ export default async function Page({ params }: PageProps) {
   const proofLinkLabel = content(blocks, "proof_link_label", "");
 
   const codeEyebrow = content(blocks, "code_eyebrow", "How I build");
-  const codeHeading = content(
-    blocks,
-    "code_heading",
-    "Automation that ships itself"
-  );
+  const codeHeading = content(blocks, "code_heading", "Three rules I don't break");
   const codeIntro = content(
     blocks,
     "code_intro",
-    "Pipelines, integrations and internal tools that run unattended — typed end to end, deployed with zero downtime."
+    "How every project gets built, from first commit to what's live."
   );
+  const codePrinciples = [
+    content(
+      blocks,
+      "code_principle_1",
+      "Typed end to end — if it compiles, it's already half-tested."
+    ),
+    content(
+      blocks,
+      "code_principle_2",
+      "Ship small, ship often — every push deploys, zero downtime."
+    ),
+    content(
+      blocks,
+      "code_principle_3",
+      "Real data, real users — tested on the real flow before anyone sees it."
+    ),
+  ].filter(Boolean);
 
   const stackEyebrow = content(blocks, "stack_eyebrow", "Stack");
   const stackHeading = content(blocks, "stack_heading", "One toolchain, end to end");
@@ -134,6 +148,7 @@ export default async function Page({ params }: PageProps) {
         eyebrow={codeEyebrow}
         heading={codeHeading}
         intro={codeIntro}
+        principles={codePrinciples}
       />
       <Suspense fallback={<GlobalLoader />}>
         <Proof
@@ -143,7 +158,7 @@ export default async function Page({ params }: PageProps) {
           linkLabel={proofLinkLabel}
         />
       </Suspense>
-      <Surfaces
+      <SurfacesBento
         eyebrow={surfacesEyebrow}
         heading={surfacesHeading}
         intro={surfacesIntro}

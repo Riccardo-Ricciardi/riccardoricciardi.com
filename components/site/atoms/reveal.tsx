@@ -2,22 +2,29 @@
 
 import { motion, useReducedMotion, type Variants } from "motion/react";
 
+type RevealVariant = "fade-up" | "rise" | "scale";
+
 interface RevealProps {
   children: React.ReactNode;
   as?: "div" | "section" | "li" | "span";
-  variant?: "fade-up" | "clip";
+  variant?: RevealVariant;
   delayMs?: number;
   className?: string;
 }
 
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0 },
-};
-
-const clip: Variants = {
-  hidden: { opacity: 0, clipPath: "inset(0 100% 0 0)" },
-  show: { opacity: 1, clipPath: "inset(0 0% 0 0)" },
+const VARIANTS: Record<RevealVariant, Variants> = {
+  "fade-up": {
+    hidden: { opacity: 0, y: 24 },
+    show: { opacity: 1, y: 0 },
+  },
+  rise: {
+    hidden: { opacity: 0, y: 52 },
+    show: { opacity: 1, y: 0 },
+  },
+  scale: {
+    hidden: { opacity: 0, scale: 0.92, y: 16 },
+    show: { opacity: 1, scale: 1, y: 0 },
+  },
 };
 
 export function Reveal({
@@ -35,7 +42,7 @@ export function Reveal({
   }
 
   const MotionTag = motion[as] as typeof motion.div;
-  const variants = variant === "clip" ? clip : fadeUp;
+  const variants = VARIANTS[variant];
 
   return (
     <MotionTag

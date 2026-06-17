@@ -4,6 +4,13 @@
     max-width: var(--container-max-width, 1400px);
     margin-inline: auto;
     padding-inline: 1rem;
+  }
+  /* Single full-height frame: the only place the lateral borders live, so the
+     left/right rules run unbroken down the whole page at any viewport width. */
+  .page-frame {
+    width: 100%;
+    max-width: var(--container-max-width, 1400px);
+    margin-inline: auto;
     border-left: 1px solid var(--border-subtle);
     border-right: 1px solid var(--border-subtle);
   }
