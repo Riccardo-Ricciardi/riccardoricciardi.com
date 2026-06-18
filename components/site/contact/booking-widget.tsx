@@ -640,7 +640,7 @@ function ConfirmDialog({
       }}
     >
       <div className="w-full max-w-md card-base card-flush rounded-surface overflow-hidden">
-        <header className="border-b border-dashed-soft p-5">
+        <header className="border-b border-dashed-soft p-6">
           <p className="text-eyebrow">
             {labels.confirmTitle}
           </p>
@@ -653,7 +653,7 @@ function ConfirmDialog({
         </header>
         <form
           action={formAction}
-          className="flex flex-col gap-3 p-5"
+          className="flex flex-col gap-3 p-6"
           noValidate
         >
           <input type="hidden" name="start" value={slot.start} />

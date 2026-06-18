@@ -46,6 +46,8 @@ export async function generateMetadata({
   ]);
 
   const description = content(blocks, "meta_home_description", "");
+  const role = content(blocks, "meta_role", "");
+  const homeTitle = role ? `${title} — ${role}` : title;
 
   const languages = Object.fromEntries(
     codes.map((l) => [l, `${baseUrl}/${l}`])
@@ -53,7 +55,7 @@ export async function generateMetadata({
 
   return {
     metadataBase: new URL(baseUrl),
-    title: { default: title, template: `%s | ${title}` },
+    title: { default: homeTitle, template: `%s | ${title}` },
     description,
     applicationName: title,
     authors: [{ name: APP_CONFIG.author.name }],
@@ -67,13 +69,13 @@ export async function generateMetadata({
       type: "website",
       url: `${baseUrl}${path}`,
       siteName: title,
-      title,
+      title: homeTitle,
       description,
       locale,
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: homeTitle,
       description,
     },
     robots: {
@@ -109,12 +111,12 @@ export default async function LocaleLayout({
   }));
 
   const ariaLabels = {
-    nav: content(blocks, "aria_nav", ""),
-    menu: content(blocks, "aria_menu", ""),
-    language: content(blocks, "aria_language", ""),
-    theme: content(blocks, "aria_theme", ""),
-    home: content(blocks, "aria_home", ""),
-    skip: content(blocks, "aria_skip", ""),
+    nav: content(blocks, "aria_nav", "Main navigation"),
+    menu: content(blocks, "aria_menu", "Menu"),
+    language: content(blocks, "aria_language", "Language"),
+    theme: content(blocks, "aria_theme", "Theme"),
+    home: content(blocks, "aria_home", "Riccardo Ricciardi — Home"),
+    skip: content(blocks, "aria_skip", "Skip to main content"),
   };
 
   const errorCopy = {

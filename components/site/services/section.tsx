@@ -19,16 +19,16 @@ interface ServicesProps {
 }
 
 const SERVICE_ICONS: Record<string, LucideIcon> = {
-  "desktop-automation": Workflow,
-  "full-stack-product": Layers,
-  "integrations-rescue": Wrench,
+  "fullstack-web": Layers,
+  "refactor-migrations": Wrench,
+  integrations: Workflow,
 };
 
 // Illustrative command per playbook (technical token, not localized copy).
 const SERVICE_CMD: Record<string, string> = {
-  "desktop-automation": "automate --desktop",
-  "full-stack-product": "ship --full-stack",
-  "integrations-rescue": "rescue --integration",
+  "fullstack-web": "ship --full-stack",
+  "refactor-migrations": "refactor --safe",
+  integrations: "wire --integrations",
 };
 
 export function Services({

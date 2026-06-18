@@ -16,7 +16,7 @@ export async function GithubStrip({ locale, heading }: GithubStripProps) {
       aria-labelledby="github-strip-heading"
       className="container-page section-y"
     >
-      <div className="content-narrow flex flex-col gap-5">
+      <div className="content-narrow flex flex-col gap-8">
         <h2 id="github-strip-heading" className="text-h3 text-balance">
           {heading}
         </h2>
@@ -42,11 +42,11 @@ export async function GithubStrip({ locale, heading }: GithubStripProps) {
 export function GithubStripSkeleton() {
   return (
     <section className="container-page section-y">
-      <div className="content-narrow flex flex-col gap-5">
+      <div className="content-narrow flex flex-col gap-8">
         <div className="h-6 w-64 animate-pulse rounded bg-muted" />
         <div className="flex flex-wrap gap-2">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-7 w-28 animate-pulse rounded-full bg-muted" />
+            <div key={i} className="h-7 w-28 animate-pulse rounded-[var(--radius-pill)] bg-muted" />
           ))}
         </div>
       </div>

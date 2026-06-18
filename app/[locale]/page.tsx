@@ -5,7 +5,6 @@ import { Proof } from "@/components/site/proof/section";
 import { type SurfaceEntry } from "@/components/site/surfaces/section";
 import { SurfacesBento } from "@/components/site/surfaces/bento";
 import { Services, type ServiceItem } from "@/components/site/services/section";
-import { CodeShowcase } from "@/components/site/code/showcase";
 import { StackRow } from "@/components/site/stack/section";
 import { ClosingCta } from "@/components/site/closing-cta";
 import { GlobalLoader } from "@/components/global-loader";
@@ -49,36 +48,12 @@ export default async function Page({ params }: PageProps) {
     "RICCARDO RICCIARDI · SOFTWARE & AUTOMATION"
   );
   const heroPrimary = content(blocks, "hero_cta_primary", "See what's running");
+  const heroAvailability = content(blocks, "hero_availability", "Available for new work");
   const contactLabel = content(blocks, "contact_label", "");
 
   const proofEyebrow = content(blocks, "proof_eyebrow", "");
   const proofHeading = content(blocks, "proof_heading", "");
   const proofLinkLabel = content(blocks, "proof_link_label", "");
-
-  const codeEyebrow = content(blocks, "code_eyebrow", "How I build");
-  const codeHeading = content(blocks, "code_heading", "Three rules I don't break");
-  const codeIntro = content(
-    blocks,
-    "code_intro",
-    "How every project gets built, from first commit to what's live."
-  );
-  const codePrinciples = [
-    content(
-      blocks,
-      "code_principle_1",
-      "Typed end to end — if it compiles, it's already half-tested."
-    ),
-    content(
-      blocks,
-      "code_principle_2",
-      "Ship small, ship often — every push deploys, zero downtime."
-    ),
-    content(
-      blocks,
-      "code_principle_3",
-      "Real data, real users — tested on the real flow before anyone sees it."
-    ),
-  ].filter(Boolean);
 
   const stackEyebrow = content(blocks, "stack_eyebrow", "Stack");
   const stackHeading = content(blocks, "stack_heading", "One toolchain, end to end");
@@ -90,8 +65,8 @@ export default async function Page({ params }: PageProps) {
   const stackGroupLabels = {
     languages: content(blocks, "stack_group_languages", "Languages"),
     frontend: content(blocks, "stack_group_frontend", "Frontend"),
-    backend: content(blocks, "stack_group_backend", "Backend & Infra"),
-    hardware: content(blocks, "stack_group_hardware", "Hardware & QA"),
+    backend: content(blocks, "stack_group_backend", "Backend"),
+    hardware: content(blocks, "stack_group_hardware", "Embedded"),
   };
 
   const surfacesEyebrow = content(blocks, "surfaces_eyebrow", "");
@@ -115,20 +90,20 @@ export default async function Page({ params }: PageProps) {
   const servicesHeading = content(blocks, "services_heading", "");
   const serviceItems: ServiceItem[] = [
     {
-      id: "desktop-automation",
-      title: content(blocks, "service_desktop-automation_title", ""),
-      body: content(blocks, "service_desktop-automation_body", ""),
+      id: "fullstack-web",
+      title: content(blocks, "service_1_title", "Full-stack web app"),
+      body: content(blocks, "service_1_body", ""),
       primary: true,
     },
     {
-      id: "full-stack-product",
-      title: content(blocks, "service_full-stack-product_title", ""),
-      body: content(blocks, "service_full-stack-product_body", ""),
+      id: "refactor-migrations",
+      title: content(blocks, "service_2_title", "Refactor & migrations"),
+      body: content(blocks, "service_2_body", ""),
     },
     {
-      id: "integrations-rescue",
-      title: content(blocks, "service_integrations-rescue_title", ""),
-      body: content(blocks, "service_integrations-rescue_body", ""),
+      id: "integrations",
+      title: content(blocks, "service_3_title", "Integrations"),
+      body: content(blocks, "service_3_body", ""),
     },
   ].filter((s) => s.title && s.body);
 
@@ -141,14 +116,9 @@ export default async function Page({ params }: PageProps) {
         wordmarkLine={heroWordmark}
         title={heroTitle}
         proofClause={heroProof}
+        availability={heroAvailability}
         primaryCta={{ label: heroPrimary, href: "#proof" }}
         secondaryCta={{ label: contactLabel, href: `/${locale}/contact` }}
-      />
-      <CodeShowcase
-        eyebrow={codeEyebrow}
-        heading={codeHeading}
-        intro={codeIntro}
-        principles={codePrinciples}
       />
       <Suspense fallback={<GlobalLoader />}>
         <Proof
@@ -158,24 +128,26 @@ export default async function Page({ params }: PageProps) {
           linkLabel={proofLinkLabel}
         />
       </Suspense>
-      <SurfacesBento
-        eyebrow={surfacesEyebrow}
-        heading={surfacesHeading}
-        intro={surfacesIntro}
-        entries={surfaceEntries}
-      />
-      <StackRow
-        eyebrow={stackEyebrow}
-        heading={stackHeading}
-        intro={stackIntro}
-        groupLabels={stackGroupLabels}
-      />
       <Services
         eyebrow={servicesEyebrow}
         heading={servicesHeading}
         items={serviceItems}
         contactHref={`/${locale}/contact`}
       />
+      <SurfacesBento
+        eyebrow={surfacesEyebrow}
+        heading={surfacesHeading}
+        intro={surfacesIntro}
+        entries={surfaceEntries}
+      />
+      <Suspense fallback={<GlobalLoader />}>
+        <StackRow
+          eyebrow={stackEyebrow}
+          heading={stackHeading}
+          intro={stackIntro}
+          groupLabels={stackGroupLabels}
+        />
+      </Suspense>
       <ClosingCta
         heading={closingHeading}
         sub={closingSub}

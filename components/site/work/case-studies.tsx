@@ -90,7 +90,7 @@ export async function CaseStudies({ locale, labels }: CaseStudiesProps) {
 
   return (
     <section className="container-page section-divider-b section-y">
-      <div className="content-narrow flex flex-col gap-20">
+      <div className="content-narrow flex flex-col gap-16">
         {studies.map((project) => (
           <CaseStudyArticle
             key={project.id}
@@ -106,7 +106,7 @@ export async function CaseStudies({ locale, labels }: CaseStudiesProps) {
 export function CaseStudiesSkeleton() {
   return (
     <section className="container-page section-divider-b section-y">
-      <div className="content-narrow flex flex-col gap-20">
+      <div className="content-narrow flex flex-col gap-16">
         {Array.from({ length: 2 }).map((_, i) => (
           <div key={i} className="flex flex-col gap-6">
             <div className="h-3 w-48 animate-pulse rounded bg-muted" />

@@ -14,12 +14,12 @@ export async function StackStrip({ heading, srLabel }: StackStripProps) {
   if (skills.length === 0) return null;
 
   return (
-    <section className="mt-16 border-t border-border pt-10 md:mt-20">
+    <section className="mt-16 border-t border-border pt-8 md:mt-24">
       <h2 className="text-h3">{heading}</h2>
       <span className="sr-only">{srLabel}</span>
       <div
         aria-hidden="true"
-        className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-4"
+        className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-4"
       >
         {skills.map((skill) => (
           <StackIcon key={skill.id} skill={skill} />

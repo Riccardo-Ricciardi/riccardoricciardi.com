@@ -88,7 +88,7 @@ export function ContactForm({ locale, labels }: ContactFormProps) {
       <form
         ref={formRef}
         action={formAction}
-        className="flex flex-col gap-5"
+        className="flex flex-col gap-6"
         noValidate
       >
         <input type="hidden" name="locale" value={locale} />

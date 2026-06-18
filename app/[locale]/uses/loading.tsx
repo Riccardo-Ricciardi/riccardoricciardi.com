@@ -29,9 +29,9 @@ export default function Loading() {
         ))}
       </div>
 
-      <div className="mt-16 border-t border-border pt-10 md:mt-20">
+      <div className="mt-16 border-t border-border pt-8 md:mt-24">
         <div className="h-5 w-48 animate-pulse rounded bg-muted" />
-        <div className="mt-6 flex flex-wrap gap-x-5 gap-y-4">
+        <div className="mt-6 flex flex-wrap gap-x-6 gap-y-4">
           {Array.from({ length: 12 }).map((_, i) => (
             <div key={i} className="size-6 animate-pulse rounded bg-muted" />
           ))}

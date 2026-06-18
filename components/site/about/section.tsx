@@ -101,7 +101,7 @@ export async function About({
             </div>
           )}
 
-          <ul className="mt-5 flex w-full max-w-sm list-none flex-col gap-2.5 p-0">
+          <ul className="mt-6 flex w-full max-w-sm list-none flex-col gap-2.5 p-0">
             <li className="text-telemetry">{facts.location}</li>
             <li className="text-telemetry">{facts.languages}</li>
             <li className="text-telemetry">{facts.availability}</li>
@@ -118,7 +118,7 @@ export async function About({
           </ul>
         </aside>
 
-        <div className="flex flex-col gap-8 md:gap-10">
+        <div className="flex flex-col gap-8 md:gap-12">
           {sections.length === 0 ? (
             <EmptyState
               icon={FileText}

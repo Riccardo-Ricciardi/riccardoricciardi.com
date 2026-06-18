@@ -51,13 +51,13 @@ export function ContactPanels({
         </button>
       </div>
 
-      <div className="mt-6 grid items-start gap-10 lg:mt-0 lg:grid-cols-2 lg:gap-12">
+      <div className="mt-6 grid items-start gap-12 lg:mt-0 lg:grid-cols-2 lg:gap-12">
         <section
           id="contact-panel-write"
           aria-label={writeLabel}
           className={cn(active !== "write" && "hidden", "lg:block")}
         >
-          <h2 className="text-h3 mb-5 hidden lg:block">{writeLabel}</h2>
+          <h2 className="text-h3 mb-6 hidden lg:block">{writeLabel}</h2>
           {form}
         </section>
         <section
@@ -65,7 +65,7 @@ export function ContactPanels({
           aria-label={callLabel}
           className={cn(active !== "call" && "hidden", "lg:block")}
         >
-          <h2 className="text-h3 mb-5 hidden lg:block">{callLabel}</h2>
+          <h2 className="text-h3 mb-6 hidden lg:block">{callLabel}</h2>
           {booking}
         </section>
       </div>

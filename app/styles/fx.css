@@ -162,30 +162,6 @@
     );
   }
 
-  /* ── 4. spotlight: glow che segue il cursore (--mx/--my via JS) ── */
-  .spotlight {
-    position: relative;
-  }
-  .spotlight::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background: radial-gradient(
-      220px circle at var(--mx, 50%) var(--my, -20%),
-      var(--glow-soft),
-      transparent 62%
-    );
-    opacity: 0;
-    transition: opacity var(--dur-slow) var(--ease-standard);
-    z-index: 0;
-  }
-  .spotlight:hover::after,
-  .spotlight:focus-within::after {
-    opacity: 1;
-  }
-
   /* surface elevata con glow firma (per il visual hero + terminal) */
   .surface-glow {
     box-shadow: var(--elev-glow);
@@ -269,25 +245,12 @@
     }
   }
 
-  /* ── brandmark wireframe: faint outline, accent on group-hover ────── */
+  /* ── brandmark: faint static silhouette (hero bg watermark) ── */
   .logo-mark path {
-    stroke: color-mix(in srgb, var(--foreground) 10%, transparent);
-    transition: stroke 0.55s var(--ease-standard);
+    fill: color-mix(in srgb, var(--foreground) 8%, transparent);
   }
-  .group:hover .logo-mark path {
-    stroke: color-mix(in srgb, var(--accent-blue) 72%, transparent);
-  }
-  .hero-logo-mark {
-    -webkit-mask-image: radial-gradient(
-      90% 75% at 60% 50%,
-      #000 30%,
-      transparent 78%
-    );
-    mask-image: radial-gradient(
-      90% 75% at 60% 50%,
-      #000 30%,
-      transparent 78%
-    );
+  .dark .logo-mark path {
+    fill: color-mix(in srgb, var(--foreground) 6%, transparent);
   }
 
   /* ── draw-on-view: stroke a wireframe in as it scrolls into view ─── */

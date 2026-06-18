@@ -37,7 +37,7 @@ export function UsesList({ items }: UsesListProps) {
           key={category}
           aria-label={category}
           className={cn(
-            "grid gap-x-12 gap-y-6 py-10 first:pt-0 last:pb-0 md:grid-cols-[11rem_1fr]",
+            "grid gap-x-12 gap-y-6 py-8 first:pt-0 last:pb-0 md:grid-cols-[11rem_1fr]",
             idx > 0 && "border-t border-border"
           )}
         >

@@ -81,7 +81,7 @@ export function Contact({
         {email && (
           <a
             href={`mailto:${email}`}
-            className="text-telemetry mt-5 transition-colors hover:text-foreground"
+            className="text-telemetry mt-6 transition-colors hover:text-foreground"
           >
             {email}
           </a>

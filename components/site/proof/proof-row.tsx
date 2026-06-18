@@ -101,6 +101,7 @@ export function ProofRow({ project, locale, linkLabel, layout }: ProofRowProps) 
   const { stateLabel, segments } = telemetryParts(project);
   const href = `/${locale}/work#${project.slug ?? project.id}`;
   const image = project.screenshot_url ?? project.og_image;
+  const hasImage = Boolean(image);
 
   if (layout === "banner") {
     return (
@@ -150,7 +151,7 @@ export function ProofRow({ project, locale, linkLabel, layout }: ProofRowProps) 
             mirrored && "lg:order-2"
           )}
         >
-          <TelemetryLine stateLabel={stateLabel} segments={segments.slice(0, 1)} />
+          <TelemetryLine stateLabel={stateLabel} />
           <h3 className="text-h3 text-foreground">{project.name}</h3>
           <p className="text-body-lg text-muted-foreground">
             {project.description}
@@ -160,11 +161,13 @@ export function ProofRow({ project, locale, linkLabel, layout }: ProofRowProps) 
               {project.outcome}
             </p>
           )}
-          <div className="flex flex-wrap gap-2">
-            {project.metrics.map((metric) => (
-              <AnimatedMetricChip key={metric}>{metric}</AnimatedMetricChip>
-            ))}
-          </div>
+          {hasImage && (
+            <div className="flex flex-wrap gap-2">
+              {project.metrics.map((metric) => (
+                <AnimatedMetricChip key={metric}>{metric}</AnimatedMetricChip>
+              ))}
+            </div>
+          )}
           <span className="text-body-sm flex items-center gap-1 text-signal">
             <span className="link-underline">{linkLabel}</span>
             <ArrowRight
@@ -179,7 +182,7 @@ export function ProofRow({ project, locale, linkLabel, layout }: ProofRowProps) 
             <div className="card-base card-flush overflow-hidden">
               <Image
                 src={image}
-                alt={project.name || project.slug || "Project screenshot"}
+                alt={`${project.name ?? project.slug ?? "Project"} — screenshot of the ${project.surface ?? "app"} interface`}
                 width={1280}
                 height={800}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 640px"

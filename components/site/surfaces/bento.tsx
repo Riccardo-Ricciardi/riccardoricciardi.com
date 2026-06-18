@@ -11,7 +11,6 @@ import {
 import { cn } from "@/utils/cn";
 import { Heading } from "@/components/site/atoms/heading";
 import { Reveal } from "@/components/site/atoms/reveal";
-import { SpotlightGroup } from "@/components/site/fx/spotlight";
 import { DrawOnView } from "@/components/site/fx/draw-on-view";
 import { Parallax } from "@/components/site/fx/parallax";
 import type { SurfaceEntry } from "@/components/site/surfaces/section";
@@ -39,7 +38,7 @@ const PLACEMENT: Record<string, string> = {
 };
 
 const CARD_BASE =
-  "card-base spotlight group relative flex h-full flex-col overflow-hidden p-5 transition-colors hover:border-accent-blue no-underline";
+  "card-base group relative flex h-full flex-col overflow-hidden transition-colors hover:border-accent-blue no-underline";
 
 function CardHeader({ entry }: { entry: SurfaceEntry }) {
   const Icon = ICONS[entry.id];
@@ -76,7 +75,7 @@ function Shell({ entry, children }: { entry: SurfaceEntry; children: React.React
 function WindowsCard({ entry }: { entry: SurfaceEntry }) {
   const Icon = ICONS[entry.id];
   return (
-    <Link href={entry.href ?? "#"} className={cn(CARD_BASE, "min-h-[20rem] p-6")}>
+    <Link href={entry.href ?? "#"} className={cn(CARD_BASE, "min-h-[20rem]")}>
       <CardHeader entry={entry} />
       <p className="mt-3 max-w-md text-body text-muted-foreground">{entry.line}</p>
 
@@ -265,13 +264,13 @@ function CardFor({ entry }: { entry: SurfaceEntry }) {
 export function SurfacesBento({ eyebrow, heading, intro, entries }: BentoProps) {
   return (
     <section className="section-divider-b">
-      <div className="container-page section-y flex flex-col gap-10">
+      <div className="container-page section-y flex flex-col gap-12">
         <Parallax speed={0.04}>
           <Reveal variant="fade-up">
             <Heading level="h2" eyebrow={eyebrow} title={heading} subtitle={intro} />
           </Reveal>
         </Parallax>
-        <SpotlightGroup className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2">
+        <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2">
           {entries.map((entry, i) => (
             <Reveal
               key={entry.id}
@@ -282,7 +281,7 @@ export function SurfacesBento({ eyebrow, heading, intro, entries }: BentoProps) 
               <CardFor entry={entry} />
             </Reveal>
           ))}
-        </SpotlightGroup>
+        </div>
       </div>
     </section>
   );

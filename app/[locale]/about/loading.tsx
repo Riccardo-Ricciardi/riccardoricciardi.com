@@ -9,14 +9,14 @@ export default function Loading() {
       <div className="grid gap-8 md:grid-cols-[1fr_2fr] md:gap-12 lg:gap-16">
         <div>
           <div className="aspect-[4/5] w-full max-w-sm animate-pulse rounded-surface bg-muted" />
-          <div className="mt-5 flex max-w-sm flex-col gap-2.5">
+          <div className="mt-6 flex max-w-sm flex-col gap-2.5">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-3 w-36 animate-pulse rounded bg-muted" />
             ))}
           </div>
         </div>
 
-        <div className="flex flex-col gap-8 md:gap-10">
+        <div className="flex flex-col gap-8 md:gap-12">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="flex flex-col gap-3">
               <div className="flex items-baseline gap-3">

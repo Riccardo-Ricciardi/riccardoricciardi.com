@@ -15,6 +15,7 @@ interface HeroProps {
   wordmarkLine: string;
   title: string;
   proofClause: string;
+  availability?: string;
   primaryCta: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
 }
@@ -25,6 +26,7 @@ export function Hero({
   wordmarkLine,
   title,
   proofClause,
+  availability,
   primaryCta,
   secondaryCta,
 }: HeroProps) {
@@ -44,11 +46,9 @@ export function Hero({
     <section ref={ref} className="section-divider-b relative overflow-hidden">
       <div
         aria-hidden="true"
-        className="group pointer-events-none absolute inset-y-0 right-0 z-20 hidden w-[42%] items-center justify-end sm:flex"
+        className="pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-[42%] items-center justify-center sm:flex"
       >
-        <div className="pointer-events-auto flex h-[112%] items-center">
-          <LogoMark className="hero-logo-mark h-full w-auto translate-x-[14%]" />
-        </div>
+        <LogoMark className="h-[58%] w-auto" />
       </div>
 
       <motion.div
@@ -107,6 +107,9 @@ export function Hero({
             <Link href={secondaryCta.href} className="btn-base btn-lg btn-ghost">
               {secondaryCta.label}
             </Link>
+          )}
+          {availability && (
+            <span className="pill-base pill-mono ml-1">{availability}</span>
           )}
         </motion.div>
       </motion.div>

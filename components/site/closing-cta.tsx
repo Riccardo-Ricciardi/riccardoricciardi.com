@@ -24,7 +24,7 @@ export function ClosingCta({
       <div className="container-page section-y relative">
         <Reveal
           variant="scale"
-          className="content-narrow flex flex-col items-center gap-5 text-center"
+          className="content-narrow flex flex-col items-center gap-6 text-center"
         >
           <span className="inline-flex items-center gap-2 rounded-[var(--radius-control)] border border-border bg-card px-3 py-1.5 font-mono text-sm">
             <span className="text-signal">$</span>
