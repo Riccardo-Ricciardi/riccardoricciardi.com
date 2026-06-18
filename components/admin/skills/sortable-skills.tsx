@@ -25,9 +25,6 @@ import type { Skill, SkillCategory } from "@/components/admin/types";
 import { SubmitButton } from "@/components/admin/actions/submit-button";
 import { DeleteButton } from "@/components/admin/actions/delete-button";
 import { cn } from "@/utils/cn";
-import { getSupabaseImageUrl } from "@/utils/env";
-
-const BASE_URL = getSupabaseImageUrl();
 
 interface Props {
   initial: Skill[];
@@ -134,7 +131,7 @@ function SortableRow({
     transition,
   };
 
-  const iconSrc = row.icon_url ?? `${BASE_URL}/${row.name}.png`;
+  const iconSrc = row.icon_url;
 
   return (
     <li
